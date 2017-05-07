@@ -21,8 +21,11 @@ defmodule ExDebugToolbar.Plug.CodeInjector do
     put_in conn.resp_body, body
   end
 
-  defp debug_toolbar_tag(_conn) do
-    "TOOLBAR"
+  defp debug_toolbar_tag(conn) do
+    path = ExDebugToolbar.Router.Helpers.static_path(conn, "/js/app.js")
+    """
+    <script src="#{path}"></script>
+    """
   end
 
   defp inject?(%Conn{status: 200} = conn) do

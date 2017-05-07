@@ -5,12 +5,13 @@ defmodule ExDebugToolbar.Plug.CodeInjectorTest do
   alias ExDebugToolbar.Plug.CodeInjector
 
   @default_conn_opts [status: 200, content_type: "text/html", body: ""]
+  @code "<script src=\"/__ex_debug_toolbar__/js/app.js\"></script>\n"
 
   test "it adds code before closing <body> tag" do
     html = "<html><body></body></html>"
     conn = conn_with_plug(body: html)
 
-    assert conn.resp_body == "<html><body>TOOLBAR</body></html>"
+    assert conn.resp_body == "<html><body>#{@code}</body></html>"
   end
 
   test "it does nothing if there is no body tag" do
@@ -38,12 +39,13 @@ defmodule ExDebugToolbar.Plug.CodeInjectorTest do
     html = '<html><body></body></html>'
     conn = conn_with_plug(body: html)
 
-    assert conn.resp_body == "<html><body>TOOLBAR</body></html>"
+    assert conn.resp_body == "<html><body>#{@code}</body></html>"
   end
 
   defp conn_with_plug(opts) do
     opts = Keyword.merge(@default_conn_opts, opts)
     conn(:get, "/")
+    |> put_private(:phoenix_endpoint, ExDebugToolbar.Endpoint)
     |> CodeInjector.call(%{})
     |> put_resp_content_type(opts[:content_type])
     |> send_resp(opts[:status], opts[:body])

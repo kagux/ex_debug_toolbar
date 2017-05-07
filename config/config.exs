@@ -7,7 +7,7 @@ use Mix.Config
 
 # Configures the endpoint
 config :ex_debug_toolbar, ExDebugToolbar.Endpoint,
-  url: [host: "localhost"],
+  url: [host: "localhost", path: "/__ex_debug_toolbar__"],
   secret_key_base: "v6SG14aYQCvYyk4rRq4HYYJ1GGXUIf23oWS5kmy0MngyWPTrlQAGnl1mvKkGy/Tj",
   render_errors: [view: ExDebugToolbar.ErrorView, accepts: ~w(html json)],
   pubsub: [name: ExDebugToolbar.PubSub,
