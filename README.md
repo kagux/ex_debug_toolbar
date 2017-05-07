@@ -1,19 +1,51 @@
-# ExDebugToolbar
+# Installation
+ 1. Add `ex_debug_toolbar` to your list of dependencies in `mix.exs`:
 
-To start your Phoenix app:
+    ```elixir
+    def deps do
+      [{:ex_debug_toolbar, "~> 1.0.0"}]
+    end
+    ```
 
-  * Install dependencies with `mix deps.get`
-  * Install Node.js dependencies with `npm install`
-  * Start Phoenix endpoint with `mix phoenix.server`
+  2. Add plug to your endpoint in `lib/my_app/endpoint.ex` before `plug MyApp.Router`
+  ```elixir
+    defmodule MyApp.Endpoint do
+      ...
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+      plug ExDebugToolbar.Plug
 
-Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
+      plug MyApp.Router
+    end
+  ```
+  3. Add forwarding rule to your router `MyApp.Router`
+  ```elixir
+    defmodule MyApp.Router
+      ...
 
-## Learn more
+      forward "/__ex_debug_toolbar__", ExDebugToolbar.Endpoint
+    end
 
-  * Official website: http://www.phoenixframework.org/
-  * Guides: http://phoenixframework.org/docs/overview
-  * Docs: https://hexdocs.pm/phoenix
-  * Mailing list: http://groups.google.com/group/phoenix-talk
-  * Source: https://github.com/phoenixframework/phoenix
+  ```
+# TODO
+[ ] Plugs
+  [ ] Forward `__ex_debug_toolbar__` path requests to `ExDebugToolbar.Endpoint`
+  [ ] Start `ExDebugToolbar.Request` to collect request metrics
+[ ] UI
+  [ ] Simple UI and connect it to channel
+  [ ] Interactive UI (investigate JS app vs HTML)
+[ ] Display POC metrics
+  [ ] Request time
+  [ ] Ecto queries count
+  [ ] Log entries count
+[ ] Cleanup unused modules
+[ ] Docs
+[ ] Simple installer mix task
+[ ] Upgrade to Phoenix 1.3
+[ ] Configurable URL path (instead of hardcoded `__ex_debug_toolbar__`)
+
+
+# Contribution
+  Contributions in the form of bug reports, pull requests, or thoughtful discussions in the GitHub issue tracker are welcome!
+
+## Demo App
+  Use [demo app](https://github.com/kagux/ex_debug_toolbar_demo) to simplify development process.
