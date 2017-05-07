@@ -17,14 +17,14 @@ defmodule ExDebugToolbar.Plug.CodeInjector do
 
   defp append_code_to_resp_body(conn) do
     resp_body = to_string(conn.resp_body)
-    body = String.replace(resp_body, "</body>", debug_toolbar_tag(conn) <> "</body>")
+    body = String.replace(resp_body, "</body>", debug_toolbar_tag() <> "</body>")
     put_in conn.resp_body, body
   end
 
-  defp debug_toolbar_tag(conn) do
-    path = ExDebugToolbar.Router.Helpers.static_path(conn, "/js/app.js")
+  defp debug_toolbar_tag do
+    path = ExDebugToolbar.Router.Helpers.static_path(ExDebugToolbar.Endpoint, "/js/app.js")
     """
-    <script src="#{path}"></script>
+    <script src="/__ex_debug_toolbar__#{path}"></script>
     """
   end
 

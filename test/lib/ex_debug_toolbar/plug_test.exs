@@ -6,7 +6,6 @@ defmodule ExDebugToolbar.PlugTest do
 
   test "it works" do
     conn = conn(:get, "/")
-    |> put_private(:phoenix_endpoint, ExDebugToolbar.Endpoint)
     |> Plug.call(%{})
     |> put_resp_content_type("text/html")
     |> send_resp(200, "<html><body></body></html>")

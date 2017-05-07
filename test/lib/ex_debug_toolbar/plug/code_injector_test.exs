@@ -45,7 +45,6 @@ defmodule ExDebugToolbar.Plug.CodeInjectorTest do
   defp conn_with_plug(opts) do
     opts = Keyword.merge(@default_conn_opts, opts)
     conn(:get, "/")
-    |> put_private(:phoenix_endpoint, ExDebugToolbar.Endpoint)
     |> CodeInjector.call(%{})
     |> put_resp_content_type(opts[:content_type])
     |> send_resp(opts[:status], opts[:body])
