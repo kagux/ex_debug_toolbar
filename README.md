@@ -28,19 +28,31 @@
   ```
 # TODO
 [ ] Plugs
+
   [ ] Forward `__ex_debug_toolbar__` path requests to `ExDebugToolbar.Endpoint`
+
   [ ] Start `ExDebugToolbar.Request` to collect request metrics
+
 [ ] UI
+
   [ ] Simple UI and connect it to channel
+
   [ ] Interactive UI (investigate JS app vs HTML)
 [ ] Display POC metrics
+
   [ ] Request time
+
   [ ] Ecto queries count
+
   [ ] Log entries count
 [ ] Cleanup unused modules
+
 [ ] Docs
+
 [ ] Simple installer mix task
+
 [ ] Upgrade to Phoenix 1.3
+
 [ ] Configurable URL path (instead of hardcoded `__ex_debug_toolbar__`)
 
 
