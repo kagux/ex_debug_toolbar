@@ -38,6 +38,7 @@
   - [ ] Request time
   - [ ] Ecto queries count
   - [ ] Log entries count
+  - [ ] Open channels count
 - [ ] Cleanup unused modules
 - [ ] Docs
 - [ ] Simple installer mix task
