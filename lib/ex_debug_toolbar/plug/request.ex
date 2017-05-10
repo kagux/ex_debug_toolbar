@@ -8,9 +8,10 @@ defmodule ExDebugToolbar.Plug.Request do
       alias Plug.RequestId
 
       def call(conn, opts) do
-        header = Plug.RequestId.init(opts)
         conn = conn |> set_request_id(opts)
+        header = Plug.RequestId.init(opts)
         request_id = Plug.Conn.get_resp_header(conn, header) |> List.first
+        Process.put(:request_id, request_id)
         Request.start request_id
         conn = super(conn, opts)
         Request.put_path(conn.request_path)

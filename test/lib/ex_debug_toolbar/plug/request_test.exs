@@ -27,7 +27,13 @@ defmodule ExDebugToolbar.Plug.RequestTest do
   end
 
   test "it sets request id when it's missing" do
-    refute make_request(without_request_id: true) |> get_resp_header("x-request-id") |> Enum.empty?
+    request_id_header = make_request(without_request_id: true) |> get_resp_header("x-request-id")
+    assert request_id_header |> Enum.any?
+  end
+
+  test "it sets request id in process metadata" do
+    [request_id] = make_request() |> get_resp_header("x-request-id")
+    assert Process.get(:request_id) == request_id
   end
 
   test "it sets request path" do

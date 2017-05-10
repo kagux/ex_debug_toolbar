@@ -4,16 +4,17 @@ defmodule ExDebugToolbar.Request.Registry do
 
   @table :'$ex_debug_toolar_request_registry'
 
-  def register(%Request{} = request) do
+  def register(%Request{id: request_id} = request) do
     with_alive_registry fn ->
-      true = :ets.insert_new(@table, {self(), request})
+      true = :ets.insert_new(@table, {request_id, request})
       :ok
     end
   end
 
-  def update(changes) do
+  def update(changes), do: Process.get(:request_id) |> update(changes)
+  def update(request_id, changes) do
     with_alive_registry fn ->
-      GenServer.cast(__MODULE__, {:update, self(), changes})
+      GenServer.cast(__MODULE__, {:update, request_id, changes})
       :ok
     end
   end
@@ -25,24 +26,16 @@ defmodule ExDebugToolbar.Request.Registry do
 
     {:noreply, nil}
   end
-
-  defp apply_changes(request, changes) when is_map(changes) do
-    Map.merge(request, changes)
-  end
-
-  defp apply_changes(request, changes) when is_function(changes) do
-    changes.(request)
-  end
-
   def all do
     with_alive_registry fn ->
       :ets.match(@table, {:"_", :'$1'}) |> List.flatten
     end
   end
 
-  def lookup(pid \\ self()) do
-    case registry_alive?() && :ets.lookup(@table, pid) do
-      [{^pid, request}] -> {:ok, request}
+  def lookup, do: Process.get(:request_id) |> lookup
+  def lookup(request_id) do
+    case registry_alive?() && :ets.lookup(@table, request_id) do
+      [{^request_id, request}] -> {:ok, request}
       false ->
         {:error, :registry_not_running}
       [] -> {:error, :not_found}
@@ -69,5 +62,13 @@ defmodule ExDebugToolbar.Request.Registry do
     else
       {:error, :registry_not_running}
     end
+  end
+
+
+  defp apply_changes(request, changes) when is_map(changes) do
+    Map.merge(request, changes)
+  end
+  defp apply_changes(request, changes) when is_function(changes) do
+    changes.(request)
   end
 end

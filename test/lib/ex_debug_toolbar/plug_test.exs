@@ -25,10 +25,6 @@ defmodule ExDebugToolbar.PlugTest do
     assert make_request().assigns[:called?] == true
   end
 
-  test "it sets request id" do
-    refute make_request() |> get_resp_header("x-request-id") |> Enum.empty?
-  end
-
   test "it tracks all plugs execution time" do
     make_request timeout: 50
     assert {:ok, request} = lookup_request()
