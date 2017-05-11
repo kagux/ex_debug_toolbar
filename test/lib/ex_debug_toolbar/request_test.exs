@@ -4,28 +4,25 @@ defmodule ExDebugToolbar.RequestTest do
   alias ExDebugToolbar.Request
 
   describe "start_event/3" do
-    test "adds new event" do
-      request = %Request{events: []} |> Request.start_event("event")
-      assert request.events |> length == 1
-      event = request.events |> hd
+    test "adds first event" do
+      %{timeline: event} = %Request{} |> Request.start_event("event")
+      assert %Event{} = event
       assert event.name == "event"
       assert_in_delta :os.system_time(:micro_seconds), DateTime.to_unix(event.started_at, :microsecond), 5000
     end
 
     test "attaches metadata" do
-      request = %Request{events: []} |> Request.start_event("event", foo: :bar)
-      event = request.events |> hd
-      assert event.metadata == %{foo: :bar}
+      request = %Request{} |> Request.start_event("event", foo: :bar)
+      assert request.timeline.metadata == %{foo: :bar}
     end
   end
 
   describe "finish_event/2" do
-    test "it updates event with finish time and duration" do
+    test "it updates top event with finish time and duration" do
       started_at = DateTime.utc_now
       event = %Event{name: "event", started_at: started_at}
-      events = [%Event{}, event, %Event{}]
-      request = %Request{events: events} |> Request.finish_event("event")
-      [_, event, _] = request.events
+      request = %Request{timeline: event} |> Request.finish_event("event")
+      event = request.timeline
       assert :gt == DateTime.compare(event.finished_at, started_at)
       assert event.duration > 0
     end

@@ -4,23 +4,23 @@ defmodule ExDebugToolbar.Request do
 
   defstruct [
     id: nil,
-    events: [],
+    timeline: nil,
     metadata: %{},
     path: nil
   ]
 
   def start_event(%Request{} = request, event_name, opts \\ []) do
     event = %Event{name: event_name, started_at: DateTime.utc_now, metadata: Map.new(opts)}
-    Map.update!(request, :events, &[event | &1])
+    Map.put(request, :timeline, event)
   end
 
-  def finish_event(%Request{} = request, event_name) do
-    {head, [event | tail]} = request.events |> Enum.split_while(&(&1.name != event_name))
+  def finish_event(%Request{} = request, _event_name) do
+    event = request.timeline
     finished_at = DateTime.utc_now
     duration = DateTime.to_unix(finished_at, :microsecond) - DateTime.to_unix(event.started_at, :microsecond)
-    event = event |> Map.merge(%{finished_at: finished_at, duration: duration})
+    event = request.timeline |> Map.merge(%{finished_at: finished_at, duration: duration})
 
-    %{request | events: head ++ [event | tail]}
+    %{request | timeline: event}
   end
 
   def put_metadata(%Request{} = request, key, value) do

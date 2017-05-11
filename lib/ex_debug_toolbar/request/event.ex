@@ -4,6 +4,7 @@ defmodule ExDebugToolbar.Request.Event do
     started_at: nil,
     finished_at: nil,
     duration: 0,
-    metadata: %{}
+    metadata: %{},
+    events: []
   ]
 end

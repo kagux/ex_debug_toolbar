@@ -28,8 +28,7 @@ defmodule ExDebugToolbar.PhoenixTest do
   test "it tracks all plugs execution time" do
     make_request timeout: 50
     assert {:ok, request} = get_request()
-    event = request.events |> Enum.find(&(&1.name == "request"))
-    assert_in_delta event.duration, 50 * 1000, 5 * 1000 # 5ms delta
+    assert_in_delta request.timeline.duration, 50 * 1000, 5 * 1000 # 5ms delta
   end
 
   defp make_request(opts \\ []) do
