@@ -35,7 +35,7 @@ defmodule ExDebugToolbar.Request.RegistryTest do
       new_request = %Request{id: "r_2"}
       :ok = Registry.register(request)
       assert :ok = Registry.update("r_1", %{id: "r_2"})
-      assert {:ok, new_request} == lookup_request("r_1")
+      assert {:ok, new_request} == get_request("r_1")
     end
 
     test "updates request using function" do
@@ -44,7 +44,7 @@ defmodule ExDebugToolbar.Request.RegistryTest do
       :ok = Registry.register(request)
       updater = fn %Request{} = r -> Map.put(r, :id, "r_2") end
       assert :ok = Registry.update("r_1", updater)
-      assert {:ok, new_request} == lookup_request("r_1")
+      assert {:ok, new_request} == get_request("r_1")
     end
   end
 
@@ -54,7 +54,7 @@ defmodule ExDebugToolbar.Request.RegistryTest do
     :ok = Registry.register(request)
     Process.put(:request_id, "r_1")
     assert :ok = Registry.update(%{id: "r_2"})
-    assert {:ok, new_request} == lookup_request("r_1")
+    assert {:ok, new_request} == get_request("r_1")
   end
 
   describe "all/0" do

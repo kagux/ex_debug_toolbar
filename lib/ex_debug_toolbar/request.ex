@@ -1,39 +1,37 @@
 defmodule ExDebugToolbar.Request do
-  alias ExDebugToolbar.Request.Registry
+  alias ExDebugToolbar.Request.Event
   alias ExDebugToolbar.Request
 
   defstruct [
     id: nil,
-    started_at: nil,
-    finished_at: nil,
-    duration: 0,
+    events: [],
+    metadata: %{},
     path: nil
   ]
 
-  defdelegate lookup, to: Registry
-  defdelegate all, to: Registry
-
-  def start(request_id) do
-    request = %Request{
-      id: request_id,
-      started_at: DateTime.utc_now
-    }
-    :ok = Registry.register(request)
-    request
+  def start_event(%Request{} = request, event_name, opts \\ []) do
+    event = %Event{name: event_name, started_at: DateTime.utc_now, metadata: Map.new(opts)}
+    Map.update!(request, :events, &[event | &1])
   end
 
-  def finish do
+  def finish_event(%Request{} = request, event_name) do
+    {head, [event | tail]} = request.events |> Enum.split_while(&(&1.name != event_name))
     finished_at = DateTime.utc_now
-    Registry.update fn request ->
-      duration = DateTime.to_unix(finished_at, :microsecond) - DateTime.to_unix(request.started_at, :microsecond)
-      request
-      |> Map.put(:duration, duration)
-      |> Map.put(:finished_at, finished_at)
-    end
-  end
-  def finish(result), do: result
+    duration = DateTime.to_unix(finished_at, :microsecond) - DateTime.to_unix(event.started_at, :microsecond)
+    event = event |> Map.merge(%{finished_at: finished_at, duration: duration})
 
-  def put_path(path) do
-    Registry.update(%{path: path})
+    %{request | events: head ++ [event | tail]}
+  end
+
+  def put_metadata(%Request{} = request, key, value) do
+    request |> Map.update!(:metadata, &Map.put(&1, key, value))
+  end
+
+  def get_metadata(%Request{} = request, key, default \\ nil) do
+    Map.get(request.metadata, key, default)
+  end
+
+  def put_path(%Request{} = request, path) do
+    Map.put(request, :path, path)
   end
 end

@@ -23,7 +23,9 @@ defmodule ExDebugToolbar.Plug.CodeInjector do
 
   defp debug_toolbar_tag do
     path = ExDebugToolbar.Router.Helpers.static_path(ExDebugToolbar.Endpoint, "/js/app.js")
+    request_id = Process.get(:request_id)
     """
+    <script>window.requestId='#{request_id}';</script>
     <script src="/__ex_debug_toolbar__#{path}"></script>
     """
   end

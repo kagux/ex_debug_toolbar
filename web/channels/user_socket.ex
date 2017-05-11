@@ -2,7 +2,7 @@ defmodule ExDebugToolbar.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", ExDebugToolbar.RoomChannel
+  channel "toolbar:*", ExDebugToolbar.ToolbarChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

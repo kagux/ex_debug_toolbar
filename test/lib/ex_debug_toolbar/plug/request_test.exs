@@ -22,7 +22,7 @@ defmodule ExDebugToolbar.Plug.RequestTest do
 
   test "it tracks request" do
     [request_id] = make_request() |> get_resp_header("x-request-id")
-    assert {:ok, request} = lookup_request()
+    assert {:ok, request} = get_request()
     assert request.id == request_id
   end
 
@@ -38,7 +38,7 @@ defmodule ExDebugToolbar.Plug.RequestTest do
 
   test "it sets request path" do
     make_request()
-    {:ok, request} = lookup_request()
+    {:ok, request} = get_request()
     assert request.path == "/path"
   end
 

@@ -5,7 +5,12 @@ defmodule ExDebugToolbar.Plug.CodeInjectorTest do
   alias ExDebugToolbar.Plug.CodeInjector
 
   @default_conn_opts [status: 200, content_type: "text/html", body: "", path: "/"]
-  @code "<script src=\"/__ex_debug_toolbar__/js/app.js\"></script>\n"
+  @code "<script>window.requestId='request_123';</script>\n<script src=\"/__ex_debug_toolbar__/js/app.js\"></script>\n"
+
+  setup do
+    Process.put(:request_id, "request_123")
+    :ok
+  end
 
   test "it adds code before closing <body> tag" do
     html = "<html><body></body></html>"

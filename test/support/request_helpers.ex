@@ -1,17 +1,17 @@
 defmodule ExDebugToolbar.Test.Support.RequestHelpers do
-  alias ExDebugToolbar.Request.Registry
+  alias ExDebugToolbar.Toolbar
 
   def wait_for_registry do
     :timer.sleep 5
   end
 
-  def lookup_request do
+  def get_request do
     wait_for_registry()
-    Registry.lookup()
+    Toolbar.get_request()
   end
 
-  def lookup_request(id) do
+  def get_request(id) do
     wait_for_registry()
-    Registry.lookup(id)
+    Toolbar.get_request(id)
   end
 end

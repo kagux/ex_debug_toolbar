@@ -1,4 +1,4 @@
-defmodule UsingExDebugToolbarPlug do
+defmodule UsingExDebugToolbar do
   def init(opts), do: opts
   def call(conn, opts) do
     if timeout = Keyword.get(opts, :timeout) do
@@ -8,10 +8,10 @@ defmodule UsingExDebugToolbarPlug do
   end
 
   defoverridable [call: 2]
-  use ExDebugToolbar.Plug
+  use ExDebugToolbar.Phoenix
 end
 
-defmodule ExDebugToolbar.PlugTest do
+defmodule ExDebugToolbar.PhoenixTest do
   use ExUnit.Case, async: true
   use Plug.Test
   import Plug.Conn
@@ -27,13 +27,14 @@ defmodule ExDebugToolbar.PlugTest do
 
   test "it tracks all plugs execution time" do
     make_request timeout: 50
-    assert {:ok, request} = lookup_request()
-    assert_in_delta request.duration, 50 * 1000, 5 * 1000 # 5ms delta
+    assert {:ok, request} = get_request()
+    event = request.events |> Enum.find(&(&1.name == "request"))
+    assert_in_delta event.duration, 50 * 1000, 5 * 1000 # 5ms delta
   end
 
   defp make_request(opts \\ []) do
     conn(:get, "/")
-    |> UsingExDebugToolbarPlug.call(opts)
+    |> UsingExDebugToolbar.call(opts)
     |> put_resp_content_type("text/html")
     |> send_resp(200, "<html><body></body></html>")
   end
