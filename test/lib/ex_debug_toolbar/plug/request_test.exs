@@ -1,10 +1,12 @@
 defmodule UsingExDebugToolbarRequestPlug do
   use Plug.Builder
   use ExDebugToolbar.Plug.Request
+  require Logger
 
   plug :fake
 
   def fake(conn, _opts) do
+    Logger.debug "log entry"
     conn |> Plug.Conn.assign(:called?, true)
   end
 end
@@ -40,6 +42,13 @@ defmodule ExDebugToolbar.Plug.RequestTest do
     make_request()
     {:ok, request} = get_request()
     assert request.path == "/path"
+  end
+
+  test "it collects logs from logger" do
+    make_request()
+    {:ok, request} = get_request()
+    assert request.logs |> length > 0
+    assert request.logs |> Enum.find(&(&1.message) == "log entry")
   end
 
   defp make_request(opts \\ []) do

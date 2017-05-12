@@ -19,10 +19,10 @@ defmodule ExDebugToolbar.Request.Registry do
     end
   end
 
-  def handle_cast({:update, pid, changes}, _state) do
-    {:ok, request} = lookup(pid)
+  def handle_cast({:update, request_id, changes}, _state) do
+    {:ok, request} = lookup(request_id)
     request = apply_changes(request, changes)
-    true = :ets.insert(@table, {pid, request})
+    true = :ets.insert(@table, {request_id, request})
 
     {:noreply, nil}
   end

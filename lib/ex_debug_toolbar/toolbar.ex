@@ -35,6 +35,10 @@ defmodule ExDebugToolbar.Toolbar do
     update_request(&Request.put_path(&1, path))
   end
 
+  def add_log_entry(request_id, entry) do
+    Registry.update(request_id, &Request.add_log_entry(&1, entry))
+  end
+
   defp update_request(func) do
     get_request_id() |> Registry.update(func)
   end

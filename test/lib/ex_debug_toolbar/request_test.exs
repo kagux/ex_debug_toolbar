@@ -1,6 +1,6 @@
 defmodule ExDebugToolbar.RequestTest do
   use ExUnit.Case, async: true
-  alias ExDebugToolbar.Request.Event
+  alias ExDebugToolbar.Request.{Event, LogEntry}
   alias ExDebugToolbar.Request
 
   describe "start_event/3" do
@@ -43,5 +43,17 @@ defmodule ExDebugToolbar.RequestTest do
   test "put_path/1 sets path" do
     request = %Request{} |> Request.put_path("/my_path")
     assert request.path == "/my_path"
+  end
+
+  test "add_log_entry/3 adds new log entry to the list" do
+    timestamp = {{2000, 1, 1}, {13, 30, 15}}
+    metadata = [foo: :bar]
+    request = %Request{logs: [%LogEntry{}]} |> Request.add_log_entry({:debug, "log entry", timestamp, metadata})
+    log_entry = request.logs |> List.last
+    assert %LogEntry{} = log_entry
+    assert log_entry.level == :debug
+    assert log_entry.message == "log entry"
+    assert log_entry.metadata == metadata
+    assert log_entry.timestamp == timestamp
   end
 end

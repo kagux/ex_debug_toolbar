@@ -1,10 +1,11 @@
 defmodule ExDebugToolbar.Request do
-  alias ExDebugToolbar.Request.Event
+  alias ExDebugToolbar.Request.{Event, LogEntry}
   alias ExDebugToolbar.Request
 
   defstruct [
     id: nil,
     timeline: nil,
+    logs: [],
     metadata: %{},
     path: nil
   ]
@@ -33,5 +34,22 @@ defmodule ExDebugToolbar.Request do
 
   def put_path(%Request{} = request, path) do
     Map.put(request, :path, path)
+  end
+
+  def add_log_entry(%Request{} = request, entry) do
+    {level, message, timestamp, metadata} = entry
+    entry = %LogEntry{
+      level: level,
+      message: inspect(message),
+      metadata: inspect(metadata),
+      timestamp: inspect(timestamp)
+    }
+
+    logs = add_to_list(request.logs, entry)
+    %{request | logs: logs}
+  end
+
+  defp add_to_list(list, item) do
+    [item | Enum.reverse(list)] |> Enum.reverse
   end
 end
