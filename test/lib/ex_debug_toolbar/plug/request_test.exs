@@ -1,11 +1,10 @@
-defmodule UsingExDebugToolbarRequestPlug do
-  use Plug.Builder
-  use ExDebugToolbar.Plug.Request
+defmodule TimeoutPlug do
+  @behaviour Plug
 
-  plug :fake
-
-  def fake(conn, _opts) do
-    conn |> Plug.Conn.assign(:called?, true)
+  def init(opts), do: opts
+  def call(conn, opts) do
+    :timer.sleep Keyword.get(opts, :timeout, 0)
+    conn
   end
 end
 
@@ -14,7 +13,6 @@ defmodule ExDebugToolbar.Plug.RequestTest do
   use Plug.Test
   import Plug.Conn
   import ExDebugToolbar.Test.Support.RequestHelpers
-  alias Plug.RequestId
 
   test "it works" do
     assert {200, _, _} = sent_resp(make_request())
@@ -26,9 +24,10 @@ defmodule ExDebugToolbar.Plug.RequestTest do
     assert request.id == request_id
   end
 
-  test "it sets request id when it's missing" do
-    request_id_header = make_request(without_request_id: true) |> get_resp_header("x-request-id")
-    assert request_id_header |> Enum.any?
+  test "it tracks all following plugs execution time" do
+    make_request timeout: 50
+    assert {:ok, request} = get_request()
+    assert_in_delta request.timeline.duration, 50 * 1000, 5 * 1000 # 5ms delta
   end
 
   test "it sets request id in process metadata" do
@@ -44,9 +43,9 @@ defmodule ExDebugToolbar.Plug.RequestTest do
 
   defp make_request(opts \\ []) do
     conn = conn(:get, "/path")
-    conn = if opts[:without_request_id], do: conn, else: RequestId.call(conn, RequestId.init(opts))
-    conn
-    |> UsingExDebugToolbarRequestPlug.call(opts)
-    |> send_resp(200, "")
+    |> Plug.RequestId.call(Plug.RequestId.init([]))
+    |> ExDebugToolbar.Plug.Request.call(opts)
+    conn = if opts[:timeout], do: TimeoutPlug.call(conn, opts), else: conn
+    conn |> send_resp(200, "")
   end
 end
