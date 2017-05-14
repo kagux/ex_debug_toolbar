@@ -3,7 +3,7 @@ defmodule ExDebugToolbar.Mixfile do
 
   def project do
     [app: :ex_debug_toolbar,
-     version: "0.0.1",
+     version: "1.0.0",
      elixir: "~> 1.2",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
@@ -28,11 +28,14 @@ defmodule ExDebugToolbar.Mixfile do
   #
   # Type `mix help deps` for examples and options.
   defp deps do
-    [{:phoenix, "~> 1.2.1"},
-     {:phoenix_pubsub, "~> 1.0"},
-     {:phoenix_html, "~> 2.6"},
-     {:phoenix_live_reload, "~> 1.0", only: :dev},
-     {:gettext, "~> 0.11"},
-     {:cowboy, "~> 1.0"}]
+    [
+      {:phoenix, "~> 1.2.1"},
+      {:phoenix_pubsub, "~> 1.0"},
+      {:phoenix_html, "~> 2.6"},
+      {:phoenix_live_reload, "~> 1.0", only: :dev},
+      {:gettext, "~> 0.11"},
+      {:cowboy, "~> 1.0"},
+      {:mock, "~> 0.2", only: :test},
+    ]
   end
 end

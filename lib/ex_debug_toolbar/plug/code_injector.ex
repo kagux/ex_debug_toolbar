@@ -23,18 +23,20 @@ defmodule ExDebugToolbar.Plug.CodeInjector do
 
   defp debug_toolbar_tag do
     path = ExDebugToolbar.Router.Helpers.static_path(ExDebugToolbar.Endpoint, "/js/app.js")
+    request_id = Process.get(:request_id)
     """
+    <script>window.requestId='#{request_id}';</script>
     <script src="/__ex_debug_toolbar__#{path}"></script>
     """
   end
 
-  defp inject?(%Conn{status: 200} = conn) do
-    conn
-    |> get_resp_header("content-type")
-    |> html_content_type?
-  end
-  defp inject?(_), do: false
+  defp inject?(%Conn{request_path: "/phoenix/live_reload/frame"}), do: false
+  defp inject?(%Conn{status: status}) when status != 200, do: false
+  defp inject?(%Conn{} = conn), do: html_content_type?(conn)
 
+  defp html_content_type?(%Conn{} = conn) do
+    conn |> get_resp_header("content-type") |> html_content_type?
+  end
   defp html_content_type?([]), do: false
   defp html_content_type?([type | _]), do: String.starts_with?(type, "text/html")
 end

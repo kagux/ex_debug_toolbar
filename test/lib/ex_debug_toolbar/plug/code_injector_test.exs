@@ -4,8 +4,13 @@ defmodule ExDebugToolbar.Plug.CodeInjectorTest do
   import Plug.Conn
   alias ExDebugToolbar.Plug.CodeInjector
 
-  @default_conn_opts [status: 200, content_type: "text/html", body: ""]
-  @code "<script src=\"/__ex_debug_toolbar__/js/app.js\"></script>\n"
+  @default_conn_opts [status: 200, content_type: "text/html", body: "", path: "/"]
+  @code "<script>window.requestId='request_123';</script>\n<script src=\"/__ex_debug_toolbar__/js/app.js\"></script>\n"
+
+  setup do
+    Process.put(:request_id, "request_123")
+    :ok
+  end
 
   test "it adds code before closing <body> tag" do
     html = "<html><body></body></html>"
@@ -42,9 +47,16 @@ defmodule ExDebugToolbar.Plug.CodeInjectorTest do
     assert conn.resp_body == "<html><body>#{@code}</body></html>"
   end
 
+  test "it does nothing if request path is /phoenix/live_reload/frame" do
+    html = "<html><body></body></html>"
+    conn = conn_with_plug(body: html, path: "/phoenix/live_reload/frame")
+
+    assert conn.resp_body == html
+  end
+
   defp conn_with_plug(opts) do
     opts = Keyword.merge(@default_conn_opts, opts)
-    conn(:get, "/")
+    conn(:get, opts[:path])
     |> CodeInjector.call(%{})
     |> put_resp_content_type(opts[:content_type])
     |> send_resp(opts[:status], opts[:body])

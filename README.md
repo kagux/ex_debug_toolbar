@@ -7,14 +7,13 @@
     end
     ```
 
-  2. Add plug to your endpoint in `lib/my_app/endpoint.ex` before `plug MyApp.Router`
+  2. Add `ExDebugToolbar.Phoenix` to your endpoint in `lib/my_app/endpoint.ex` right before logger plug
   ```elixir
     defmodule MyApp.Endpoint do
       ...
-
-      plug ExDebugToolbar.Plug
-
-      plug MyApp.Router
+      use ExDebugToolbar.Phoenix
+      plug Plug.Logger
+      ...
     end
   ```
   3. Add forwarding rule to your router `MyApp.Router`
@@ -30,7 +29,6 @@
 - [ ] Plugs
   - [ ] Forward `__ex_debug_toolbar__` path requests to `ExDebugToolbar.Endpoint`
   - [ ] Start `ExDebugToolbar.Request` to collect request metrics
-
 - [ ] UI
   - [ ] Simple UI and connect it to channel
   - [ ] Interactive UI (investigate JS app vs HTML)
@@ -38,6 +36,8 @@
   - [ ] Request time
   - [ ] Ecto queries count
   - [ ] Log entries count
+  - [ ] Open channels count
+- [ ] Support nested events
 - [ ] Cleanup unused modules
 - [ ] Docs
 - [ ] Simple installer mix task
