@@ -31,8 +31,8 @@ defmodule ExDebugToolbar.Toolbar do
   def add_data(key, data), do: get_request_id() |> add_data(key, data)
 
   def add_data(%Request{} = request, key, data) do
-    container = Map.get_lazy(request, key, fn -> Collectable.init_container(data) end)
-    Map.put(request, key, Collectable.put(data, container))
+    container = Map.get_lazy(request.data, key, fn -> Collectable.init_container(data) end)
+    Map.update!(request, :data, &Map.put(&1, key, Collectable.put(data, container)))
   end
 
   def add_data(request_id, key, data) do
