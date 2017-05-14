@@ -9,7 +9,6 @@ defmodule ExDebugToolbar.Plug.Request do
   def call(conn, opts) do
     put_request_id_in_process(conn, opts)
     Toolbar.start_request
-    Toolbar.put_path(conn.request_path)
     Toolbar.start_event("request")
     Plug.Conn.register_before_send(conn, fn conn ->
       Toolbar.finish_event("request")

@@ -13,6 +13,7 @@ defmodule ExDebugToolbar.Plug.RequestTest do
   use Plug.Test
   import Plug.Conn
   import ExDebugToolbar.Test.Support.RequestHelpers
+  alias ExDebugToolbar.Data.Timeline
 
   test "it works" do
     assert {200, _, _} = sent_resp(make_request())
@@ -27,18 +28,12 @@ defmodule ExDebugToolbar.Plug.RequestTest do
   test "it tracks all following plugs execution time" do
     make_request timeout: 50
     assert {:ok, request} = get_request()
-    assert_in_delta request.timeline.duration, 50 * 1000, 5 * 1000 # 5ms delta
+    assert_in_delta Timeline.duration(request.timeline), 50 * 1000, 5 * 1000 # 5ms delta
   end
 
   test "it sets request id in process metadata" do
     [request_id] = make_request() |> get_resp_header("x-request-id")
     assert Process.get(:request_id) == request_id
-  end
-
-  test "it sets request path" do
-    make_request()
-    {:ok, request} = get_request()
-    assert request.path == "/path"
   end
 
   defp make_request(opts \\ []) do
