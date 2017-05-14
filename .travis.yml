@@ -1,0 +1,11 @@
+sudo: required
+language: generic
+
+services:
+  - docker
+
+before_install:
+  - docker build -f docker/test/Dockerfile -t ex_toolbar .
+
+script:
+  - docker run ex_toolbar mix test
