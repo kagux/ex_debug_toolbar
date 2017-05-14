@@ -36,7 +36,7 @@ defmodule ExDebugToolbar.Toolbar do
   end
 
   def add_data(request_id, key, data) do
-    Registry.update(request_id, &add_data(&1, key, data))
+    :ok = Registry.update(request_id, &add_data(&1, key, data))
   end
 
   defp get_request_id do
