@@ -1,15 +1,18 @@
 defmodule ExDebugToolbar.Data.MapTest do
   use ExUnit.Case, async: true
-  alias ExDebugToolbar.Data.Collectable
+  alias ExDebugToolbar.Data.{Collectable, Collection}
 
   test "implements collecable protocol" do
-    assert Collectable.init_container(%{}) == %{}
-    assert Collectable.put(%{foo: :bar}, %{}) == %{foo: :bar}
+    assert Collectable.init_collection(%{}) == %{}
   end
 
-  test "it overwrites container values" do
-    container = %{key: "old value", foo: :bar}
-    updated_container = Collectable.put(%{key: "new value"}, container)
-    assert updated_container == %{key: "new value", foo: :bar}
+  test "implements collecable collection protocol" do
+    assert Collection.change(%{}, %{foo: :bar}) == %{foo: :bar}
+  end
+
+  test "it overwrites collection values" do
+    collection = %{key: "old value", foo: :bar}
+    updated_collection = Collection.change(collection, %{key: "new value"})
+    assert updated_collection == %{key: "new value", foo: :bar}
   end
 end

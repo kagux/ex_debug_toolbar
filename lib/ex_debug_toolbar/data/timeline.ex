@@ -1,5 +1,5 @@
 defmodule ExDebugToolbar.Data.Timeline do
-  alias ExDebugToolbar.Data.{Event, Timeline}
+  alias ExDebugToolbar.Data.Timeline
 
   defstruct [
     events: []
@@ -12,24 +12,27 @@ defmodule ExDebugToolbar.Data.Timeline do
     |> Enum.sum
   end
 
-  def upsert_event(%Timeline{} = timeline, %Event{} = event) do
-    case {timeline.events, event.name} do
-      {[], _} -> insert_event(timeline, event)
-      {[%{name: name} | _], other} when name != other -> insert_event(timeline, event)
-      {[%{started_at: time, name: name}], name} when not is_nil(time) -> update_last_event(timeline)
-    end
+  def start_event(%Timeline{} = timeline, name) do
+    event = %Timeline.Event{name: name, started_at: DateTime.utc_now()}
+    %{timeline | events: [event | timeline.events]}
   end
 
-  defp update_last_event(%{events: [event | other_events]} = timeline) do
+  def finish_event(%Timeline{events: [event | other_events]} = timeline, _name) do
     finished_at = DateTime.utc_now
     duration = DateTime.to_unix(finished_at, :microsecond) - DateTime.to_unix(event.started_at, :microsecond)
     event = %{event | duration: duration}
     %{timeline | events: [event | other_events]}
   end
-  
-  defp insert_event(timeline, event) do
-    event = %{event | started_at: DateTime.utc_now()}
-    %{timeline | events: [event | timeline.events]}
-  end
 end
 
+alias ExDebugToolbar.Data.{Collection, Timeline, Timeline.Action}
+
+defimpl Collection, for: Timeline do
+  def change(timeline, %Action{action: :start_event, event_name: name}) do
+    Timeline.start_event(timeline, name)
+  end
+
+  def change(timeline, %Action{action: :finish_event, event_name: name}) do
+    Timeline.finish_event(timeline, name)
+  end
+end

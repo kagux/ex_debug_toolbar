@@ -1,7 +1,7 @@
 defmodule ExDebugToolbar.Toolbar do
   alias ExDebugToolbar.Request.Registry
   alias ExDebugToolbar.Request
-  alias ExDebugToolbar.Data.{Collectable, Event}
+  alias ExDebugToolbar.Data.{Collectable, Collection, Timeline}
 
   def start_request do
     request = %Request{id: get_request_id()}
@@ -14,11 +14,11 @@ defmodule ExDebugToolbar.Toolbar do
   defdelegate get_all_requests, to: Registry, as: :all
 
   def start_event(name) do
-    add_data(:timeline, %Event{name: name})
+    add_data(:timeline, %Timeline.Action{action: :start_event, event_name: name})
   end
 
   def finish_event(name) do
-    add_data(:timeline, %Event{name: name})
+    add_data(:timeline, %Timeline.Action{action: :finish_event, event_name: name})
   end
 
   def record_event(name, func) do
@@ -38,7 +38,7 @@ defmodule ExDebugToolbar.Toolbar do
   end
 
   defp update_request(%Request{} = request, key, data) do
-    container = Map.get_lazy(request.data, key, fn -> Collectable.init_container(data) end)
-    Map.update!(request, :data, &Map.put(&1, key, Collectable.put(data, container)))
+    collection = Map.get_lazy(request.data, key, fn -> Collectable.init_collection(data) end)
+    Map.update!(request, :data, &Map.put(&1, key, Collection.change(collection, data)))
   end
 end
