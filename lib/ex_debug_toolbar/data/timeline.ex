@@ -16,16 +16,21 @@ defmodule ExDebugToolbar.Data.Timeline do
     %{timeline | queue: [event | timeline.queue]}
   end
 
-  def finish_event(%Timeline{queue: [event], events: events} = timeline, name) do
+  def finish_event(%Timeline{queue: [%{name: name} = event]} = timeline, name) do
+    events = timeline.events
     closed_event = update_duration(event)
-    %{timeline | queue: [], events: [closed_event | events], duration: closed_event.duration + timeline.duration}
+    %{timeline |
+      queue: [],
+      events: [closed_event | events],
+      duration: closed_event.duration + timeline.duration
+    }
   end
-  def finish_event(%Timeline{queue: [event | [parent | rest]], events: events} = timeline, name) do
+  def finish_event(%Timeline{queue: [%{name: name} = event | [parent | rest]]} = timeline, name) do
     closed_event = update_duration(event)
-    new_parent = %{parent | events: [event | parent.events]}
-
+    new_parent = %{parent | events: [closed_event | parent.events]}
     %{timeline | queue: [new_parent | rest]}
   end
+  def finish_event(_timeline, name), do: raise "the event #{name} is not open"
 
   defp update_duration(event) do
     finished_at = DateTime.utc_now

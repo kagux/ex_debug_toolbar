@@ -33,11 +33,18 @@ defmodule ExDebugToolbar.Data.TimelineTest do
     assert %Event{name: "nested"} = nested_event
   end
 
-  test "raises unless name matches" do
-    # todo
-  end
-
-  test "raises if timeline has no events" do
+  test "raises an error when closing an event that is not open" do
+    assert_raise RuntimeError, fn ->
+      %Timeline{}
+      |> Timeline.start_event("outsider")
+      |> Timeline.finish_event("nested")
+    end
+    assert_raise RuntimeError, fn ->
+      %Timeline{}
+      |> Timeline.start_event("outsider")
+      |> Timeline.start_event("another")
+      |> Timeline.finish_event("nested")
+    end
   end
 
   describe "duration/1" do
@@ -45,9 +52,9 @@ defmodule ExDebugToolbar.Data.TimelineTest do
       timeline =
         %Timeline{}
         |> Timeline.start_event("outsider")
-        |> Timeline.finish_event("nested")
-        |> Timeline.start_event("nested")
         |> Timeline.finish_event("outsider")
+        |> Timeline.start_event("nested")
+        |> Timeline.finish_event("nested")
       assert Timeline.duration(timeline) == Enum.reduce(timeline.events, 0, fn(e, acc) -> acc + e.duration end)
     end
 
