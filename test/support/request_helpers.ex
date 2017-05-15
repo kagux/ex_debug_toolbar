@@ -2,7 +2,7 @@ defmodule ExDebugToolbar.Test.Support.RequestHelpers do
   alias ExDebugToolbar.Toolbar
 
   def wait_for_registry do
-    :timer.sleep 5
+    :timer.sleep 20
   end
 
   def get_request do
