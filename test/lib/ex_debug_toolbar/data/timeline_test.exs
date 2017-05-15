@@ -19,18 +19,27 @@ defmodule ExDebugToolbar.Data.TimelineTest do
   test "accepts nested events" do
     timeline =
       %Timeline{}
-      |> Timeline.start_event("outsider")
-      |> Timeline.start_event("nested")
-      |> Timeline.finish_event("nested")
-      |> Timeline.finish_event("outsider")
+      |> Timeline.start_event("A")
+      |> Timeline.start_event("B")
+      |> Timeline.finish_event("B")
+      |> Timeline.start_event("B")
+      |> Timeline.finish_event("B")
+      |> Timeline.finish_event("A")
+      |> Timeline.start_event("C")
+      |> Timeline.start_event("D")
+      |> Timeline.finish_event("D")
+      |> Timeline.start_event("E")
+      |> Timeline.finish_event("E")
+      |> Timeline.finish_event("C")
 
-    assert timeline.events |> length == 1
-    outsider_event = timeline.events |> List.first
-    assert %Event{name: "outsider"} = outsider_event
+    [first_event, second_event] = timeline.events
+    assert first_event.name == "C"
+    assert first_event.events |> Enum.at(0) |> Map.fetch!(:name) == "E"
+    assert first_event.events |> Enum.at(1) |> Map.fetch!(:name) == "D"
 
-    assert outsider_event.events |> length == 1
-    nested_event = outsider_event.events |> List.first
-    assert %Event{name: "nested"} = nested_event
+    assert second_event.name == "A"
+    assert second_event.events |> Enum.at(0) |> Map.fetch!(:name) == "B"
+    assert second_event.events |> Enum.at(1) |> Map.fetch!(:name) == "B"
   end
 
   test "raises an error when closing an event that is not open" do
