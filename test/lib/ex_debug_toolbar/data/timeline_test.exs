@@ -3,30 +3,41 @@ defmodule ExDebugToolbar.Data.TimelineTest do
   alias ExDebugToolbar.Data.Timeline
   alias ExDebugToolbar.Data.Timeline.Event
 
-  describe "start_event/2" do
-    test "adds new event and records started_at time" do
-      timeline = %Timeline{} |> Timeline.start_event("name")
-      assert timeline.events |> length == 1
-      event = timeline.events |> List.first
-      assert %Event{name: "name", started_at: %DateTime{}} = event 
-    end
+  test "adds new event and records started_at time" do
+    timeline =
+      %Timeline{}
+      |> Timeline.start_event("name")
+      |> Timeline.finish_event("name")
+
+    assert timeline.events |> length == 1
+    event = timeline.events |> List.first
+
+    assert %Event{name: "name", started_at: %DateTime{}} = event
+    assert event.duration > 0
   end
 
-  describe "finish_event/2" do
-    test "finishes current event" do
-      existing_event = %Event{name: "event", started_at: DateTime.utc_now()}
-      timeline = %Timeline{events: [existing_event]} |> Timeline.finish_event("event")
-      assert timeline.events |> length == 1
-      event = timeline.events |> List.first
-      assert event.duration > 0
-    end
+  test "accepts nested events" do
+    timeline =
+      %Timeline{}
+      |> Timeline.start_event("outsider")
+      |> Timeline.start_event("nested")
+      |> Timeline.finish_event("nested")
+      |> Timeline.finish_event("outsider")
 
-    test "raises unless name matches" do
-      # todo
-    end
+    assert timeline.events |> length == 1
+    outsider_event = timeline.events |> List.first
+    assert %Event{name: "outsider"} = outsider_event
 
-    test "raises if timeline has no events" do
-    end
+    assert outsider_event.events |> length == 1
+    nested_event = outsider_event.events |> List.first
+    assert %Event{name: "nested"} = nested_event
+  end
+
+  test "raises unless name matches" do
+    # todo
+  end
+
+  test "raises if timeline has no events" do
   end
 
   describe "duration/1" do

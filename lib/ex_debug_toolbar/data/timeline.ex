@@ -2,7 +2,8 @@ defmodule ExDebugToolbar.Data.Timeline do
   alias ExDebugToolbar.Data.Timeline
 
   defstruct [
-    events: []
+    events: [],
+    queue: []
   ]
 
   def duration(%Timeline{} = timeline) do
@@ -13,15 +14,25 @@ defmodule ExDebugToolbar.Data.Timeline do
   end
 
   def start_event(%Timeline{} = timeline, name) do
-    event = %Timeline.Event{name: name, started_at: DateTime.utc_now()}
-    %{timeline | events: [event | timeline.events]}
+    event = %Timeline.Event{name: name, started_at: DateTime.utc_now(), events: []}
+    %{timeline | queue: [event | timeline.queue]}
   end
 
-  def finish_event(%Timeline{events: [event | other_events]} = timeline, _name) do
+  def finish_event(%Timeline{queue: [event], events: events} = timeline, name) do
+    closed_event = update_duration(event)
+    %{timeline | queue: [], events: [closed_event | events]}
+  end
+  def finish_event(%Timeline{queue: [event | [parent | rest]], events: events} = timeline, name) do
+    closed_event = update_duration(event)
+    new_parent = %{parent | events: [event | parent.events]}
+
+    %{timeline | queue: [new_parent | rest]}
+  end
+
+  defp update_duration(event) do
     finished_at = DateTime.utc_now
     duration = DateTime.to_unix(finished_at, :microsecond) - DateTime.to_unix(event.started_at, :microsecond)
-    event = %{event | duration: duration}
-    %{timeline | events: [event | other_events]}
+    %{event | duration: duration}
   end
 end
 
