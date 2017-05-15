@@ -7,11 +7,12 @@
     end
     ```
 
-  2. Add `ExDebugToolbar.Phoenix` to your endpoint in `lib/my_app/endpoint.ex`
+  2. Add `ExDebugToolbar.Phoenix` to your endpoint in `lib/my_app/endpoint.ex` right before logger plug
   ```elixir
     defmodule MyApp.Endpoint do
-      use Phoenix.Endpoint, otp_app: :my_app
+      ...
       use ExDebugToolbar.Phoenix
+      plug Plug.Logger
       ...
     end
   ```

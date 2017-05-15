@@ -15,7 +15,7 @@ defmodule ExDebugToolbar.Data.LoggerCollector do
   def handle_event({level, _gl, event}, state) do
     {Logger, message, timestamp, metadata} = event
     if metadata[:request_id] do
-      Toolbar.add_log_entry metadata[:request_id], {level, message, timestamp, metadata}
+      # Toolbar.add_log_entry metadata[:request_id], {level, message, timestamp, metadata}
     end
     {:ok, state}
   end
