@@ -42,13 +42,20 @@ defmodule ExDebugToolbar.Data.TimelineTest do
 
   describe "duration/1" do
     test "retuns total duration of all events" do
-      timeline = %Timeline{events: [%Event{duration: 5}, %Event{duration: 1}]}
-      assert timeline |> Timeline.duration == 6
+      timeline =
+        %Timeline{}
+        |> Timeline.start_event("outsider")
+        |> Timeline.finish_event("nested")
+        |> Timeline.start_event("nested")
+        |> Timeline.finish_event("outsider")
+      assert Timeline.duration(timeline) == Enum.reduce(timeline.events, 0, fn(e, acc) -> acc + e.duration end)
     end
 
     test "it ignores unfinished events" do
-      timeline = %Timeline{events: [%Event{duration: 5}, %Event{}]}
-      assert timeline |> Timeline.duration == 5
+      timeline =
+        %Timeline{}
+        |> Timeline.start_event("outsider")
+      assert timeline |> Timeline.duration == 0
     end
   end
 end

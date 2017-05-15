@@ -3,14 +3,12 @@ defmodule ExDebugToolbar.Data.Timeline do
 
   defstruct [
     events: [],
+    duration: 0,
     queue: []
   ]
 
   def duration(%Timeline{} = timeline) do
-    timeline.events
-    |> Stream.map(&(&1.duration))
-    |> Stream.reject(&is_nil/1)
-    |> Enum.sum
+    timeline.duration
   end
 
   def start_event(%Timeline{} = timeline, name) do
@@ -20,7 +18,7 @@ defmodule ExDebugToolbar.Data.Timeline do
 
   def finish_event(%Timeline{queue: [event], events: events} = timeline, name) do
     closed_event = update_duration(event)
-    %{timeline | queue: [], events: [closed_event | events]}
+    %{timeline | queue: [], events: [closed_event | events], duration: closed_event.duration + timeline.duration}
   end
   def finish_event(%Timeline{queue: [event | [parent | rest]], events: events} = timeline, name) do
     closed_event = update_duration(event)
