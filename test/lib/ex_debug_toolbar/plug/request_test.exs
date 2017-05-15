@@ -36,13 +36,6 @@ defmodule ExDebugToolbar.Plug.RequestTest do
     assert Process.get(:request_id) == request_id
   end
 
-  test "it collects logs from logger" do
-    make_request()
-    {:ok, request} = get_request()
-    assert request.data.logs |> length > 0
-    assert request.data.logs |> Enum.find(&(&1.message) == "log entry")
-  end
-
   defp make_request(opts \\ []) do
     conn = conn(:get, "/path")
     |> Plug.RequestId.call(Plug.RequestId.init([]))
