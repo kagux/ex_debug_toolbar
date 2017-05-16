@@ -45,6 +45,6 @@ defmodule ExDebugToolbar.Collector.LoggerCollector do
   end
 
   defp format_timestamp({date, {h, m, s, _ms}}) do
-    {date, {h, m, s}} |> NaiveDateTime.from_erl! 
+    {date, {h, m, s}} |> NaiveDateTime.from_erl! |> to_string
   end
 end
