@@ -2,26 +2,40 @@ defmodule ExDebugToolbar.Data.Timeline do
   alias ExDebugToolbar.Data.Timeline
 
   defstruct [
-    events: []
+    events: [],
+    duration: 0,
+    queue: []
   ]
 
   def duration(%Timeline{} = timeline) do
-    timeline.events
-    |> Stream.map(&(&1.duration))
-    |> Stream.reject(&is_nil/1)
-    |> Enum.sum
+    timeline.duration
   end
 
   def start_event(%Timeline{} = timeline, name) do
     event = %Timeline.Event{name: name, started_at: DateTime.utc_now()}
-    %{timeline | events: [event | timeline.events]}
+    %{timeline | queue: [event | timeline.queue]}
   end
 
-  def finish_event(%Timeline{events: [event | other_events]} = timeline, _name) do
+  def finish_event(%Timeline{queue: [%{name: name} = event]} = timeline, name) do
+    events = timeline.events
+    finished_event = update_duration(event)
+    %{timeline |
+      queue: [],
+      events: [finished_event | events],
+      duration: finished_event.duration + timeline.duration
+    }
+  end
+  def finish_event(%Timeline{queue: [%{name: name} = event | [parent | rest]]} = timeline, name) do
+    finished_event = update_duration(event)
+    new_parent = %{parent | events: [finished_event | parent.events]}
+    %{timeline | queue: [new_parent | rest]}
+  end
+  def finish_event(_timeline, name), do: raise "the event #{name} is not open"
+
+  defp update_duration(event) do
     finished_at = DateTime.utc_now
     duration = DateTime.to_unix(finished_at, :microsecond) - DateTime.to_unix(event.started_at, :microsecond)
-    event = %{event | duration: duration}
-    %{timeline | events: [event | other_events]}
+    %{event | duration: duration}
   end
 end
 
