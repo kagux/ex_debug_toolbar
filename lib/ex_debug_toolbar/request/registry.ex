@@ -26,9 +26,17 @@ defmodule ExDebugToolbar.Request.Registry do
 
     {:noreply, nil}
   end
+
   def all do
     with_alive_registry fn ->
       :ets.match(@table, {:"_", :'$1'}) |> List.flatten
+    end
+  end
+
+  def purge do
+    with_alive_registry fn ->
+      true = :ets.delete_all_objects(@table)
+      :ok
     end
   end
 

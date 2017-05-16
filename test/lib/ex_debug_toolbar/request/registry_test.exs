@@ -63,8 +63,6 @@ defmodule ExDebugToolbar.Request.RegistryTest do
     end
 
     test "returns all requests" do
-      :ok = Supervisor.terminate_child(ExDebugToolbar.Supervisor, Registry)
-      {:ok, _} = Supervisor.restart_child(ExDebugToolbar.Supervisor, Registry)
       pid = self()
       requests = [%Request{id: 1}, %Request{id: 2}]
       for request <- requests do
@@ -76,6 +74,12 @@ defmodule ExDebugToolbar.Request.RegistryTest do
       end
       assert requests == Registry.all
     end
+  end
+
+  test "purge/0 removes everything from ets table" do
+    :ok = Registry.register(%Request{id: 1})
+    :ok = Registry.purge()
+    assert Registry.all == []
   end
 
   describe "when registry is not running" do
@@ -107,7 +111,11 @@ defmodule ExDebugToolbar.Request.RegistryTest do
     end
 
     test "all/0 returns error" do
-      assert {:error, :registry_not_running} == Registry.all
+      assert {:error, :registry_not_running} == Registry.all()
+    end
+
+    test "purge/0 returns error" do
+      assert {:error, :registry_not_running} == Registry.purge()
     end
   end
 end
