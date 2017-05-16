@@ -6,7 +6,7 @@ defmodule ExDebugToolbar.Data.ListTest do
     assert Collection.change([], :item) == [:item]
   end
 
-  test "it appends items to the list" do
-    assert [:a, :b] == Collection.change([:a], :b)
+  test "it prepands items to the list" do
+    assert [:b, :a] == Collection.change([:a], :b)
   end
 end

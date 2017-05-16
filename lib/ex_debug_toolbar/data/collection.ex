@@ -11,6 +11,6 @@ end
 
 defimpl Collection, for: List do
   def change(collection, item) do 
-    [item | Enum.reverse(collection)] |> Enum.reverse
+    [item | collection]
   end
 end
