@@ -15,7 +15,6 @@ defmodule ExDebugToolbar.Collector.LoggerCollectorTest do
   @request_id "request_with_logs"
 
   setup do
-    Logger.metadata(request_id: @request_id)
     Process.put(:request_id, @request_id)
     Toolbar.start_request()
     on_exit &delete_all_requests/0
@@ -23,9 +22,15 @@ defmodule ExDebugToolbar.Collector.LoggerCollectorTest do
   end
 
   test "it collects logs from logger" do
+    Logger.metadata(request_id: @request_id)
     Logger.debug "log entry"
     {:ok, request} = get_request()
     assert request.data.logs |> length > 0
     assert request.data.logs |> Enum.find(&(&1.message) == "log entry")
+  end
+
+  test "it does nothing when request_id is missing" do
+    Logger.debug "log entry"
+    assert {:ok, _} = get_request()
   end
 end
