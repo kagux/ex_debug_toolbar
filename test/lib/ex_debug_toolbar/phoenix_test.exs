@@ -24,7 +24,6 @@ defmodule ExDebugToolbar.PhoenixTest do
   use ExUnit.Case, async: true
   use Plug.Test
   import Supervisor.Spec
-  import ExDebugToolbar.Test.Support.RequestHelpers
 
   setup_all do
     children = [supervisor(EndpointUsingExDebugToolbar, [])]
@@ -39,13 +38,6 @@ defmodule ExDebugToolbar.PhoenixTest do
 
   test "it executes existing plugs" do
     assert make_request().assigns[:called?] == true
-  end
-
-  test "it collects logs from logger" do
-    make_request()
-    {:ok, request} = get_request()
-    assert request.data.logs |> length > 0
-    assert request.data.logs |> Enum.find(&(&1.message) == "log entry")
   end
 
   defp make_request(assigns \\ %{}) do
