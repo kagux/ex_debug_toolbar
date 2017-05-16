@@ -1,7 +1,7 @@
 defmodule ExDebugToolbar.Toolbar do
   alias ExDebugToolbar.Request.Registry
   alias ExDebugToolbar.Request
-  alias ExDebugToolbar.Data.{Collectable, Collection, Timeline, LogEntry}
+  alias ExDebugToolbar.Data.{Collectable, Collection, Timeline}
 
   def start_request do
     request = %Request{id: get_request_id()}
@@ -26,16 +26,6 @@ defmodule ExDebugToolbar.Toolbar do
     result = func.()
     finish_event(name)
     result
-  end
-
-  def add_log_entry(request_id, {level, message, timestamp}, metadata \\ []) do
-    log_entry = %LogEntry{
-      level: level,
-      message: message,
-      timestamp: timestamp,
-      metadata: metadata
-    }
-    add_data request_id, :logs, log_entry
   end
 
   def add_data(key, data), do: get_request_id() |> add_data(key, data)

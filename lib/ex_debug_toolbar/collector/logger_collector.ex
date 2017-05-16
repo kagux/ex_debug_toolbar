@@ -1,5 +1,6 @@
 defmodule ExDebugToolbar.Collector.LoggerCollector do
   alias ExDebugToolbar.Toolbar
+  alias ExDebugToolbar.Data.LogEntry
   @behaviour :gen_event
 
   def init(_), do: {:ok, nil}
@@ -12,11 +13,8 @@ defmodule ExDebugToolbar.Collector.LoggerCollector do
     {:ok, state}
   end
 
-  def handle_event({level, _gl, event}, state) do
-    {Logger, message, timestamp, metadata} = event
-    if metadata[:request_id] do
-      Toolbar.add_log_entry metadata[:request_id], {level, message, timestamp}, metadata
-    end
+  def handle_event({level, _gl, {_, _, _, metadata} = event}, state) do
+    if metadata[:request_id], do: add_log_to_toolbar(level, event)
     {:ok, state}
   end
 
@@ -34,5 +32,16 @@ defmodule ExDebugToolbar.Collector.LoggerCollector do
 
   def terminate(_reason, _state) do
     :ok
+  end
+
+  defp add_log_to_toolbar(level, event) do
+    {Logger, message, timestamp, metadata} = event
+    log_entry = %LogEntry{
+      level: level,
+      message: message,
+      timestamp: timestamp,
+      metadata: metadata
+    }
+    Toolbar.add_data metadata[:request_id], :logs, log_entry
   end
 end
