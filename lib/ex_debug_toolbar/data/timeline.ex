@@ -12,22 +12,22 @@ defmodule ExDebugToolbar.Data.Timeline do
   end
 
   def start_event(%Timeline{} = timeline, name) do
-    event = %Timeline.Event{name: name, started_at: DateTime.utc_now(), events: []}
+    event = %Timeline.Event{name: name, started_at: DateTime.utc_now()}
     %{timeline | queue: [event | timeline.queue]}
   end
 
   def finish_event(%Timeline{queue: [%{name: name} = event]} = timeline, name) do
     events = timeline.events
-    closed_event = update_duration(event)
+    finished_event = update_duration(event)
     %{timeline |
       queue: [],
-      events: [closed_event | events],
-      duration: closed_event.duration + timeline.duration
+      events: [finished_event | events],
+      duration: finished_event.duration + timeline.duration
     }
   end
   def finish_event(%Timeline{queue: [%{name: name} = event | [parent | rest]]} = timeline, name) do
-    closed_event = update_duration(event)
-    new_parent = %{parent | events: [closed_event | parent.events]}
+    finished_event = update_duration(event)
+    new_parent = %{parent | events: [finished_event | parent.events]}
     %{timeline | queue: [new_parent | rest]}
   end
   def finish_event(_timeline, name), do: raise "the event #{name} is not open"

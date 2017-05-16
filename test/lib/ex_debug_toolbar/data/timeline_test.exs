@@ -3,7 +3,7 @@ defmodule ExDebugToolbar.Data.TimelineTest do
   alias ExDebugToolbar.Data.Timeline
   alias ExDebugToolbar.Data.Timeline.Event
 
-  test "adds new event and records started_at time" do
+  test "tracks events and computes duration" do
     timeline =
       %Timeline{}
       |> Timeline.start_event("name")
@@ -20,39 +20,48 @@ defmodule ExDebugToolbar.Data.TimelineTest do
     timeline =
       %Timeline{}
       |> Timeline.start_event("A")
-      |> Timeline.start_event("B")
-      |> Timeline.finish_event("B")
-      |> Timeline.start_event("B")
-      |> Timeline.finish_event("B")
+      |> Timeline.start_event("A-B")
+      |> Timeline.finish_event("A-B")
+      |> Timeline.start_event("A-B")
+      |> Timeline.finish_event("A-B")
       |> Timeline.finish_event("A")
       |> Timeline.start_event("C")
-      |> Timeline.start_event("D")
-      |> Timeline.finish_event("D")
-      |> Timeline.start_event("E")
-      |> Timeline.finish_event("E")
+      |> Timeline.start_event("C-D")
+      |> Timeline.finish_event("C-D")
+      |> Timeline.start_event("C-E")
+      |> Timeline.finish_event("C-E")
       |> Timeline.finish_event("C")
 
     [first_event, second_event] = timeline.events
     assert first_event.name == "C"
-    assert first_event.events |> Enum.at(0) |> Map.fetch!(:name) == "E"
-    assert first_event.events |> Enum.at(1) |> Map.fetch!(:name) == "D"
+    assert first_event.events |> Enum.at(0) |> Map.fetch!(:name) == "C-E"
+    assert first_event.events |> Enum.at(1) |> Map.fetch!(:name) == "C-D"
 
     assert second_event.name == "A"
-    assert second_event.events |> Enum.at(0) |> Map.fetch!(:name) == "B"
-    assert second_event.events |> Enum.at(1) |> Map.fetch!(:name) == "B"
+    assert second_event.events |> Enum.at(0) |> Map.fetch!(:name) == "A-B"
+    assert second_event.events |> Enum.at(1) |> Map.fetch!(:name) == "A-B"
   end
 
   test "raises an error when closing an event that is not open" do
     assert_raise RuntimeError, fn ->
       %Timeline{}
-      |> Timeline.start_event("outsider")
-      |> Timeline.finish_event("nested")
+      |> Timeline.start_event("A")
+      |> Timeline.finish_event("B")
     end
     assert_raise RuntimeError, fn ->
       %Timeline{}
-      |> Timeline.start_event("outsider")
-      |> Timeline.start_event("another")
-      |> Timeline.finish_event("nested")
+      |> Timeline.start_event("A")
+      |> Timeline.start_event("B")
+      |> Timeline.finish_event("C")
+    end
+  end
+
+  test "raises an error when closing an event that is not the last one opened" do
+    assert_raise RuntimeError, fn ->
+      %Timeline{}
+      |> Timeline.start_event("A")
+      |> Timeline.start_event("C")
+      |> Timeline.finish_event("A")
     end
   end
 
@@ -60,17 +69,17 @@ defmodule ExDebugToolbar.Data.TimelineTest do
     test "retuns total duration of all events" do
       timeline =
         %Timeline{}
-        |> Timeline.start_event("outsider")
-        |> Timeline.finish_event("outsider")
-        |> Timeline.start_event("nested")
-        |> Timeline.finish_event("nested")
-      assert Timeline.duration(timeline) == Enum.reduce(timeline.events, 0, fn(e, acc) -> acc + e.duration end)
+        |> Timeline.start_event("A")
+        |> Timeline.finish_event("A")
+        |> Timeline.start_event("B")
+        |> Timeline.finish_event("B")
+      assert Timeline.duration(timeline) == timeline.events |> Enum.map(&(&1.duration)) |> Enum.sum
     end
 
     test "it ignores unfinished events" do
       timeline =
         %Timeline{}
-        |> Timeline.start_event("outsider")
+        |> Timeline.start_event("A")
       assert timeline |> Timeline.duration == 0
     end
   end
