@@ -9,14 +9,15 @@ defmodule EndpointUsingExDebugToolbar do
 
   plug :dummy_plug
   def dummy_plug(conn, _) do
-    if timeout = conn.assigns[:timeout] do
-      :timer.sleep timeout
-    end
     Logger.debug "log entry"
-    conn
+    conn = conn
     |> Plug.Conn.assign(:called?, true)
     |> put_resp_content_type("text/html")
     |> send_resp(200, "<html><body></body></html>")
+    if timeout = conn.assigns[:timeout] do
+      :timer.sleep timeout
+    end
+    conn
   end
 end
 
@@ -24,6 +25,8 @@ defmodule ExDebugToolbar.PhoenixTest do
   use ExUnit.Case, async: true
   use Plug.Test
   import Supervisor.Spec
+  import ExDebugToolbar.Test.Support.RequestHelpers
+  alias ExDebugToolbar.Data.Timeline
 
   setup_all do
     children = [supervisor(EndpointUsingExDebugToolbar, [])]
@@ -38,6 +41,12 @@ defmodule ExDebugToolbar.PhoenixTest do
 
   test "it executes existing plugs" do
     assert make_request().assigns[:called?] == true
+  end
+
+  test "it tracks execution time of all following plugs in pipeline" do
+    make_request timeout: 100
+    assert {:ok, request} = get_request()
+    assert Timeline.duration(request.data.timeline) > 90 * 1000 # not sure why
   end
 
   defp make_request(assigns \\ %{}) do
