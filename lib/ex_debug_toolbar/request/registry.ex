@@ -19,16 +19,24 @@ defmodule ExDebugToolbar.Request.Registry do
     end
   end
 
-  def handle_cast({:update, pid, changes}, _state) do
-    {:ok, request} = lookup(pid)
+  def handle_cast({:update, request_id, changes}, _state) do
+    {:ok, request} = lookup(request_id)
     request = apply_changes(request, changes)
-    true = :ets.insert(@table, {pid, request})
+    true = :ets.insert(@table, {request_id, request})
 
     {:noreply, nil}
   end
+
   def all do
     with_alive_registry fn ->
       :ets.match(@table, {:"_", :'$1'}) |> List.flatten
+    end
+  end
+
+  def purge do
+    with_alive_registry fn ->
+      true = :ets.delete_all_objects(@table)
+      :ok
     end
   end
 

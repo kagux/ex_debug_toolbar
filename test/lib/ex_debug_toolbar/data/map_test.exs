@@ -6,7 +6,7 @@ defmodule ExDebugToolbar.Data.MapTest do
     assert Collectable.init_collection(%{}) == %{}
   end
 
-  test "implements collecable collection protocol" do
+  test "implements collection protocol" do
     assert Collection.change(%{}, %{foo: :bar}) == %{foo: :bar}
   end
 

@@ -8,3 +8,9 @@ alias ExDebugToolbar.Data.Collection
 defimpl Collection, for: Map do
   def change(collection, map), do: Map.merge(collection, map)
 end
+
+defimpl Collection, for: List do
+  def change(collection, item) do 
+    [item | collection]
+  end
+end

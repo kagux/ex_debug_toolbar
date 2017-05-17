@@ -1,5 +1,6 @@
 defmodule EndpointUsingExDebugToolbar do
   use Phoenix.Endpoint, otp_app: :ex_debug_toolbar
+  require Logger
   import Plug.Conn
 
   plug Plug.RequestId
@@ -11,6 +12,7 @@ defmodule EndpointUsingExDebugToolbar do
     if timeout = conn.assigns[:timeout] do
       :timer.sleep timeout
     end
+    Logger.debug "log entry"
     conn
     |> Plug.Conn.assign(:called?, true)
     |> put_resp_content_type("text/html")
