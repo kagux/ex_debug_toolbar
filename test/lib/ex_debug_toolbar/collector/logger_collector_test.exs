@@ -31,6 +31,7 @@ defmodule ExDebugToolbar.Collector.LoggerCollectorTest do
 
   test "it does nothing when request_id is missing" do
     Logger.debug "log entry"
-    assert {:ok, _} = get_request()
+    {:ok, request} = get_request()
+    refute Map.has_key?(request.data, :logs)
   end
 end
