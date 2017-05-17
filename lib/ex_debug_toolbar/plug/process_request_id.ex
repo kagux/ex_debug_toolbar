@@ -1,17 +1,14 @@
-defmodule ExDebugToolbar.Plug.Request do
+defmodule ExDebugToolbar.Plug.ProcessRequestId do
+  require Phoenix.Endpoint
+  alias Phoenix.Endpoint
 
   @behaviour Plug
-
-  alias ExDebugToolbar.Toolbar
 
   def init(opts), do: opts
 
   def call(conn, opts) do
-    put_request_id_in_process(conn, opts)
-    Toolbar.start_request
-    Toolbar.start_event("request")
-    Plug.Conn.register_before_send(conn, fn conn ->
-      Toolbar.finish_event("request")
+    Endpoint.instrument(conn, :ex_debug_toolbar_process_request_id, fn ->
+      put_request_id_in_process(conn, opts)
       conn
     end)
   end
