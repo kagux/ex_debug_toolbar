@@ -66,9 +66,9 @@ defmodule ExDebugToolbar.Data.TimelineTest do
   end
 
   test "optionally accepts precalculated event duration" do
-    timeline = %Timeline{} |> Timeline.start_event("A")
-    :timer.sleep 50
-    timeline = timeline |> Timeline.finish_event("A", duration: 19)
-    assert timeline.duration == 19
+    timeline = %Timeline{}
+    |> Timeline.start_event("A")
+    |> Timeline.finish_event("A", duration: 1000)
+    assert timeline.duration == 1000
   end
 end
