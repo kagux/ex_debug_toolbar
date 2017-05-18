@@ -6,5 +6,5 @@ defmodule ExDebugToolbar.Test.Support.Data.TimelineHelpers do
   def find_event([event | events], event_name) do
     find_event(event.events, event_name) || find_event(events, event_name)
   end
-  def find_event(_, _), do: false
+  def find_event(_, _), do: nil
 end
