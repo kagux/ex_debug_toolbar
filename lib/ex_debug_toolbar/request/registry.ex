@@ -19,14 +19,6 @@ defmodule ExDebugToolbar.Request.Registry do
     end
   end
 
-  def handle_cast({:update, request_id, changes}, _state) do
-    {:ok, request} = lookup(request_id)
-    request = apply_changes(request, changes)
-    true = :ets.insert(@table, {request_id, request})
-
-    {:noreply, nil}
-  end
-
   def all do
     with_alive_registry fn ->
       :ets.match(@table, {:"_", :'$1'}) |> List.flatten
@@ -59,6 +51,14 @@ defmodule ExDebugToolbar.Request.Registry do
     {:ok, %{table: table}}
   end
 
+  def handle_cast({:update, request_id, changes}, _state) do
+    {:ok, request} = lookup(request_id)
+    request = apply_changes(request, changes)
+    true = :ets.insert(@table, {request_id, request})
+
+    {:noreply, nil}
+  end
+
   defp registry_alive? do
     pid = Process.whereis(__MODULE__)
     !is_nil(pid) && Process.alive?(pid)
@@ -71,7 +71,6 @@ defmodule ExDebugToolbar.Request.Registry do
       {:error, :registry_not_running}
     end
   end
-
 
   defp apply_changes(request, changes) when is_map(changes) do
     Map.merge(request, changes)
