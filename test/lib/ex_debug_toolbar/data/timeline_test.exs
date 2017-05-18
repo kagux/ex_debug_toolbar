@@ -64,23 +64,4 @@ defmodule ExDebugToolbar.Data.TimelineTest do
       |> Timeline.finish_event("A")
     end
   end
-
-  describe "duration/1" do
-    test "retuns total duration of all events" do
-      timeline =
-        %Timeline{}
-        |> Timeline.start_event("A")
-        |> Timeline.finish_event("A")
-        |> Timeline.start_event("B")
-        |> Timeline.finish_event("B")
-      assert Timeline.duration(timeline) == timeline.events |> Enum.map(&(&1.duration)) |> Enum.sum
-    end
-
-    test "it ignores unfinished events" do
-      timeline =
-        %Timeline{}
-        |> Timeline.start_event("A")
-      assert timeline |> Timeline.duration == 0
-    end
-  end
 end
