@@ -5,6 +5,10 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
 
   @request_id "request_id"
 
+  setup_all do
+    delete_all_requests()
+  end
+
   setup do
     Process.put(:request_id, @request_id)
     on_exit &delete_all_requests/0

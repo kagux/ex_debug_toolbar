@@ -6,6 +6,7 @@ defmodule ExDebugToolbar.Collector.LoggerCollectorTest do
   require Logger
 
   setup_all do
+    delete_all_requests()
     Logger.add_backend(LoggerCollector)
     on_exit fn ->
       Logger.remove_backend(LoggerCollector)
