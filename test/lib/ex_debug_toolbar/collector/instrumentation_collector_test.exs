@@ -32,13 +32,6 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
   describe "phoenix_controller_call"  do
     setup [:start_request]
 
-    test "it starts a phoenix_controller event" do
-      Collector.phoenix_controller_call(:start, %{}, %{conn: %{}})
-      assert {:ok, request} = get_request(@request_id)
-      assert request.data.timeline.queue |> Enum.count > 0
-      assert request.data.timeline.events |> Enum.count == 0
-    end
-
     test "it records a phoenix controller event" do
       conn = %{private: %{phoenix_controller: ExDebugToolbar.Toolbar , phoenix_action: "execute"}}
       call_collector(&Collector.phoenix_controller_call/3, %{conn: conn})
@@ -49,13 +42,6 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
 
   describe "phoenix_controller_render"  do
     setup [:start_request]
-
-    test "it starts a phoenix render event" do
-      Collector.phoenix_controller_render(:start, %{}, %{template: "template"})
-      assert {:ok, request} = get_request(@request_id)
-      assert request.data.timeline.queue |> Enum.count > 0
-      assert request.data.timeline.events |> Enum.count == 0
-    end
 
     test "it records a phoenix render event" do
       call_collector(&Collector.phoenix_controller_render/3, %{template: "template"})
