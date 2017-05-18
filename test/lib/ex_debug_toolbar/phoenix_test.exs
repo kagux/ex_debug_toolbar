@@ -4,7 +4,6 @@ defmodule ExDebugToolbar.PhoenixTest do
   use Plug.Test
   import Supervisor.Spec
   import ExDebugToolbar.Test.Support.RequestHelpers
-  alias ExDebugToolbar.Data.Timeline
   alias ExDebugToolbar.Fixtures.Endpoint
 
   setup_all do
@@ -25,7 +24,7 @@ defmodule ExDebugToolbar.PhoenixTest do
   test "it tracks execution time of all following plugs in pipeline" do
     make_request timeout: 100
     assert {:ok, request} = get_request()
-    assert Timeline.duration(request.data.timeline) > 70 * 1000 # not sure why
+    assert request.data.timeline.duration > 70 * 1000 # not sure why
   end
 
   defp make_request(assigns \\ %{}) do
