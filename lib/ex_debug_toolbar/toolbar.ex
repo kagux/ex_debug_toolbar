@@ -17,8 +17,12 @@ defmodule ExDebugToolbar.Toolbar do
     add_data(:timeline, %Timeline.Action{action: :start_event, event_name: name})
   end
 
-  def finish_event(name) do
-    add_data(:timeline, %Timeline.Action{action: :finish_event, event_name: name})
+  def finish_event(name, opts \\ []) do
+    add_data(:timeline, %Timeline.Action{
+       action: :finish_event,
+       event_name: name,
+       duration: opts[:duration]
+     })
   end
 
   def record_event(name, func) do

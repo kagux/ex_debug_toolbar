@@ -24,10 +24,10 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
 
     test "it records request timeline on stop" do
       Collector.ex_debug_toolbar(:start, %{}, %{})
-      Collector.ex_debug_toolbar(:stop, %{}, %{})
+      Collector.ex_debug_toolbar(:stop, 50000, %{})
       assert {:ok, request} = get_request(@request_id)
       assert request.data.timeline.events |> Enum.any?
-      assert request.data.timeline.duration > 0
+      assert request.data.timeline.duration == 50
     end
   end
 end
