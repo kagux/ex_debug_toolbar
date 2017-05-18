@@ -1,6 +1,9 @@
 use Mix.Config
 
 if Mix.env == :test do
+  config :ex_debug_toolbar, ExDebugToolbar.Fixtures.Endpoint,
+    instrumenters: [ExDebugToolbar.Collector.InstrumentationCollector]
+
   config :ex_debug_toolbar, ExDebugToolbar.Endpoint,
     url: [host: "localhost"],
     secret_key_base: "v6SG14aYQCvYyk4rRq4HYYJ1GGXUIf23oWS5kmy0MngyWPTrlQAGnl1mvKkGy/Tj",

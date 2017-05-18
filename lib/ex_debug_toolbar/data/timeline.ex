@@ -7,10 +7,6 @@ defmodule ExDebugToolbar.Data.Timeline do
     queue: []
   ]
 
-  def duration(%Timeline{} = timeline) do
-    timeline.duration
-  end
-
   def start_event(%Timeline{} = timeline, name) do
     event = %Timeline.Event{name: name, started_at: DateTime.utc_now()}
     %{timeline | queue: [event | timeline.queue]}
