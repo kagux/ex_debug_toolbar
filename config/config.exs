@@ -1,7 +1,7 @@
 use Mix.Config
 
 if Mix.env == :test do
-  config :ex_debug_toolbar, EndpointUsingExDebugToolbar,
+  config :ex_debug_toolbar, ExDebugToolbar.Fixtures.Endpoint,
     instrumenters: [ExDebugToolbar.Collector.InstrumentationCollector]
 
   config :ex_debug_toolbar, ExDebugToolbar.Endpoint,
