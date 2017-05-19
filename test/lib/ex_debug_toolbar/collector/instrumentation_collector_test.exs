@@ -1,7 +1,10 @@
 defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
   use ExUnit.Case, async: false
+  use Plug.Test
   alias ExDebugToolbar.Collector.InstrumentationCollector, as: Collector
+  alias ExDebugToolbar.Toolbar
   import ExDebugToolbar.Test.Support.RequestHelpers
+  import ExDebugToolbar.Test.Support.Data.TimelineHelpers
 
   @request_id "request_id"
 
@@ -24,11 +27,39 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
     end
 
     test "it records request timeline on stop" do
-      Collector.ex_debug_toolbar(:start, %{}, %{})
-      Collector.ex_debug_toolbar(:stop, 50000, %{})
+      call_collector(&Collector.ex_debug_toolbar/3, duration: 50000)
       assert {:ok, request} = get_request(@request_id)
       assert request.data.timeline.events |> Enum.any?
       assert request.data.timeline.duration == 50000
     end
   end
+
+  describe "phoenix_controller_call"  do
+    setup [:start_request]
+
+    test "it records a phoenix controller event" do
+      conn = %{private: %{phoenix_controller: ExDebugToolbar.Toolbar , phoenix_action: "execute"}}
+      call_collector(&Collector.phoenix_controller_call/3, context: %{conn: conn})
+      assert {:ok, request} = get_request(@request_id)
+      assert find_event(request.data.timeline, "ExDebugToolbar.Toolbar:execute")
+    end
+  end
+
+  describe "phoenix_controller_render"  do
+    setup [:start_request]
+
+    test "it records a phoenix render event" do
+      call_collector(&Collector.phoenix_controller_render/3, context: %{template: "template"})
+      assert {:ok, request} = get_request(@request_id)
+      assert find_event(request.data.timeline, "template")
+    end
+  end
+
+  defp call_collector(function, opts) do
+    opts = [context: %{}, duration: 0] |> Keyword.merge(opts)
+    function.(:start, %{}, opts[:context])
+    |> (&function.(:stop, opts[:duration], &1)).()
+  end
+
+  defp start_request(_context), do: Toolbar.start_request
 end
