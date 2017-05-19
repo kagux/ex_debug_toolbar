@@ -19,6 +19,7 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
     test "it starts request on ex_debug_toolbar start" do
       Collector.ex_debug_toolbar(:start, %{}, %{})
       assert {:ok, request} = get_request(@request_id)
+      assert %NaiveDateTime{} = request.created_at
       assert request.data.timeline
     end
 
@@ -27,7 +28,7 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
       Collector.ex_debug_toolbar(:stop, 50000, %{})
       assert {:ok, request} = get_request(@request_id)
       assert request.data.timeline.events |> Enum.any?
-      assert request.data.timeline.duration == 50
+      assert request.data.timeline.duration == 50000
     end
   end
 end

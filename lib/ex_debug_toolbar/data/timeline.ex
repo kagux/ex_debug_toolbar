@@ -8,7 +8,7 @@ defmodule ExDebugToolbar.Data.Timeline do
   ]
 
   def start_event(%Timeline{} = timeline, name) do
-    event = %Timeline.Event{name: name, started_at: DateTime.utc_now()}
+    event = %Timeline.Event{name: name, started_at: System.monotonic_time()}
     %{timeline | queue: [event | timeline.queue]}
   end
 
@@ -30,8 +30,7 @@ defmodule ExDebugToolbar.Data.Timeline do
   def finish_event(_timeline, name, _opts), do: raise "the event #{name} is not open"
 
   defp update_duration(event, nil) do
-    finished_at = DateTime.utc_now
-    duration = DateTime.to_unix(finished_at, :microsecond) - DateTime.to_unix(event.started_at, :microsecond)
+    duration = System.monotonic_time() - event.started_at
     update_duration(event, duration)
   end
   defp update_duration(event, duration), do: %{event | duration: duration}

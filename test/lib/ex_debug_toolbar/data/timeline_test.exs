@@ -12,7 +12,9 @@ defmodule ExDebugToolbar.Data.TimelineTest do
     assert timeline.events |> length == 1
     event = timeline.events |> List.first
 
-    assert %Event{name: "name", started_at: %DateTime{}} = event
+    assert %Event{} = event
+    assert event.name == "name"
+    assert is_integer(event.started_at)
     assert event.duration > 0
   end
 
