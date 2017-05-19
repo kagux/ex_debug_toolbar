@@ -4,7 +4,7 @@ defmodule ExDebugToolbar.Toolbar do
   alias ExDebugToolbar.Data.{Collectable, Collection, Timeline}
 
   def start_request do
-    request = %Request{id: get_request_id()}
+    request = %Request{id: get_request_id(), created_at: NaiveDateTime.utc_now()}
     :ok = Registry.register(request)
   end
 
