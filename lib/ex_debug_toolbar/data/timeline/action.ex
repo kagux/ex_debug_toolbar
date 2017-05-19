@@ -1,5 +1,5 @@
 defmodule ExDebugToolbar.Data.Timeline.Action do
-  defstruct [:action, :event_name]
+  defstruct [:action, :event_name, :duration]
 end
 alias ExDebugToolbar.Data.{Collectable, Timeline.Action, Timeline}
 

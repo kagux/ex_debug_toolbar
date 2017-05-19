@@ -4,7 +4,7 @@ defmodule ExDebugToolbar.Toolbar do
   alias ExDebugToolbar.Data.{Collectable, Collection, Timeline}
 
   def start_request do
-    request = %Request{id: get_request_id()}
+    request = %Request{id: get_request_id(), created_at: NaiveDateTime.utc_now()}
     :ok = Registry.register(request)
   end
 
@@ -17,8 +17,12 @@ defmodule ExDebugToolbar.Toolbar do
     add_data(:timeline, %Timeline.Action{action: :start_event, event_name: name})
   end
 
-  def finish_event(name) do
-    add_data(:timeline, %Timeline.Action{action: :finish_event, event_name: name})
+  def finish_event(name, opts \\ []) do
+    add_data(:timeline, %Timeline.Action{
+       action: :finish_event,
+       event_name: name,
+       duration: opts[:duration]
+     })
   end
 
   def record_event(name, func) do
