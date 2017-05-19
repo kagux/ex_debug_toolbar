@@ -39,9 +39,11 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
 
     test "it records a phoenix controller event" do
       conn = %{private: %{phoenix_controller: ExDebugToolbar.Toolbar , phoenix_action: "execute"}}
-      call_collector(&Collector.phoenix_controller_call/3, context: %{conn: conn})
+      call_collector(&Collector.phoenix_controller_call/3, context: %{conn: conn}, duration: 19)
       assert {:ok, request} = get_request(@request_id)
-      assert find_event(request.data.timeline, "ExDebugToolbar.Toolbar:execute")
+      event = find_event(request.data.timeline, "ExDebugToolbar.Toolbar:execute")
+      assert event
+      assert event.duration == 19
     end
   end
 
@@ -49,9 +51,11 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
     setup [:start_request]
 
     test "it records a phoenix render event" do
-      call_collector(&Collector.phoenix_controller_render/3, context: %{template: "template"})
+      call_collector(&Collector.phoenix_controller_render/3, context: %{template: "template"}, duration: 7)
       assert {:ok, request} = get_request(@request_id)
-      assert find_event(request.data.timeline, "template")
+      event = find_event(request.data.timeline, "template")
+      assert event
+      assert event.duration == 7
     end
   end
 

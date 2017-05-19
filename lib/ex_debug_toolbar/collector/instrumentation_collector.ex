@@ -14,18 +14,16 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollector do
     Toolbar.start_event(event_name)
     event_name
   end
- 
-  def phoenix_controller_call(:stop, _diff, event_name) do
-    Toolbar.finish_event(event_name)
+  def phoenix_controller_call(:stop, time_diff, event_name) do
+    Toolbar.finish_event(event_name, duration: time_diff)
   end
- 
+
   def phoenix_controller_render(:start, _, %{template: template}) do
     Toolbar.start_event(template)
     template
   end
- 
-  def phoenix_controller_render(:stop, _diff, template) do
-    Toolbar.finish_event(template)
+  def phoenix_controller_render(:stop, time_diff, template) do
+    Toolbar.finish_event(template, duration: time_diff)
   end
 
   defp controller_event_name(%{private: %{phoenix_controller: controller, phoenix_action: action}}) do
