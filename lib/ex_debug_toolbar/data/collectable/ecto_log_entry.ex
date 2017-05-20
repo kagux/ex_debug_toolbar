@@ -5,6 +5,9 @@ defimpl Collectable, for: Ecto.LogEntry do
   def init_collection(_entry), do: []
 
   def encode(entry) do
-    Map.take(entry, @encode_keys)
+    duration = (entry.queue_time || 0) + (entry.query_time || 0) + (entry.decode_time || 0)
+    entry
+    |> Map.take(@encode_keys)
+    |> Map.put(:total_time, duration)
   end
 end
