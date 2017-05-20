@@ -6,4 +6,3 @@ defmodule ExDebugToolbar.Data.EctoLogTest do
     assert Collectable.init_collection(%Ecto.LogEntry{}) == []
   end
 end
-
