@@ -51,6 +51,7 @@ defmodule ExDebugToolbar.Toolbar do
 
   defp update_request(%Request{} = request, key, data) do
     collection = Map.get_lazy(request.data, key, fn -> Collectable.init_collection(data) end)
-    Map.update!(request, :data, &Map.put(&1, key, Collection.change(collection, data)))
+    updated_data = data |> Collectable.encode |> (&Collection.change(collection, &1)).()
+    Map.update!(request, :data, &Map.put(&1, key, updated_data))
   end
 end

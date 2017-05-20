@@ -38,13 +38,9 @@ defmodule ExDebugToolbar.Collector.LoggerCollector do
     {Logger, message, timestamp, metadata} = event
     log_entry = %LogEntry{
       level: level,
-      message: message |> to_string,
-      timestamp: timestamp |> format_timestamp
+      message: message,
+      timestamp: timestamp
     }
     Toolbar.add_data metadata[:request_id], :logs, log_entry
-  end
-
-  defp format_timestamp({date, {h, m, s, _ms}}) do
-    {date, {h, m, s}} |> NaiveDateTime.from_erl! |> to_string
   end
 end

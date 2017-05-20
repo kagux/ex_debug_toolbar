@@ -27,11 +27,10 @@ defmodule ExDebugToolbar.Collector.EctoCollectorTest do
   end
 
   test "adds query to ecto queries collection" do
-    query = %Ecto.LogEntry{query: "select * from users"}
-    query |> Collector.log
+    %Ecto.LogEntry{query: "query"} |> Collector.log
     assert {:ok, request} = get_request()
     assert request.data |> Map.has_key?(:ecto)
     assert request.data.ecto |> length == 1
-    assert request.data.ecto |> hd == query
+    assert %{query: "query"} = request.data.ecto |> hd
   end
 end
