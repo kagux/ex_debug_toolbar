@@ -1,26 +1,16 @@
 defmodule ExDebugToolbar.Collector.LoggerCollectorTest do
-  use ExUnit.Case, async: false
-  alias ExDebugToolbar.Collector.LoggerCollector
-  alias ExDebugToolbar.Toolbar
-  import ExDebugToolbar.Test.Support.RequestHelpers
+  use ExDebugToolbar.CollectorCase, async: false
+  alias ExDebugToolbar.Collector.LoggerCollector, as: Collector
   require Logger
 
   setup_all do
-    delete_all_requests()
-    Logger.add_backend(LoggerCollector)
+    Logger.add_backend(Collector)
     on_exit fn ->
-      Logger.remove_backend(LoggerCollector)
+      Logger.remove_backend(Collector)
     end
   end
 
-  @request_id "request_with_logs"
-
-  setup do
-    Process.put(:request_id, @request_id)
-    Toolbar.start_request()
-    on_exit &delete_all_requests/0
-    :ok
-  end
+  setup :start_request
 
   test "it collects logs from logger" do
     Logger.metadata(request_id: @request_id)

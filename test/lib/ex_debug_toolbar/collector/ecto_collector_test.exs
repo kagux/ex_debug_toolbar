@@ -1,22 +1,9 @@
 defmodule ExDebugToolbar.Collector.EctoCollectorTest do
-  use ExUnit.Case, async: false
-  use Plug.Test
+  use ExDebugToolbar.CollectorCase, async: false
   alias ExDebugToolbar.Collector.EctoCollector, as: Collector
   alias ExDebugToolbar.Data.Timeline.Event
-  import ExDebugToolbar.Test.Support.RequestHelpers
 
-  @request_id "request_id"
-
-  setup_all do
-    delete_all_requests()
-  end
-
-  setup do
-    Process.put(:request_id, @request_id)
-    on_exit &delete_all_requests/0
-    start_request()
-    :ok
-  end
+  setup :start_request
 
   test "adds a query execution event" do
     %Ecto.LogEntry{decode_time: 5,query_time: 10, queue_time: 15} |> Collector.log
