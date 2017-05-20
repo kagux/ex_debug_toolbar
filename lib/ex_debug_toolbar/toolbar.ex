@@ -36,7 +36,7 @@ defmodule ExDebugToolbar.Toolbar do
     add_data(:timeline, %Timeline.Action{
       action: :add_event,
       event_name: name,
-      duration: opts[:duration]
+      duration: duration
     })
   end
 

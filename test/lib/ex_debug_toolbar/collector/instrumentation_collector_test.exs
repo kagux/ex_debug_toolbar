@@ -64,6 +64,4 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
     function.(:start, %{}, opts[:context])
     |> (&function.(:stop, opts[:duration], &1)).()
   end
-
-  defp start_request(_context), do: Toolbar.start_request
 end
