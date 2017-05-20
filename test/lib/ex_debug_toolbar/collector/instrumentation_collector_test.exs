@@ -2,7 +2,6 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
   use ExUnit.Case, async: false
   use Plug.Test
   alias ExDebugToolbar.Collector.InstrumentationCollector, as: Collector
-  alias ExDebugToolbar.Toolbar
   import ExDebugToolbar.Test.Support.RequestHelpers
   import ExDebugToolbar.Test.Support.Data.TimelineHelpers
 

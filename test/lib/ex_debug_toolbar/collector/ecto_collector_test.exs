@@ -1,4 +1,4 @@
-defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
+defmodule ExDebugToolbar.Collector.EctoCollectorTest do
   use ExUnit.Case, async: false
   use Plug.Test
   alias ExDebugToolbar.Collector.EctoCollector, as: Collector
@@ -25,5 +25,13 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
     assert request.data.timeline.duration == 30
     assert %Event{name: "ecto.query"} = request.data.timeline.events |> hd
   end
-end
 
+  test "adds query to ecto queries collection" do
+    query = %Ecto.LogEntry{query: "select * from users"}
+    query |> Collector.log
+    assert {:ok, request} = get_request()
+    assert request.data |> Map.has_key?(:ecto)
+    assert request.data.ecto |> length == 1
+    assert request.data.ecto |> hd == query
+  end
+end
