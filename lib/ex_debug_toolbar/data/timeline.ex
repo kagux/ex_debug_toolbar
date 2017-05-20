@@ -7,6 +7,10 @@ defmodule ExDebugToolbar.Data.Timeline do
     queue: []
   ]
 
+  def add_event(%Timeline{} = timeline, name, duration) do
+    start_event(timeline, name) |> finish_event(name, duration: duration)
+  end
+
   def start_event(%Timeline{} = timeline, name) do
     event = %Timeline.Event{name: name, started_at: System.monotonic_time()}
     %{timeline | queue: [event | timeline.queue]}
@@ -45,5 +49,9 @@ defimpl Collection, for: Timeline do
 
   def change(timeline, %Action{action: :finish_event, event_name: name, duration: duration}) do
     Timeline.finish_event(timeline, name, duration: duration)
+  end
+
+  def change(timeline, %Action{action: :add_event, event_name: name, duration: duration}) do
+    Timeline.add_event(timeline, name, duration)
   end
 end

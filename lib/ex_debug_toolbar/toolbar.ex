@@ -32,6 +32,14 @@ defmodule ExDebugToolbar.Toolbar do
     result
   end
 
+  def add_event(name, duration) do
+    add_data(:timeline, %Timeline.Action{
+      action: :add_event,
+      event_name: name,
+      duration: opts[:duration]
+    })
+  end
+
   def add_data(key, data), do: get_request_id() |> add_data(key, data)
   def add_data(request_id, key, data) do
     :ok = Registry.update(request_id, &update_request(&1, key, data))

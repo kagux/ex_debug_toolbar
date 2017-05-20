@@ -73,4 +73,11 @@ defmodule ExDebugToolbar.Data.TimelineTest do
     |> Timeline.finish_event("A", duration: 1000)
     assert timeline.duration == 1000
   end
+
+  test "adds an event that already happened" do
+    timeline = %Timeline{} |> Timeline.add_event("A", 5000)
+    assert timeline.events |> length == 1
+    assert %Event{name: "A"} = timeline.events |> hd
+    assert timeline.duration == 5000
+  end
 end
