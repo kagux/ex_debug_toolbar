@@ -19,4 +19,6 @@ defmodule ExDebugToolbar.Test.Support.RequestHelpers do
   def delete_all_requests do
     :ok = Registry.purge()
   end
+
+  def start_request(_context \\ %{}), do: Toolbar.start_request
 end

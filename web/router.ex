@@ -18,9 +18,4 @@ defmodule ExDebugToolbar.Router do
 
     get "/", PageController, :index
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", ExDebugToolbar do
-  #   pipe_through :api
-  # end
 end

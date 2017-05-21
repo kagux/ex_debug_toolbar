@@ -1,22 +1,6 @@
 defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
-  use ExUnit.Case, async: false
-  use Plug.Test
+  use ExDebugToolbar.CollectorCase, async: false
   alias ExDebugToolbar.Collector.InstrumentationCollector, as: Collector
-  alias ExDebugToolbar.Toolbar
-  import ExDebugToolbar.Test.Support.RequestHelpers
-  import ExDebugToolbar.Test.Support.Data.TimelineHelpers
-
-  @request_id "request_id"
-
-  setup_all do
-    delete_all_requests()
-  end
-
-  setup do
-    Process.put(:request_id, @request_id)
-    on_exit &delete_all_requests/0
-    :ok
-  end
 
   describe "ex_debug_toolbar"  do
     test "it starts request on ex_debug_toolbar start" do
@@ -64,6 +48,4 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
     function.(:start, %{}, opts[:context])
     |> (&function.(:stop, opts[:duration], &1)).()
   end
-
-  defp start_request(_context), do: Toolbar.start_request
 end
