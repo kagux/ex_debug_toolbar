@@ -1,13 +1,14 @@
 defmodule ExDebugToolbar.Fixtures.Endpoint do
   use Phoenix.Endpoint, otp_app: :ex_debug_toolbar
+  use ExDebugToolbar.Phoenix
   require Logger
   import Plug.Conn
 
   plug Plug.RequestId
 
-  use ExDebugToolbar.Phoenix
 
   plug :dummy_plug
+
   def dummy_plug(conn, _) do
     Logger.debug "log entry"
     conn = conn
