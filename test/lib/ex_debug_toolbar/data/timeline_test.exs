@@ -76,7 +76,7 @@ defmodule ExDebugToolbar.Data.TimelineTest do
     end
 
     test "adds an event that already happened" do
-      timeline = %Timeline{} |> Timeline.add_event("A", 5000)
+      timeline = %Timeline{} |> Timeline.add_finished_event("A", 5000)
       assert timeline.events |> length == 1
       assert %Event{name: "A"} = timeline.events |> hd
       assert timeline.duration == 5000
@@ -102,9 +102,9 @@ defmodule ExDebugToolbar.Data.TimelineTest do
       assert %Event{name: "event", duration: 5} = timeline.events |> hd
     end
 
-    test "passing :add_event action change/2 adds event" do
+    test "passing :add_finished_event action change/2 adds event" do
       timeline = %Timeline{}
-      |> Collection.change(%Action{action: :add_event, event_name: "event", duration: 5})
+      |> Collection.change(%Action{action: :add_finished_event, event_name: "event", duration: 5})
 
       assert timeline.events |> length == 1
       assert %Event{name: "event", duration: 5} = timeline.events |> hd

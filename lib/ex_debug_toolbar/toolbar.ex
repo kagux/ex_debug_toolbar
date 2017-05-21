@@ -32,9 +32,9 @@ defmodule ExDebugToolbar.Toolbar do
     result
   end
 
-  def add_event(name, duration) do
+  def add_finished_event(name, duration) do
     add_data(:timeline, %Timeline.Action{
-      action: :add_event,
+      action: :add_finished_event,
       event_name: name,
       duration: duration
     })

@@ -7,7 +7,7 @@ defmodule ExDebugToolbar.Data.Timeline do
     queue: []
   ]
 
-  def add_event(%Timeline{} = timeline, name, duration) do
+  def add_finished_event(%Timeline{} = timeline, name, duration) do
     start_event(timeline, name) |> finish_event(name, duration: duration)
   end
 
@@ -51,7 +51,7 @@ defimpl Collection, for: Timeline do
     Timeline.finish_event(timeline, name, duration: duration)
   end
 
-  def change(timeline, %Action{action: :add_event, event_name: name, duration: duration}) do
-    Timeline.add_event(timeline, name, duration)
+  def change(timeline, %Action{action: :add_finished_event, event_name: name, duration: duration}) do
+    Timeline.add_finished_event(timeline, name, duration)
   end
 end
