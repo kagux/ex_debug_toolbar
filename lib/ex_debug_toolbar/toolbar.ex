@@ -1,7 +1,7 @@
 defmodule ExDebugToolbar.Toolbar do
   alias ExDebugToolbar.Request.Registry
   alias ExDebugToolbar.Request
-  alias ExDebugToolbar.Data.{Collectable, Collection, Timeline}
+  alias ExDebugToolbar.Data.{Collectable, Collection}
   alias ExDebugToolbar.Toolbar.Config
 
   def start_request do
@@ -15,15 +15,11 @@ defmodule ExDebugToolbar.Toolbar do
   defdelegate get_all_requests, to: Registry, as: :all
 
   def start_event(name) do
-    add_data(:timeline, %Timeline.Action{action: :start_event, event_name: name})
+    add_data(:timeline, {:start_event, name})
   end
 
   def finish_event(name, opts \\ []) do
-    add_data(:timeline, %Timeline.Action{
-       action: :finish_event,
-       event_name: name,
-       duration: opts[:duration]
-     })
+    add_data(:timeline, {:finish_event, name, opts[:duration]})
   end
 
   def record_event(name, func) do
@@ -34,11 +30,7 @@ defmodule ExDebugToolbar.Toolbar do
   end
 
   def add_finished_event(name, duration) do
-    add_data(:timeline, %Timeline.Action{
-      action: :add_finished_event,
-      event_name: name,
-      duration: duration
-    })
+    add_data(:timeline, {:add_finished_event, name, duration})
   end
 
   def add_data(key, data), do: get_request_id() |> add_data(key, data)
