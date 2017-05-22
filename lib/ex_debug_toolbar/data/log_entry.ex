@@ -9,7 +9,7 @@ end
 alias ExDebugToolbar.Data.{Collectable, LogEntry}
 
 defimpl Collectable, for: LogEntry do
-  def encode(entry) do
+  def format(entry) do
     entry
     |> Map.from_struct
     |> Map.update!(:message, &to_string/1)

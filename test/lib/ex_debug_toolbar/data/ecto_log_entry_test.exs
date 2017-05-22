@@ -13,17 +13,17 @@ defmodule ExDebugToolbar.Data.EctoLogTest do
       {:ok, entry: entry}
     end
 
-    test "encode/1 encodes into map", context do
+    test "format/1 formats into map", context do
       assert %{
         decode_time: 5,
         query_time: 10,
         queue_time: 15,
         query: "select * from users"
-      } = Collectable.encode(context.entry)
+      } = Collectable.format(context.entry)
     end
 
-    test "encode/1 adds total time", context do
-      assert %{total_time: 30} = Collectable.encode(context.entry)
+    test "format/1 adds total time", context do
+      assert %{total_time: 30} = Collectable.format(context.entry)
     end
   end
 end

@@ -3,8 +3,8 @@ defmodule ExDebugToolbar.Data.MapTest do
   alias ExDebugToolbar.Data.{Collectable, Collection}
 
   describe "collectable protocol" do
-    test "encode/1 returns same map" do
-      assert Collectable.encode(%{foo: :bar}) == %{foo: :bar}
+    test "format/1 returns same map" do
+      assert Collectable.format(%{foo: :bar}) == %{foo: :bar}
     end
   end
 

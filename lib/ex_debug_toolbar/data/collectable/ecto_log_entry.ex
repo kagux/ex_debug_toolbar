@@ -1,11 +1,11 @@
 alias ExDebugToolbar.Data.Collectable
 defimpl Collectable, for: Ecto.LogEntry do
-  @encode_keys ~w(decode_time query_time queue_time query)a
+  @format_keys ~w(decode_time query_time queue_time query)a
 
-  def encode(entry) do
+  def format(entry) do
     duration = (entry.queue_time || 0) + (entry.query_time || 0) + (entry.decode_time || 0)
     entry
-    |> Map.take(@encode_keys)
+    |> Map.take(@format_keys)
     |> Map.put(:total_time, duration)
   end
 end

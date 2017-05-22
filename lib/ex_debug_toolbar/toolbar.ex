@@ -53,7 +53,7 @@ defmodule ExDebugToolbar.Toolbar do
 
   defp update_request(%Request{} = request, key, data, collection_def) do
     collection = Map.get(request.data, key, collection_def)
-    updated_data = data |> Collectable.encode |> (&Collection.change(collection, &1)).()
+    updated_data = data |> Collectable.format |> (&Collection.change(collection, &1)).()
     Map.update!(request, :data, &Map.put(&1, key, updated_data))
   end
 end

@@ -12,17 +12,17 @@ defmodule ExDebugToolbar.Data.LogEntryTest do
       {:ok, entry: entry}
     end
 
-    test "encode/1 encodes into map", context do
-      assert %{level: "debug"} = Collectable.encode(context.entry)
+    test "format/1 formats into map", context do
+      assert %{level: "debug"} = Collectable.format(context.entry)
     end
 
-    test "encode/1 encodes message into string", context do
+    test "format/1 formats message into string", context do
       entry = %{context.entry | message: ["he", "y"]}
-      assert %{message: "hey"} = Collectable.encode(entry)
+      assert %{message: "hey"} = Collectable.format(entry)
     end
 
-    test "encode/1 encodes timestamp into string", context do
-      assert %{timestamp: "2015-04-29 02:44:00"} = Collectable.encode(context.entry)
+    test "format/1 formats timestamp into string", context do
+      assert %{timestamp: "2015-04-29 02:44:00"} = Collectable.format(context.entry)
     end
   end
 end
