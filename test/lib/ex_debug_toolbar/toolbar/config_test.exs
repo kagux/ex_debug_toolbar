@@ -1,7 +1,7 @@
 defmodule ExDebugToolbar.Toolbar.ConfigTest do
   use ExUnit.Case, async: false
 
-  alias ExDebugToolbar.Data.Timeline
+  alias ExDebugToolbar.Data.{Timeline, Logs, EctoQueries}
   alias ExDebugToolbar.Toolbar.Config
 
   setup do
@@ -12,14 +12,14 @@ defmodule ExDebugToolbar.Toolbar.ConfigTest do
 
   test "get_collections/0 returns default collections definitions" do
     assert Config.get_collections() == %{
-      logs: [],
+      logs: %Logs{},
       timeline: %Timeline{},
-      ecto: []
+      ecto: %EctoQueries{}
     }
   end
 
   test "get_collection/1 return collection definition for a key" do
-    assert {:ok, []} == Config.get_collection(:logs)
+    assert {:ok, %Logs{}} == Config.get_collection(:logs)
   end
 
   test "define_collection/2 adds new collection for given key" do

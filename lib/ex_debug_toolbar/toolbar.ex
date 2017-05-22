@@ -1,7 +1,7 @@
 defmodule ExDebugToolbar.Toolbar do
   alias ExDebugToolbar.Request.Registry
   alias ExDebugToolbar.Request
-  alias ExDebugToolbar.Data.{Collectable, Collection}
+  alias ExDebugToolbar.Data.Collection
   alias ExDebugToolbar.Toolbar.Config
 
   def start_request do
@@ -53,7 +53,7 @@ defmodule ExDebugToolbar.Toolbar do
 
   defp update_request(%Request{} = request, key, data, collection_def) do
     collection = Map.get(request.data, key, collection_def)
-    updated_data = data |> Collectable.format |> (&Collection.change(collection, &1)).()
+    updated_data = collection |> Collection.format_item(data) |> (&Collection.add(collection, &1)).()
     Map.update!(request, :data, &Map.put(&1, key, updated_data))
   end
 end

@@ -17,7 +17,7 @@ defmodule ExDebugToolbar.Collector.EctoCollectorTest do
     %Ecto.LogEntry{query: "query"} |> Collector.log
     assert {:ok, request} = get_request()
     assert request.data |> Map.has_key?(:ecto)
-    assert request.data.ecto |> length == 1
-    assert %{query: "query"} = request.data.ecto |> hd
+    assert request.data.ecto.queries |> length == 1
+    assert %{query: "query"} = request.data.ecto.queries |> hd
   end
 end
