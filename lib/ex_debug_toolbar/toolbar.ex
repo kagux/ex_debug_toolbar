@@ -2,6 +2,7 @@ defmodule ExDebugToolbar.Toolbar do
   alias ExDebugToolbar.Request.Registry
   alias ExDebugToolbar.Request
   alias ExDebugToolbar.Data.{Collectable, Collection, Timeline}
+  alias ExDebugToolbar.Toolbar.Config
 
   def start_request do
     request = %Request{id: get_request_id(), created_at: NaiveDateTime.utc_now()}
@@ -42,15 +43,24 @@ defmodule ExDebugToolbar.Toolbar do
 
   def add_data(key, data), do: get_request_id() |> add_data(key, data)
   def add_data(request_id, key, data) do
-    :ok = Registry.update(request_id, &update_request(&1, key, data))
+    case Config.get_collection(key) do
+      {:ok, collection_def} ->
+        :ok = Registry.update(request_id, &update_request(&1, key, data, collection_def))
+      :error ->
+        {:error, :undefined_collection}
+    end
+  end
+
+  def define_collection(key, collection) do
+    Config.define_collection(key, collection)
   end
 
   defp get_request_id do
     Process.get(:request_id)
   end
 
-  defp update_request(%Request{} = request, key, data) do
-    collection = Map.get_lazy(request.data, key, fn -> Collectable.init_collection(data) end)
+  defp update_request(%Request{} = request, key, data, collection_def) do
+    collection = Map.get(request.data, key, collection_def)
     updated_data = data |> Collectable.encode |> (&Collection.change(collection, &1)).()
     Map.update!(request, :data, &Map.put(&1, key, updated_data))
   end

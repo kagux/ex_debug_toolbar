@@ -9,8 +9,6 @@ end
 alias ExDebugToolbar.Data.{Collectable, LogEntry}
 
 defimpl Collectable, for: LogEntry do
-  def init_collection(_), do: []
-
   def encode(entry) do
     entry
     |> Map.from_struct

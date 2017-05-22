@@ -12,10 +12,6 @@ defmodule ExDebugToolbar.Data.LogEntryTest do
       {:ok, entry: entry}
     end
 
-    test "init_collection/1 returns a list" do
-      assert Collectable.init_collection(%LogEntry{}) == []
-    end
-
     test "encode/1 encodes into map", context do
       assert %{level: "debug"} = Collectable.encode(context.entry)
     end

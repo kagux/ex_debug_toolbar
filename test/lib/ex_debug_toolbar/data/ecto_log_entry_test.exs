@@ -13,10 +13,6 @@ defmodule ExDebugToolbar.Data.EctoLogTest do
       {:ok, entry: entry}
     end
 
-    test "change/2 returns a list" do
-      assert Collectable.init_collection(%Ecto.LogEntry{}) == []
-    end
-
     test "encode/1 encodes into map", context do
       assert %{
         decode_time: 5,
