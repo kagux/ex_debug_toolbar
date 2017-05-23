@@ -46,6 +46,13 @@ defmodule ExDebugToolbar.Request.RegistryTest do
       assert :ok = Registry.update("r_1", updater)
       assert {:ok, new_request} == get_request("r_1")
     end
+
+    test "does not raise error if request is missing" do
+      pid = Process.whereis Registry
+      assert :ok = Registry.update("missing_request", %{id: 2})
+      :timer.sleep 10
+      assert Process.whereis(Registry) == pid
+    end
   end
 
   test "update/1 uses request id from process disctionary" do

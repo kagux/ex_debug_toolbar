@@ -52,11 +52,14 @@ defmodule ExDebugToolbar.Request.Registry do
   end
 
   def handle_cast({:update, request_id, changes}, _state) do
-    {:ok, request} = lookup(request_id)
-    request = apply_changes(request, changes)
-    true = :ets.insert(@table, {request_id, request})
-
-    {:noreply, nil}
+    case lookup(request_id) do
+      {:ok, request} ->
+        request = apply_changes(request, changes)
+        :ets.insert(@table, {request_id, request})
+        {:noreply, nil}
+      _ ->
+        {:noreply, nil}
+    end
   end
 
   defp registry_alive? do

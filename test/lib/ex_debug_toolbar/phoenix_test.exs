@@ -14,21 +14,38 @@ defmodule ExDebugToolbar.PhoenixTest do
   end
 
   test "it works" do
-    assert {200, _, _} = sent_resp(make_request())
+    conn = make_request("/")
+    assert {200, _, _} = sent_resp(conn)
   end
 
   test "it executes existing plugs" do
-    assert make_request().assigns[:called?] == true
+    conn = make_request("/")
+    assert conn.assigns[:called?] == true
   end
 
   test "it tracks execution time of all following plugs in pipeline" do
-    make_request timeout: 100
+    make_request "/", timeout: 100
     assert {:ok, request} = get_request()
     assert request.data.timeline.duration > 70 * 1000 # not sure why
   end
 
-  defp make_request(assigns \\ %{}) do
-    conn(:get, "/")
+  describe "requests to __ex_debug_toolbar__" do
+    setup do
+      conn = make_request("/__ex_debug_toolbar__/path")
+      {:ok, conn: conn}
+    end
+
+    test "are not tracked" do
+      assert {:error, :not_found} = get_request()
+    end
+
+    test "routed through ExDebugToolbar.Endpoint", context do
+      assert %{phoenix_endpoint: ExDebugToolbar.Endpoint} = context.conn.private
+    end
+  end
+
+  defp make_request(path, assigns \\ %{}) do
+    conn(:get, path)
     |> Map.put(:assigns, Map.new(assigns))
     |> Endpoint.call(%{})
   end

@@ -3,25 +3,27 @@ defmodule ExDebugToolbar.Phoenix do
     quote do
       require Phoenix.Endpoint
       alias Phoenix.Endpoint
-      alias ExDebugToolbar.Plug.RequestId
+      alias ExDebugToolbar.Plug.Router
 
       Logger.add_backend(ExDebugToolbar.Collector.LoggerCollector)
 
       Endpoint.socket "/__ex_debug_toolbar__/socket", ExDebugToolbar.UserSocket
 
-      Endpoint.plug ExDebugToolbar.Plug.CodeInjector
-
       def call(conn, opts) do
-        conn = call_request_id_plugs(conn, opts)
-        Endpoint.instrument(conn, :ex_debug_toolbar, fn ->
-          super(conn, opts)
-        end)
+        case dispatch_router(conn, opts) do
+          %{private: %{phoenix_endpoint: ExDebugToolbar.Endpoint}} = conn ->
+            conn
+          conn ->
+            Endpoint.instrument(conn, :ex_debug_toolbar, fn ->
+              super(conn, opts)
+            end)
+        end
       end
       defoverridable [call: 2]
 
-      defp call_request_id_plugs(conn, opts) do
-        opts = RequestId.init(opts)
-        ExDebugToolbar.Plug.RequestId.call(conn, opts)
+      defp dispatch_router(conn, opts) do
+        opts = Router.init(opts)
+        Router.call(conn, opts)
       end
     end
   end
