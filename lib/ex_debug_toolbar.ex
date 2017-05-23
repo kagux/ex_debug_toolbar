@@ -12,6 +12,7 @@ defmodule ExDebugToolbar do
       supervisor(ExDebugToolbar.Endpoint, []),
       # Start your own worker by calling: ExDebugToolbar.Worker.start_link(arg1, arg2, arg3)
       worker(ExDebugToolbar.Request.Registry, []),
+      worker(ExDebugToolbar.Toolbar.Config, []),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

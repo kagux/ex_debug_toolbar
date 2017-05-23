@@ -5,18 +5,3 @@ defmodule ExDebugToolbar.Data.LogEntry do
     timestamp: nil
   ]
 end
-
-alias ExDebugToolbar.Data.{Collectable, LogEntry}
-
-defimpl Collectable, for: LogEntry do
-  def init_collection(_), do: []
-
-  def encode(entry) do
-    entry
-    |> Map.from_struct
-    |> Map.update!(:message, &to_string/1)
-    |> Map.update!(:timestamp, fn {date, {h, m, s, _ms}} ->
-      {date, {h, m, s}} |> NaiveDateTime.from_erl! |> to_string
-    end)
-  end
-end

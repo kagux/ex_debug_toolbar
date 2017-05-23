@@ -1,12 +1,14 @@
 defmodule ExDebugToolbar.Data.ListTest do
   use ExUnit.Case, async: true
-  alias ExDebugToolbar.Data.{Collection}
+  alias ExDebugToolbar.Data.Collection
 
-  test "implements collection protocol" do
-    assert Collection.change([], :item) == [:item]
-  end
+  describe "collection protocol" do
+    test "add/2 prepands values to the collection" do
+      assert Collection.add([:bar], :foo) == [:foo, :bar]
+    end
 
-  test "it prepands items to the list" do
-    assert [:b, :a] == Collection.change([:a], :b)
+    test "format_item/2 returns same value" do
+      assert Collection.format_item([], :foo) == :foo
+    end
   end
 end

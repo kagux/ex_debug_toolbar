@@ -1,6 +1,6 @@
 defmodule ExDebugToolbar.Data.TimelineTest do
   use ExUnit.Case, async: true
-  alias ExDebugToolbar.Data.Timeline.{Event, Action}
+  alias ExDebugToolbar.Data.Timeline.{Event}
   alias ExDebugToolbar.Data.{Timeline, Collection}
 
   describe "events management" do
@@ -84,30 +84,34 @@ defmodule ExDebugToolbar.Data.TimelineTest do
   end
 
   describe "collection protocol" do
-    test "passing :start_event action change/2 starts new event" do
+    test "passing :start_event action add/2 starts new event" do
       timeline = %Timeline{}
-      |> Collection.change(%Action{action: :start_event, event_name: "event"})
+      |> Collection.add({:start_event, "event"})
       |> Timeline.finish_event("event")
 
       assert timeline.events |> length == 1
       assert %Event{name: "event"} = timeline.events |> hd
     end
 
-    test "passing :finish_event action change/2 finishes event" do
+    test "passing :finish_event action add/2 finishes event" do
       timeline = %Timeline{}
       |> Timeline.start_event("event")
-      |> Collection.change(%Action{action: :finish_event, event_name: "event", duration: 5})
+      |> Collection.add({:finish_event, "event", 5})
 
       assert timeline.events |> length == 1
       assert %Event{name: "event", duration: 5} = timeline.events |> hd
     end
 
-    test "passing :add_finished_event action change/2 adds event" do
+    test "passing :add_finished_event action add/2 adds event" do
       timeline = %Timeline{}
-      |> Collection.change(%Action{action: :add_finished_event, event_name: "event", duration: 5})
+      |> Collection.add({:add_finished_event, "event", 5})
 
       assert timeline.events |> length == 1
       assert %Event{name: "event", duration: 5} = timeline.events |> hd
+    end
+
+    test "format_item/2 returns same value for tuple" do
+      assert Collection.format_item(%Timeline{}, {:hello}) == {:hello}
     end
   end
 end

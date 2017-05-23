@@ -40,18 +40,20 @@ defmodule ExDebugToolbar.Data.Timeline do
   defp update_duration(event, duration), do: %{event | duration: duration}
 end
 
-alias ExDebugToolbar.Data.{Collection, Timeline, Timeline.Action}
+alias ExDebugToolbar.Data.{Collection, Timeline}
 
 defimpl Collection, for: Timeline do
-  def change(timeline, %Action{action: :start_event, event_name: name}) do
+  def add(timeline, {:start_event, name}) do
     Timeline.start_event(timeline, name)
   end
 
-  def change(timeline, %Action{action: :finish_event, event_name: name, duration: duration}) do
+  def add(timeline, {:finish_event, name, duration}) do
     Timeline.finish_event(timeline, name, duration: duration)
   end
 
-  def change(timeline, %Action{action: :add_finished_event, event_name: name, duration: duration}) do
+  def add(timeline, {:add_finished_event, name, duration}) do
     Timeline.add_finished_event(timeline, name, duration)
   end
+
+  def format_item(_timeline, item), do: item
 end

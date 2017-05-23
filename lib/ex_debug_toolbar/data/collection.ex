@@ -1,16 +1,7 @@
 defprotocol ExDebugToolbar.Data.Collection do
-  @doc "applies changes to collection"
-  def change(collection, changes)
-end
+  @doc "adds item to collection"
+  def add(collection, item)
 
-alias ExDebugToolbar.Data.Collection
-
-defimpl Collection, for: Map do
-  def change(collection, map), do: Map.merge(collection, map)
-end
-
-defimpl Collection, for: List do
-  def change(collection, item) do 
-    [item | collection]
-  end
+  @doc "formats item"
+  def format_item(collection, item)
 end
