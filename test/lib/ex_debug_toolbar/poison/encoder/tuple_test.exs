@@ -4,7 +4,7 @@ defmodule ExDebugToolbar.Poison.Encoder.TupleTest do
 
   describe "Poison.Encoder protocol" do
     test "tuples are encoded as lists" do
-      assert Encoder.encode({:foo, :bar}, []) |> to_string == "[\"foo\",\"bar\"]"
+      assert Encoder.encode({:foo, :bar}, []) |> to_string == ~S(["foo","bar"])
     end
   end
 end
