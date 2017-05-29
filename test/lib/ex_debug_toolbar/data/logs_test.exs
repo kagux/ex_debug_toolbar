@@ -1,10 +1,10 @@
 defmodule ExDebugToolbar.Data.LogsTest do
   use ExUnit.Case, async: true
-  alias ExDebugToolbar.Data.{Collection, LogEntry, Logs}
+  alias ExDebugToolbar.Data.{Collection, Logs}
 
   describe "collection protocol" do
     setup do
-      entry = %LogEntry{
+      entry = %Logs.Entry{
         level: "debug",
         message: "hey",
         timestamp: {{2015, 4, 29}, {2, 44, 0, 0}}
