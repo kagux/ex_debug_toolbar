@@ -635,9 +635,9 @@ boom@2.x.x:
   dependencies:
     hoek "2.x.x"
 
-bootstrap-sass-namespace@^3.3.7-alpha.6:
-  version "3.3.7-alpha.6"
-  resolved "https://registry.yarnpkg.com/bootstrap-sass-namespace/-/bootstrap-sass-namespace-3.3.7-alpha.6.tgz#a6efbe267e12b98196fa7da827b694e85ca9f80a"
+bootstrap-sass@^3.3.7:
+  version "3.3.7"
+  resolved "https://registry.yarnpkg.com/bootstrap-sass/-/bootstrap-sass-3.3.7.tgz#6596c7ab40f6637393323ab0bc80d064fc630498"
 
 bower-config@^1.4.0:
   version "1.4.0"

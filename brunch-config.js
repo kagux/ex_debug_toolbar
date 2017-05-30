@@ -42,14 +42,14 @@ exports.config = {
       ignore: [/web\/static\/vendor/]
     },
     copycat:{
-      "css/fonts" : ["node_modules/bootstrap-sass-namespace/assets/fonts"],
+      "css/fonts" : ["node_modules/bootstrap-sass/assets/fonts"],
       verbose : true, //shows each file that is copied to the destination directory
       onlyChanged: true //only copy a file if it's modified time has changed (only effective when using brunch watch)
     },
     sass: {
       options: {
         mode: 'ruby',
-        includePaths: ['node_modules/bootstrap-sass-namespace/assets/stylesheets/']
+        includePaths: ['node_modules/bootstrap-sass/assets/stylesheets/']
       }
     }
   },
