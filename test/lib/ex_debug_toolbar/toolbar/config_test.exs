@@ -1,7 +1,7 @@
 defmodule ExDebugToolbar.Toolbar.ConfigTest do
   use ExUnit.Case, async: false
 
-  alias ExDebugToolbar.Data.{Timeline, Logs, EctoQueries}
+  alias ExDebugToolbar.Data.{Conn, Timeline, Logs, EctoQueries}
   alias ExDebugToolbar.Toolbar.Config
 
   setup do
@@ -12,9 +12,10 @@ defmodule ExDebugToolbar.Toolbar.ConfigTest do
 
   test "get_collections/0 returns default collections definitions" do
     assert Config.get_collections() == %{
+      conn: %Conn{},
       logs: %Logs{},
       timeline: %Timeline{},
-      ecto: %EctoQueries{}
+      ecto: %EctoQueries{},
     }
   end
 

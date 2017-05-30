@@ -1,6 +1,15 @@
 defmodule ExDebugToolbar.Data.Timeline do
   alias ExDebugToolbar.Data.Timeline
 
+  defmodule Event do
+    defstruct [
+      name: nil,
+      started_at: nil,
+      duration: 0,
+      events: [],
+    ]
+  end
+
   defstruct [
     events: [],
     duration: 0,

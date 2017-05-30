@@ -1,11 +1,12 @@
 defmodule ExDebugToolbar.Toolbar.Config do
-  alias ExDebugToolbar.Data.{Timeline, Logs, EctoQueries}
+  alias ExDebugToolbar.Data.{Conn, Timeline, Logs, EctoQueries}
 
   @default_config %{
     collections: %{
+      conn: %Conn{},
       ecto: %EctoQueries{},
       logs: %Logs{},
-      timeline: %Timeline{}
+      timeline: %Timeline{},
     }
   }
 
