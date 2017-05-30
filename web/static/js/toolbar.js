@@ -1,5 +1,8 @@
-import "phoenix_html"
-import {Socket} from "phoenix"
+import 'phoenix_html';
+import {Socket} from 'phoenix';
+import $ from "jquery";
+window.jQuery = $;
+require('bootstrap-sass');
 
 class App {
   constructor(opts) {
@@ -7,16 +10,22 @@ class App {
   }
 
   render() {
-    let socket = new Socket("/__ex_debug_toolbar__/socket");
+    this.joinChannel();
+  }
+
+  joinChannel() {
+    const socket = new Socket("/__ex_debug_toolbar__/socket");
     socket.connect();
-    let request_channel = socket.channel("toolbar:request:" + this.opts.requestId, {});
-    request_channel.join()
-    .receive("ok", resp => { console.log("Joined successfully", resp) })
+    socket
+    .channel("toolbar:request:" + this.opts.requestId, {})
+    .join()
+    .receive("ok", this.renderToolbar)
     .receive("error", resp => { console.log("Unable to join", resp) })
-    let all_requests_channel = socket.channel("toolbar:requests", {});
-    all_requests_channel.join()
-    .receive("ok", resp => { console.log("Joined successfully", resp) })
-    .receive("error", resp => { console.log("Unable to join", resp) })
+  }
+
+  renderToolbar({html: html, request: request}){
+    console.log("Request: ", request);
+    document.body.innerHTML += '<div class="ex_debug_toolbar">' + html + '</div>';
   }
 }
 
