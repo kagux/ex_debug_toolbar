@@ -8,7 +8,7 @@ defmodule ExDebugToolbar.ToolbarChannel do
     case Toolbar.get_request(request_id) do
       {:ok, request} ->
         payload = %{
-          html: View.render_to_string(ToolbarView, "show.html", []),
+          html: View.render_to_string(ToolbarView, "show.html", [request: request]),
           request: request
         }
         {:ok, payload, socket}
