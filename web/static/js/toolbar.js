@@ -19,13 +19,26 @@ class App {
     socket
     .channel("toolbar:request:" + this.opts.requestId, {})
     .join()
-    .receive("ok", this.renderToolbar)
+    .receive("ok", this.renderToolbar.bind(this))
     .receive("error", resp => { console.log("Unable to join", resp) })
   }
 
   renderToolbar({html: html, request: request}){
     console.log("Request: ", request);
-    document.body.innerHTML += '<div class="ex_debug_toolbar">' + html + '</div>';
+    document.body.innerHTML += '<div class="ex-debug-toolbar">' + html + '</div>';
+    this.renderPopovers();
+  }
+
+  renderPopovers() {
+    $('[data-toggle="popover"]').popover({
+      container: '.ex-debug-toolbar .navbar',
+      placement: 'top',
+      trigger: 'hover',
+      html: true,
+      content: function() {
+        return $(this).parent().find('[data-role="popover-content"]').html();
+      }
+    });
   }
 }
 
