@@ -4,7 +4,7 @@ defmodule ExDebugToolbar.ToolbarChannel do
   alias ExDebugToolbar.ToolbarView
   alias Phoenix.View
 
-  def join("toolbar:request:" <> request_id, _message, socket) do
+  def join("toolbar:request", %{"id" => request_id}, socket) do
     case Toolbar.get_request(request_id) do
       {:ok, request} ->
         payload = %{
