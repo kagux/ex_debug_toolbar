@@ -17,7 +17,7 @@ class App {
     const socket = new Socket("/__ex_debug_toolbar__/socket");
     socket.connect();
     socket
-    .channel("toolbar:request:" + this.opts.requestId, {})
+    .channel("toolbar:request", {id: this.opts.requestId})
     .join()
     .receive("ok", this.renderToolbar.bind(this))
     .receive("error", resp => { console.log("Unable to join", resp) })
