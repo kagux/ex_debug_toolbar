@@ -30,14 +30,16 @@ class App {
   }
 
   renderPopovers() {
-    $('[data-toggle="popover"]').popover({
-      container: '.ex-debug-toolbar .navbar',
-      placement: 'top',
-      trigger: 'hover',
-      html: true,
-      content: function() {
-        return $(this).parent().find('[data-role="popover-content"]').html();
-      }
+    $('[data-toggle="popover"]').each((i, el) => {
+      $(el).popover({
+        container: el,
+        placement: 'top',
+        trigger: 'hover',
+        html: true,
+        content: function() {
+          return $(this).parent().find('[data-role="popover-content"]').html();
+        }
+      });
     });
   }
 }

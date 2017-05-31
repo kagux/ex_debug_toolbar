@@ -20,13 +20,17 @@
   }
 
   .popover {
-    max-width: 100%;
+    max-width: 1000px;
+  }
+
+  .popover-container {
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+ .nowrap {
+   white-space:nowrap;
   }
 }
 
-#edt-logs-popover {
-  min-width: 600px;
-  max-height: 400px;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
