@@ -109,9 +109,5 @@ defmodule ExDebugToolbar.Data.TimelineTest do
       assert timeline.events |> length == 1
       assert %Event{name: "event", duration: 5} = timeline.events |> hd
     end
-
-    test "format_item/2 returns same value for tuple" do
-      assert Collection.format_item(%Timeline{}, {:hello}) == {:hello}
-    end
   end
 end

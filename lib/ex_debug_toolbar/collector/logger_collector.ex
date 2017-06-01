@@ -1,6 +1,6 @@
 defmodule ExDebugToolbar.Collector.LoggerCollector do
   alias ExDebugToolbar.Toolbar
-  alias ExDebugToolbar.Data.Logs.Entry
+  alias ExDebugToolbar.Data.LogEntry
   @behaviour :gen_event
 
   def init(_), do: {:ok, nil}
@@ -36,7 +36,7 @@ defmodule ExDebugToolbar.Collector.LoggerCollector do
 
   defp add_log_to_toolbar(level, event) do
     {Logger, message, timestamp, metadata} = event
-    log_entry = %Entry{
+    log_entry = %LogEntry{
       level: level,
       message: message,
       timestamp: timestamp

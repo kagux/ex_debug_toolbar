@@ -63,6 +63,4 @@ defimpl Collection, for: Timeline do
   def add(timeline, {:add_finished_event, name, duration}) do
     Timeline.add_finished_event(timeline, name, duration)
   end
-
-  def format_item(_timeline, item), do: item
 end

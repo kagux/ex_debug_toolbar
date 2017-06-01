@@ -41,13 +41,11 @@ defmodule ExDebugToolbar.Toolbar do
     end
   end
 
-  defp get_request_id do
-    Process.get(:request_id)
+  defp update_request(%Request{} = request, key, data) do
+    request |> Map.get(key) |> Collection.add(data) |> (&Map.put(request, key, &1)).()
   end
 
-  defp update_request(%Request{} = request, key, data) do
-    collection = Map.get(request, key)
-    updated_collection = collection |> Collection.format_item(data) |> (&Collection.add(collection, &1)).()
-    %{request | key => updated_collection}
+  defp get_request_id do
+    Process.get(:request_id)
   end
 end

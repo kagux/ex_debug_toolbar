@@ -12,9 +12,5 @@ defmodule ExDebugToolbar.Data.MapTest do
       updated_collection = Collection.add(collection, %{key: "new value"})
       assert updated_collection == %{key: "new value", foo: :bar}
     end
-
-    test "format_item/2 returns same map" do
-      assert Collection.format_item(%{}, %{foo: :bar}) == %{foo: :bar}
-    end
   end
 end
