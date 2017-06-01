@@ -1,4 +1,4 @@
 <span>
   <i class="glyphicon glyphicon-time" aria-hidden="true"></i>
-  <%= format_native_time @timeline.duration %>
+  <%= native_time_to_string @timeline.duration %>
 </span>

@@ -44,6 +44,7 @@ defmodule ExDebugToolbar.Web do
       import ExDebugToolbar.Router.Helpers
       import ExDebugToolbar.ErrorHelpers
       import ExDebugToolbar.Gettext
+      import ExDebugToolbar.View.Helpers.TimeHelpers
     end
   end
 
