@@ -1,10 +1,10 @@
 defmodule ExDebugToolbar.Request do
-  alias ExDebugToolbar.Data.{Conn, EctoQueries, Logs, Timeline}
+  alias ExDebugToolbar.Data.{EctoQueries, Logs, Timeline}
 
   defstruct [
     id: nil,
     created_at: nil,
-    conn: %Conn{},
+    conn: %Plug.Conn{},
     ecto: %EctoQueries{},
     logs: %Logs{},
     timeline: %Timeline{}
