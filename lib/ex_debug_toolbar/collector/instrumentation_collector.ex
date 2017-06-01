@@ -3,11 +3,8 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollector do
 
   def ex_debug_toolbar(:start, _, _) do
     Toolbar.start_request
-    Toolbar.start_event("request")
   end
-  def ex_debug_toolbar(:stop, time_diff, _) do
-    Toolbar.finish_event("request", duration: time_diff)
-  end
+  def ex_debug_toolbar(:stop, _, _), do: :ok
 
   def phoenix_controller_call(:start, _, %{conn: conn}) do
     event_name = controller_event_name(conn)
