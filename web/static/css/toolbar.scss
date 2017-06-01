@@ -1,0 +1,43 @@
+.ex-debug-toolbar {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.42857;
+  color: #333333;
+  background-color: #fff;
+
+  // namespacing to avoid conflicts
+  @import "bootstrap";
+
+  .navbar-nav.nav > li > span {
+    @extend a;
+    padding-left: 5px;
+    padding-right: 5px;
+    cursor: pointer;
+
+    &> i {
+      margin-right: 5px;
+    }
+  }
+
+  .popover {
+    max-width: 1000px;
+  }
+
+  .popover-container {
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+ .nowrap {
+   white-space:nowrap;
+  }
+
+  table {
+    .hljs {
+      background: unset;
+      padding: unset;
+    }
+  }
+}
+
