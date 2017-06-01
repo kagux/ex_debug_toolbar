@@ -11,6 +11,7 @@
         <th> Query</th>
         <th> Decode</th>
         <th> Query </th>
+        <th> Params </th>
       </thead>
       <tbody>
         <%= for query <- @ecto |> Enum.reverse do %>
@@ -20,6 +21,7 @@
             <td><%= query.query_time |> native_time_to_string %></td>
             <td><%= query.decode_time |> native_time_to_string %></td>
             <td class="nowrap"><span class="code"><%= query.query %></span></td>
+            <td><%= query.params |> inspect %></td>
           </tr>
         <% end %>
       </tbody>
