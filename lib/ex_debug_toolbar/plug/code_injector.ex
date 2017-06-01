@@ -1,9 +1,11 @@
 defmodule ExDebugToolbar.Plug.CodeInjector do
   import Plug.Conn
+  alias Plug.Conn
+  alias ExDebugToolbar.Router.Helpers, as: RouterHelpers
 
   @behaviour Plug
 
-  alias Plug.Conn
+  @path_prefix "/__ex_debug_toolbar__"
 
   def init(options), do: options
 
@@ -12,21 +14,36 @@ defmodule ExDebugToolbar.Plug.CodeInjector do
   end
 
   defp inject_debug_toolbar_code(conn) do
-    if inject?(conn), do: append_code_to_resp_body(conn), else: conn
+    if inject?(conn) do
+      conn |> inject_css |> inject_js
+    else
+      conn
+    end
   end
 
-  defp append_code_to_resp_body(conn) do
-    resp_body = to_string(conn.resp_body)
-    body = String.replace(resp_body, "</body>", debug_toolbar_tag() <> "</body>")
+  defp inject_js(conn) do
+    static_path("/js/toolbar.js") |> js_code |> inject_code(conn, "</body>")
+  end
+
+  defp inject_css(conn) do
+    css_path = static_path("/css/toolbar.css")
+    "<link rel='stylesheet' type='text/css' href='#{css_path}'>\n" |> inject_code(conn, "</head>")
+  end
+
+  defp static_path(path) do
+    @path_prefix <> RouterHelpers.static_path(ExDebugToolbar.Endpoint, path)
+  end
+
+  defp inject_code(code, %{resp_body: body} = conn, tag) do
+    body = body |> to_string |> String.replace(tag, code <> tag)
     put_in conn.resp_body, body
   end
 
-  defp debug_toolbar_tag do
-    path = ExDebugToolbar.Router.Helpers.static_path(ExDebugToolbar.Endpoint, "/js/app.js")
+  defp js_code(path) do
     request_id = Process.get(:request_id)
     """
     <script>window.requestId='#{request_id}';</script>
-    <script src="/__ex_debug_toolbar__#{path}"></script>
+    <script src='#{path}'></script>
     """
   end
 

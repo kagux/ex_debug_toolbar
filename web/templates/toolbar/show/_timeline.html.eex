@@ -1,0 +1,4 @@
+<span>
+  <i class="glyphicon glyphicon-time" aria-hidden="true"></i>
+  <%= native_time_to_string @timeline.duration %>
+</span>

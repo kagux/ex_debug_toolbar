@@ -2,27 +2,13 @@ exports.config = {
   // See http://brunch.io/#documentation for docs.
   files: {
     javascripts: {
-      joinTo: "js/app.js"
-
-      // To use a separate vendor.js bundle, specify two files path
-      // http://brunch.io/docs/config#-files-
-      // joinTo: {
-      //  "js/app.js": /^(web\/static\/js)/,
-      //  "js/vendor.js": /^(web\/static\/vendor)|(deps)/
-      // }
-      //
-      // To change the order of concatenation of files, explicitly mention here
-      // order: {
-      //   before: [
-      //     "web/static/vendor/js/jquery-2.1.1.js",
-      //     "web/static/vendor/js/bootstrap.min.js"
-      //   ]
-      // }
+      joinTo: {
+        "js/toolbar.js": /^(web\/static\/js\/toolbar)|^node_modules/,
+      }
     },
     stylesheets: {
-      joinTo: "css/app.css",
-      order: {
-        after: ["web/static/css/app.css"] // concat app.css last
+      joinTo: {
+        "css/toolbar.css": /^(web\/static\/css\/toolbar)|^node_modules/,
       }
     },
     templates: {
@@ -54,16 +40,30 @@ exports.config = {
     babel: {
       // Do not use ES6 compiler in vendor code
       ignore: [/web\/static\/vendor/]
+    },
+    copycat:{
+      "fonts" : ["node_modules/bootstrap-sass/assets/fonts"],
+      verbose : true, //shows each file that is copied to the destination directory
+      onlyChanged: true //only copy a file if it's modified time has changed (only effective when using brunch watch)
+    },
+    sass: {
+      options: {
+        mode: 'ruby',
+        includePaths: ['node_modules/bootstrap-sass/assets/stylesheets/']
+      }
     }
   },
 
   modules: {
     autoRequire: {
-      "js/app.js": ["web/static/js/app"]
+      "js/toolbar.js": ["web/static/js/toolbar"]
     }
   },
 
   npm: {
+    styles: {
+      'highlight.js': ['styles/default.css']
+    },
     enabled: true
   }
 };
