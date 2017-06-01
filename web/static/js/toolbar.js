@@ -1,6 +1,7 @@
 import 'phoenix_html';
 import {Socket} from 'phoenix';
 import $ from "jquery";
+import Highlight from "highlight.js";
 window.jQuery = $;
 require('bootstrap-sass');
 
@@ -25,12 +26,14 @@ class App {
 
   renderToolbar({html: html, request: request}){
     console.log("Request: ", request);
-    document.body.innerHTML += '<div class="ex-debug-toolbar">' + html + '</div>';
-    this.renderPopovers();
+    const toolbar = $(`<div class="ex-debug-toolbar">${html}</div>`);
+    toolbar.appendTo('body');
+    this.renderPopovers(toolbar);
+    this.highlightCode(toolbar);
   }
 
-  renderPopovers() {
-    $('[data-toggle="popover"]').each((i, el) => {
+  renderPopovers(toolbar) {
+    toolbar.find('[data-toggle="popover"]').each((i, el) => {
       $(el).popover({
         container: el,
         placement: 'top',
@@ -41,6 +44,12 @@ class App {
         }
       });
     });
+  }
+
+  highlightCode(toolbar) {
+    toolbar.find(".code").each((i, block) => {
+      Highlight.highlightBlock(block)
+    })
   }
 }
 

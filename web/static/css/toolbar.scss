@@ -41,5 +41,12 @@
  .nowrap {
    white-space:nowrap;
   }
+
+  table {
+    .hljs {
+      background: unset;
+      padding: unset;
+    }
+  }
 }
 

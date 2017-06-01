@@ -19,7 +19,7 @@
             <td><%= native_time_to_string query.queue_time %></td>
             <td><%= native_time_to_string query.query_time %></td>
             <td><%= native_time_to_string query.decode_time %></td>
-            <td class="nowrap"><%= query.query %></td>
+            <td class="nowrap"><span class="code"><%= query.query %></span></td>
           </tr>
         <% end %>
       </tbody>

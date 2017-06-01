@@ -61,6 +61,9 @@ exports.config = {
   },
 
   npm: {
+    styles: {
+      'highlight.js': ['styles/default.css']
+    },
     enabled: true
   }
 };
