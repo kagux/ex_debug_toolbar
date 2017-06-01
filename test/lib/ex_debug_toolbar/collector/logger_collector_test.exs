@@ -16,13 +16,13 @@ defmodule ExDebugToolbar.Collector.LoggerCollectorTest do
     Logger.metadata(request_id: @request_id)
     Logger.debug "log entry"
     {:ok, request} = get_request()
-    assert request.data.logs.entries |> length > 0
-    assert request.data.logs.entries |> Enum.find(&(&1.message) == "log entry")
+    assert request.logs.entries |> length > 0
+    assert request.logs.entries |> Enum.find(&(&1.message) == "log entry")
   end
 
   test "it does nothing when request_id is missing" do
     Logger.debug "log entry"
     {:ok, request} = get_request()
-    refute Map.has_key?(request.data, :logs)
+    assert request.logs.entries == []
   end
 end
