@@ -1,6 +1,6 @@
 <span data-toggle="popover" data-title="Ecto Queries">
   <i class="glyphicon glyphicon-hdd" aria-hidden="true"></i>
-  <%= length @ecto.queries %>
+  <%= length @ecto %>
 </span>
 <div class="hidden" data-role="popover-content">
   <div class="fluid-container popover-container">
@@ -13,12 +13,12 @@
         <th> Query </th>
       </thead>
       <tbody>
-        <%= for query <- @ecto.queries |> Enum.reverse do %>
-          <tr class="<%= ecto_query_color_class(query) %>">
-            <td><%= native_time_to_string query.total_time %></td>
-            <td><%= native_time_to_string query.queue_time %></td>
-            <td><%= native_time_to_string query.query_time %></td>
-            <td><%= native_time_to_string query.decode_time %></td>
+        <%= for query <- @ecto |> Enum.reverse do %>
+          <tr class="<%= ecto_color_class(query) %>">
+            <td><%= query |> query_total_time |> native_time_to_string %></td>
+            <td><%= query.queue_time |> native_time_to_string %></td>
+            <td><%= query.query_time |> native_time_to_string %></td>
+            <td><%= query.decode_time |> native_time_to_string %></td>
             <td class="nowrap"><span class="code"><%= query.query %></span></td>
           </tr>
         <% end %>

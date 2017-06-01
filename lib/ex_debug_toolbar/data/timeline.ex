@@ -42,6 +42,9 @@ defmodule ExDebugToolbar.Data.Timeline do
   end
   def finish_event(_timeline, name, _opts), do: raise "the event #{name} is not open"
 
+  def empty?(%Timeline{events: []}), do: true
+  def empty?(%Timeline{}), do: false
+
   defp update_duration(event, nil) do
     duration = System.monotonic_time() - event.started_at
     update_duration(event, duration)
