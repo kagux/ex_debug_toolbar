@@ -34,6 +34,7 @@ defmodule ExDebugToolbar.Mixfile do
       {:phoenix_html, "~> 2.6"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:ecto, "~> 2.1", optional: true},
+      {:postgrex, "~> 0.13", optional: true},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       {:mock, "~> 0.2", only: :test},

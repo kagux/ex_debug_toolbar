@@ -17,7 +17,7 @@ defmodule ExDebugToolbar.Collector.TemplateTest do
   test "it tracks render time" do
     compile_template("template.html")
     assert {:ok, request} = get_request()
-    timeline = request.data.timeline
+    timeline = request.timeline
     assert timeline.duration > 0
     assert %Event{name: "template#test/fixtures/template.html.eex"} = timeline.events |> hd
   end

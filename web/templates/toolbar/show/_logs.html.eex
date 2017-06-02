@@ -1,6 +1,6 @@
 <span data-toggle="popover" data-title="Server Logs">
   <i class="glyphicon glyphicon-book" aria-hidden="true"></i>
-  <%= length @logs.entries %>
+  <%= length @logs %>
 </span>
 <div class="hidden" data-role="popover-content">
   <div class="fluid-container popover-container">
@@ -11,11 +11,11 @@
         <th> Message </th>
       </thead>
       <tbody>
-        <%= for entry <- @logs.entries |> Enum.reverse do %>
-          <tr class="<%= log_entry_color_class(entry) %>">
-            <td class="nowrap"><%= entry.timestamp %></td>
+        <%= for entry <- @logs |> Enum.reverse do %>
+          <tr class="<%= log_color_class(entry) %>">
+            <td class="nowrap"><%= log_timestamp_to_string entry.timestamp %></td>
             <td><%= entry.level %></td>
-            <td class="nowrap"><%= entry.message |> text_to_html %></td>
+            <td class="nowrap"><%= entry.message |> to_string |> text_to_html %></td>
           </tr>
         <% end %>
       </tbody>

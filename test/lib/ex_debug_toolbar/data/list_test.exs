@@ -6,9 +6,5 @@ defmodule ExDebugToolbar.Data.ListTest do
     test "add/2 prepands values to the collection" do
       assert Collection.add([:bar], :foo) == [:foo, :bar]
     end
-
-    test "format_item/2 returns same value" do
-      assert Collection.format_item([], :foo) == :foo
-    end
   end
 end

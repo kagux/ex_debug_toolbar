@@ -5,14 +5,14 @@
     </div>
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <%= if timeline = @request.data[:timeline] do %>
-          <li> <%= render "show/_timeline.html", timeline: timeline %> </li>
+        <%= unless ExDebugToolbar.Data.Timeline.empty? @request.timeline do %>
+          <li> <%= render "show/_timeline.html", timeline: @request.timeline %> </li>
         <% end %>
-        <%= if logs = @request.data[:logs] do %>
-          <li> <%= render "show/_logs.html", logs: logs %> </li>
+        <%= unless Enum.empty? @request.logs do %>
+          <li> <%= render "show/_logs.html", logs: @request.logs %> </li>
         <% end %>
-        <%= if ecto = @request.data[:ecto] do %>
-          <li> <%= render "show/_ecto.html", ecto: ecto %> </li>
+        <%= unless Enum.empty? @request.ecto do %>
+          <li> <%= render "show/_ecto.html", ecto: @request.ecto %> </li>
         <% end %>
       </ul>
     </div>

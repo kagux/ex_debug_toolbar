@@ -26,7 +26,7 @@ defmodule ExDebugToolbar.PhoenixTest do
   test "it tracks execution time of all following plugs in pipeline" do
     make_request "/", timeout: 100
     assert {:ok, request} = get_request()
-    assert request.data.timeline.duration > 70 * 1000 # not sure why
+    assert request.timeline.duration > 70 * 1000 # not sure why
   end
 
   describe "requests to __ex_debug_toolbar__" do

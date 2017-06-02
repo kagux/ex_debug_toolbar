@@ -2,10 +2,6 @@ defmodule ExDebugToolbar.ToolbarTest do
   use ExDebugToolbar.CollectorCase, async: false
   alias ExDebugToolbar.Toolbar
 
-  setup_all do
-    Toolbar.define_collection(:foo, %{})
-  end
-
   describe "add_data/3" do
     setup :start_request
 
@@ -14,16 +10,9 @@ defmodule ExDebugToolbar.ToolbarTest do
     end
 
     test "it adds new data to defined collection" do
-      Toolbar.add_data(@request_id, :foo, %{foo: :bar})
+      Toolbar.add_data(@request_id, :conn, {:request, %Plug.Conn{request_path: "/path"}})
       {:ok, request} = get_request()
-      assert request.data.foo == %{foo: :bar}
-    end
-
-    test "it updates existing data in defined collection" do
-      Toolbar.add_data(@request_id, :foo, %{foo: :bar})
-      Toolbar.add_data(@request_id, :foo, %{faz: :baz})
-      {:ok, request} = get_request()
-      assert request.data.foo == %{foo: :bar, faz: :baz}
+      assert request.conn.request_path == "/path"
     end
   end
 end
