@@ -2,66 +2,95 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
   use ExUnit.Case, async: false
 
   import ExDebugToolbar.Test.Support.RequestHelpers
-  alias ExDebugToolbar.Database.RequestRepo
-  alias ExDebugToolbar.Request
+  alias ExDebugToolbar.Database.{RequestRepo, Request}
+  alias ExDebugToolbar.Database
 
   setup do
-    # clean up ets table
-    :ok = Supervisor.terminate_child(ExDebugToolbar.Supervisor, RequestRepo)
-    {:ok, _} = Supervisor.restart_child(ExDebugToolbar.Supervisor, RequestRepo)
+    Database.destroy
+    Database.create
     :ok
   end
 
-  test "request registration and lookup/1" do
-    request = %Request{id: "request_id"}
-    assert :ok = RequestRepo.register(request)
-    assert {:ok, request} == RequestRepo.lookup("request_id")
+  test "insert/1 creates new request record" do
+    request = %Request{id: 1}
+    assert :ok = RequestRepo.insert(request)
+    assert Request.count() == 1
   end
 
-  test "lookup/0 uses request id from process disctionary" do
-    request = %Request{id: "request_id"}
-    Process.put(:request_id, "request_id")
-    assert :ok = RequestRepo.register(request)
-    assert {:ok, request} == RequestRepo.lookup()
+  describe "get/1" do
+    test "returns request by id" do
+      request = %Request{id: "request_id"}
+      :ok = RequestRepo.insert(request)
+      assert {:ok, request} == RequestRepo.get("request_id")
+    end
+
+    test "returns request by pid" do
+      request = %Request{id: "request_id"}
+      self_pid = self()
+      pid = spawn fn ->
+        request = %{request | pid: self()}
+        :ok = RequestRepo.insert(request)
+        send self_pid, :done
+      end
+      msg = receive do
+        :done -> :ok
+      after
+        200 -> :error
+      end
+      assert msg == :ok
+      assert {:ok, request} = RequestRepo.get(pid)
+      assert request.id == "request_id"
+    end
+
+    test "get/1 returns error if request is missing" do
+      assert {:error, :not_found} == RequestRepo.get(self())
+      assert {:error, :not_found} == RequestRepo.get("1")
+    end
   end
 
-  test "lookup/1 returns error if request is missing" do
-    assert {:error, :not_found} == RequestRepo.lookup(self())
-  end
 
   describe "update/2" do
     test "updates request using map of changes" do
-      request = %Request{id: "r_1"}
-      new_request = %Request{id: "r_2"}
-      :ok = RequestRepo.register(request)
-      assert :ok = RequestRepo.update("r_1", %{id: "r_2"})
-      assert {:ok, new_request} == get_request("r_1")
+      request = %Request{id: "request_id", logs: [:foo]}
+      new_request = %Request{id: "request_id", logs: [:bar]}
+      :ok = RequestRepo.insert(request)
+      assert :ok = RequestRepo.update("request_id", %{logs: [:bar]})
+      assert {:ok, new_request} == get_request("request_id")
     end
 
     test "updates request using function" do
-      request = %Request{id: "r_1"}
-      new_request = %Request{id: "r_2"}
-      :ok = RequestRepo.register(request)
-      updater = fn %Request{} = r -> Map.put(r, :id, "r_2") end
-      assert :ok = RequestRepo.update("r_1", updater)
-      assert {:ok, new_request} == get_request("r_1")
+      request = %Request{id: "request_id", logs: [:foo]}
+      new_request = %Request{id: "request_id", logs: [:bar]}
+      :ok = RequestRepo.insert(request)
+      updater = fn %Request{} = r -> Map.put(r, :logs, [:bar]) end
+      assert :ok = RequestRepo.update("request_id", updater)
+      assert {:ok, new_request} == get_request("request_id")
+    end
+
+    test "acceps pid instead of id" do
+      request = %Request{id: "request_id", pid: self(), logs: [:foo]}
+      new_request = %Request{id: "request_id", pid: self(), logs: [:bar]}
+      :ok = RequestRepo.insert(request)
+      pid = self()
+      spawn fn ->
+        assert :ok = RequestRepo.update(pid, %{logs: [:bar]})
+        send pid, :done
+      end
+      msg = receive do
+        :done -> :ok
+      after
+        200 -> :error
+      end
+      assert msg == :ok
+      assert {:ok, new_request} == get_request("request_id")
     end
 
     test "does not raise error if request is missing" do
       pid = Process.whereis RequestRepo
-      assert :ok = RequestRepo.update("missing_request", %{id: 2})
+      assert :ok = RequestRepo.update("missing_request", %{logs: [:foo]})
       :timer.sleep 10
       assert Process.whereis(RequestRepo) == pid
     end
-  end
-
-  test "update/1 uses request id from process disctionary" do
-    request = %Request{id: "r_1"}
-    new_request = %Request{id: "r_2"}
-    :ok = RequestRepo.register(request)
-    Process.put(:request_id, "r_1")
-    assert :ok = RequestRepo.update(%{id: "r_2"})
-    assert {:ok, new_request} == get_request("r_1")
   end
 
   describe "all/0" do
@@ -70,21 +99,16 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
     end
 
     test "returns all requests" do
-      pid = self()
       requests = [%Request{id: 1}, %Request{id: 2}]
       for request <- requests do
-        spawn fn ->
-          :ok = RequestRepo.register(request)
-          send pid, :done
-        end
-        receive do :done -> :ok end
+        :ok = RequestRepo.insert(request)
       end
       assert requests == RequestRepo.all
     end
   end
 
-  test "purge/0 removes everything from ets table" do
-    :ok = RequestRepo.register(%Request{id: 1})
+  test "purge/0 removes all request" do
+    :ok = RequestRepo.insert(%Request{id: 1})
     :ok = RequestRepo.purge()
     assert RequestRepo.all == []
   end
@@ -98,23 +122,17 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
     end
 
     test "register/1 returns error" do
-      assert {:error, :registry_not_running} == RequestRepo.register(%Request{})
+      assert {:error, :registry_not_running} == RequestRepo.insert(%Request{id: 5})
     end
 
-    test "lookup/0 returns error" do
-      assert {:error, :registry_not_running} == RequestRepo.lookup("id")
-    end
-
-    test "lookup/1 returns error" do
-      assert {:error, :registry_not_running} == RequestRepo.lookup(self())
-    end
-
-    test "update/1 returns error" do
-      assert {:error, :registry_not_running} == RequestRepo.update(%{})
+    test "get/1 returns error" do
+      assert {:error, :registry_not_running} == RequestRepo.get(self())
+      assert {:error, :registry_not_running} == RequestRepo.get("id")
     end
 
     test "update/2 returns error" do
       assert {:error, :registry_not_running} == RequestRepo.update("id", %{})
+      assert {:error, :registry_not_running} == RequestRepo.update(self(), %{})
     end
 
     test "all/0 returns error" do

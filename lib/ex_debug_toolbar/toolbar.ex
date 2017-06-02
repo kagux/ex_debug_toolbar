@@ -5,11 +5,11 @@ defmodule ExDebugToolbar.Toolbar do
 
   def start_request do
     request = %Request{id: get_request_id(), created_at: NaiveDateTime.utc_now()}
-    :ok = RequestRepo.register(request)
+    :ok = RequestRepo.insert(request)
   end
 
   def get_request, do: get_request_id() |> get_request()
-  defdelegate get_request(request_id), to: RequestRepo, as: :lookup
+  defdelegate get_request(request_id), to: RequestRepo, as: :get
 
   defdelegate get_all_requests, to: RequestRepo, as: :all
 

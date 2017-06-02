@@ -1,2 +1,2 @@
 [ ] use request id to query registry instead of pid
-[ ] move request_id lookup to API Module
+[ ] move request_id get to API Module

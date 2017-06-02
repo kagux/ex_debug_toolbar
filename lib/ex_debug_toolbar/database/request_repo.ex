@@ -1,44 +1,53 @@
 defmodule ExDebugToolbar.Database.RequestRepo do
   use GenServer
-  alias ExDebugToolbar.Request
+  use Amnesia
+  alias ExDebugToolbar.Database.Request
+  alias ExDebugToolbar.Database
 
-  @table :'$ex_debug_toolar_request_registry'
-
-  def register(%Request{id: request_id} = request) do
+  def insert(%Request{} = request) do
     with_alive_registry fn ->
-      true = :ets.insert_new(@table, {request_id, request})
+      Amnesia.transaction do: %Request{} = Request.write request
       :ok
     end
   end
 
-  def update(changes), do: Process.get(:request_id) |> update(changes)
-  def update(request_id, changes) do
+  def update(id, changes) do
     with_alive_registry fn ->
-      GenServer.cast(__MODULE__, {:update, request_id, changes})
+      GenServer.cast(__MODULE__, {:update, id, changes})
       :ok
     end
   end
 
   def all do
     with_alive_registry fn ->
-      :ets.match(@table, {:"_", :'$1'}) |> List.flatten
+      Amnesia.transaction do: Request.stream |> Enum.reverse
     end
   end
 
   def purge do
     with_alive_registry fn ->
-      true = :ets.delete_all_objects(@table)
+      Request.clear
       :ok
     end
   end
 
-  def lookup, do: Process.get(:request_id) |> lookup
-  def lookup(request_id) do
-    case registry_alive?() && :ets.lookup(@table, request_id) do
-      [{^request_id, request}] -> {:ok, request}
-      false ->
-        {:error, :registry_not_running}
-      [] -> {:error, :not_found}
+  def get(pid) when is_pid(pid) do
+    do_get fn ->
+      Amnesia.transaction(do: Request.read_at(pid, :pid)) |> List.wrap |> List.first
+    end
+  end
+  def get(id) do
+    do_get fn ->
+      Amnesia.transaction do: Request.read(id)
+    end
+  end
+
+  defp do_get(func) do
+    with_alive_registry fn ->
+      case func.() do
+        %Request{} = request -> {:ok, request}
+        nil -> {:error, :not_found}
+      end
     end
   end
 
@@ -47,19 +56,24 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   end
 
   def init(_) do
-    table = :ets.new(@table, [:set, :named_table, {:keypos, 1}, :public, {:write_concurrency, true}])
-    {:ok, %{table: table}}
+    Process.flag(:trap_exit, true)
+    [:ok, :ok] = Database.create
+    {:ok, nil}
   end
 
-  def handle_cast({:update, request_id, changes}, _state) do
-    case lookup(request_id) do
-      {:ok, request} ->
-        request = apply_changes(request, changes)
-        :ets.insert(@table, {request_id, request})
-        {:noreply, nil}
-      _ ->
-        {:noreply, nil}
+  def handle_cast({:update, id, changes}, _state) do
+    Amnesia.transaction do
+      case get(id) do
+        {:ok, request} -> request |> apply_changes(changes) |> Request.write
+        _ -> :error
+      end
     end
+    {:noreply, nil}
+  end
+
+  def terminate(reason, _state) do
+    Database.destroy
+    reason
   end
 
   defp registry_alive? do
