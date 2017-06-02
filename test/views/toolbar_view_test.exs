@@ -5,11 +5,11 @@ defmodule ExDebugToolbar.ToolbarViewTest do
   alias Phoenix.View
   alias ExDebugToolbar.ToolbarView
 
-  test "it renderns toolbar" do
+  test "it renderns toolbar without errors" do
     assert %Request{} |> render |> is_bitstring
   end
 
-  test "it renders toolbar with logs" do
+  test "it renders toolbar with logs without errors" do
     request = %Request{logs: [%LogEntry{
       level: :info,
       message: ["GET", 32, "/"],
@@ -18,7 +18,7 @@ defmodule ExDebugToolbar.ToolbarViewTest do
     assert request |> render |> is_bitstring
   end
 
-  test "it renders toolbar with ecto queries" do
+  test "it renders toolbar with ecto queries without errors" do
     request = %Request{ecto: [%Ecto.LogEntry{
       ansi_color: :cyan,
       decode_time: 40929,
