@@ -1,4 +1,4 @@
-defmodule ExDebugToolbar.Request.Registry do
+defmodule ExDebugToolbar.Database.RequestRepo do
   use GenServer
   alias ExDebugToolbar.Request
 

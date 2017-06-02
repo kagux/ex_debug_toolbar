@@ -1,17 +1,17 @@
 defmodule ExDebugToolbar.Toolbar do
-  alias ExDebugToolbar.Request.Registry
+  alias ExDebugToolbar.Database.RequestRepo
   alias ExDebugToolbar.Request
   alias ExDebugToolbar.Data.Collection
 
   def start_request do
     request = %Request{id: get_request_id(), created_at: NaiveDateTime.utc_now()}
-    :ok = Registry.register(request)
+    :ok = RequestRepo.register(request)
   end
 
   def get_request, do: get_request_id() |> get_request()
-  defdelegate get_request(request_id), to: Registry, as: :lookup
+  defdelegate get_request(request_id), to: RequestRepo, as: :lookup
 
-  defdelegate get_all_requests, to: Registry, as: :all
+  defdelegate get_all_requests, to: RequestRepo, as: :all
 
   def start_event(name) do
     add_data(:timeline, {:start_event, name})
@@ -35,7 +35,7 @@ defmodule ExDebugToolbar.Toolbar do
   def add_data(key, data), do: get_request_id() |> add_data(key, data)
   def add_data(request_id, key, data) do
     if Map.has_key?(%Request{}, key) do
-      :ok = Registry.update(request_id, &update_request(&1, key, data))
+      :ok = RequestRepo.update(request_id, &update_request(&1, key, data))
     else
       {:error, :undefined_collection}
     end
