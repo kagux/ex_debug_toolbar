@@ -19,7 +19,7 @@ defmodule ExDebugToolbar.ToolbarViewTest do
   end
 
   test "it renders toolbar with ecto queries without errors" do
-    request = %Request{ecto: [%Ecto.LogEntry{
+    log_entry = %Ecto.LogEntry{
       ansi_color: :cyan,
       decode_time: 40929,
       params: [1],
@@ -33,7 +33,9 @@ defmodule ExDebugToolbar.ToolbarViewTest do
         connection_id: 2551,
         num_rows: 1,
       }}
-    }]}
+    }
+    duration = 15000
+    request = %Request{ecto: [{log_entry, duration}]}
     assert request |> render |> is_bitstring
   end
 
