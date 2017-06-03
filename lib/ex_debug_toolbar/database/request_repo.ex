@@ -5,30 +5,22 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   alias ExDebugToolbar.Database
 
   def insert(%Request{} = request) do
-    with_alive_registry fn ->
-      Amnesia.transaction do: %Request{} = Request.write request
-      :ok
-    end
+    Amnesia.transaction do: %Request{} = Request.write request
+    :ok
   end
 
   def update(id, changes) do
-    with_alive_registry fn ->
-      GenServer.cast(__MODULE__, {:update, id, changes})
-      :ok
-    end
+    GenServer.cast(__MODULE__, {:update, id, changes})
+    :ok
   end
 
   def all do
-    with_alive_registry fn ->
-      Amnesia.transaction do: Request.stream |> Enum.reverse
-    end
+    Amnesia.transaction do: Request.stream |> Enum.reverse
   end
 
   def purge do
-    with_alive_registry fn ->
-      Request.clear
-      :ok
-    end
+    Request.clear
+    :ok
   end
 
   def get(pid) when is_pid(pid) do
@@ -43,11 +35,9 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   end
 
   defp do_get(func) do
-    with_alive_registry fn ->
-      case func.() do
-        %Request{} = request -> {:ok, request}
-        nil -> {:error, :not_found}
-      end
+    case func.() do
+      %Request{} = request -> {:ok, request}
+      nil -> {:error, :not_found}
     end
   end
 
@@ -74,19 +64,6 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   def terminate(reason, _state) do
     Database.destroy
     reason
-  end
-
-  defp registry_alive? do
-    pid = Process.whereis(__MODULE__)
-    !is_nil(pid) && Process.alive?(pid)
-  end
-
-  defp with_alive_registry(func) do
-    if registry_alive?() do
-      func.()
-    else
-      {:error, :registry_not_running}
-    end
   end
 
   defp apply_changes(request, changes) when is_map(changes) do
