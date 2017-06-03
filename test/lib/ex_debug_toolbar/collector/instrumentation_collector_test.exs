@@ -4,8 +4,11 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
 
   describe "ex_debug_toolbar"  do
     test "it starts request on ex_debug_toolbar start" do
-      Collector.ex_debug_toolbar(:start, %{}, %{})
+      conn = %Plug.Conn{} |> Plug.Conn.put_private(:request_id, @request_id)
+      Collector.ex_debug_toolbar(:start, %{}, %{conn: conn})
       assert {:ok, request} = get_request(@request_id)
+      assert request.id == @request_id
+      assert request.pid == self()
       assert %NaiveDateTime{} = request.created_at
     end
   end
