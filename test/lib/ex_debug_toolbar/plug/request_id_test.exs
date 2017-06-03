@@ -8,9 +8,10 @@ defmodule ExDebugToolbar.Plug.RequestIdTest do
     assert request_id
   end
 
-  test "it sets request id in process metadata" do
-    [request_id] = build_conn() |> get_resp_header("x-request-id")
-    assert Process.get(:request_id) == request_id
+  test "it sets request id in conn private" do
+    conn = build_conn()
+    [request_id] = conn |> get_resp_header("x-request-id")
+    assert conn.private.request_id == request_id
   end
 
   test "it updates request headers with request id" do
