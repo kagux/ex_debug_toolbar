@@ -27,9 +27,9 @@ defmodule ExDebugToolbar.Database.RequestRepo do
       Amnesia.transaction do: Request.read(pid)
     end
   end
-  def get(id) do
+  def get(uuid) do
     do_get fn ->
-      Amnesia.transaction(do: Request.read_at(id, :id)) |> List.wrap |> List.first
+      Amnesia.transaction(do: Request.read_at(uuid, :uuid)) |> List.wrap |> List.first
     end
   end
 

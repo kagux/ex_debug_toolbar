@@ -7,7 +7,7 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
       conn = %Plug.Conn{} |> Plug.Conn.put_private(:request_id, @request_id)
       Collector.ex_debug_toolbar(:start, %{}, %{conn: conn})
       assert {:ok, request} = get_request(@request_id)
-      assert request.id == @request_id
+      assert request.uuid == @request_id
       assert request.pid == self()
       assert %NaiveDateTime{} = request.created_at
     end

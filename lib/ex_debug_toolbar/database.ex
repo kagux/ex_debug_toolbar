@@ -10,7 +10,7 @@ defdatabase ExDebugToolbar.Database do
   deftable Request,
     [
       pid: nil,
-      id: nil,
+      uuid: nil,
       created_at: nil,
       conn: %Plug.Conn{},
       ecto: [],
@@ -19,7 +19,7 @@ defdatabase ExDebugToolbar.Database do
     ],
     type: :set,
     copying: :memory,
-    index: [:id] do end
+    index: [:uuid] do end
 
   def start_link do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)

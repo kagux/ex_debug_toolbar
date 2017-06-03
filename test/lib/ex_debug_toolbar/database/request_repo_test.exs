@@ -18,13 +18,13 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
 
   describe "get/1" do
     test "returns request by id" do
-      request = %Request{id: "request_id", pid: self()}
+      request = %Request{uuid: "request_id", pid: self()}
       :ok = RequestRepo.insert(request)
       assert {:ok, request} == RequestRepo.get("request_id")
     end
 
     test "returns request by pid" do
-      request = %Request{id: "request_id"}
+      request = %Request{uuid: "request_id"}
       self_pid = self()
       pid = spawn fn ->
         request = %{request | pid: self()}
@@ -38,7 +38,7 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
       end
       assert msg == :ok
       assert {:ok, request} = RequestRepo.get(pid)
-      assert request.id == "request_id"
+      assert request.uuid == "request_id"
     end
 
     test "get/1 returns error if request is missing" do
@@ -50,16 +50,16 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
 
   describe "update/2" do
     test "updates request using map of changes" do
-      request = %Request{id: "request_id", logs: [:foo]}
-      new_request = %Request{id: "request_id", logs: [:bar]}
+      request = %Request{uuid: "request_id", logs: [:foo]}
+      new_request = %Request{uuid: "request_id", logs: [:bar]}
       :ok = RequestRepo.insert(request)
       assert :ok = RequestRepo.update("request_id", %{logs: [:bar]})
       assert {:ok, new_request} == get_request("request_id")
     end
 
     test "updates request using function" do
-      request = %Request{id: "request_id", logs: [:foo]}
-      new_request = %Request{id: "request_id", logs: [:bar]}
+      request = %Request{uuid: "request_id", logs: [:foo]}
+      new_request = %Request{uuid: "request_id", logs: [:bar]}
       :ok = RequestRepo.insert(request)
       updater = fn %Request{} = r -> Map.put(r, :logs, [:bar]) end
       assert :ok = RequestRepo.update("request_id", updater)
@@ -67,8 +67,8 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
     end
 
     test "acceps pid instead of id" do
-      request = %Request{id: "request_id", pid: self(), logs: [:foo]}
-      new_request = %Request{id: "request_id", pid: self(), logs: [:bar]}
+      request = %Request{uuid: "request_id", pid: self(), logs: [:foo]}
+      new_request = %Request{uuid: "request_id", pid: self(), logs: [:bar]}
       :ok = RequestRepo.insert(request)
       pid = self()
       spawn fn ->
@@ -100,16 +100,16 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
     test "returns all requests" do
       pid_1 = spawn fn -> :ok end
       pid_2 = spawn fn -> :ok end
-      requests = [%Request{pid: pid_1, id: 1}, %Request{pid: pid_2, id: 2}]
+      requests = [%Request{pid: pid_1, uuid: 1}, %Request{pid: pid_2, uuid: 2}]
       for request <- requests do
         :ok = RequestRepo.insert(request)
       end
-      assert requests == RequestRepo.all |> Enum.sort_by(&(&1.id))
+      assert requests == RequestRepo.all |> Enum.sort_by(&(&1.uuid))
     end
   end
 
   test "purge/0 removes all request" do
-    :ok = RequestRepo.insert(%Request{id: 1})
+    :ok = RequestRepo.insert(%Request{uuid: 1})
     :ok = RequestRepo.purge()
     assert RequestRepo.all == []
   end

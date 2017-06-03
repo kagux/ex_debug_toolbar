@@ -2,10 +2,10 @@ defmodule ExDebugToolbar.Toolbar do
   alias ExDebugToolbar.Database.{RequestRepo, Request}
   alias ExDebugToolbar.Data.Collection
 
-  def start_request(id) do
+  def start_request(uuid) do
     :ok = RequestRepo.insert(%Request{
-      id: id,
       pid: self(),
+      uuid: uuid,
       created_at: NaiveDateTime.utc_now()
     })
   end
