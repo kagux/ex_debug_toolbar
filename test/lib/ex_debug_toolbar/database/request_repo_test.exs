@@ -6,8 +6,7 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
   alias ExDebugToolbar.Database
 
   setup do
-    Database.destroy
-    Database.create
+    Database.tables |> Enum.each(&Amnesia.Table.clear/1)
     :ok
   end
 
@@ -111,36 +110,5 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
     :ok = RequestRepo.insert(%Request{id: 1})
     :ok = RequestRepo.purge()
     assert RequestRepo.all == []
-  end
-
-  describe "when registry is not running" do
-    setup do
-      :ok = Supervisor.terminate_child(ExDebugToolbar.Supervisor, RequestRepo)
-      on_exit fn ->
-        {:ok, _} = Supervisor.restart_child(ExDebugToolbar.Supervisor, RequestRepo)
-      end
-    end
-
-    test "register/1 returns error" do
-      assert {:error, :registry_not_running} == RequestRepo.insert(%Request{id: 5})
-    end
-
-    test "get/1 returns error" do
-      assert {:error, :registry_not_running} == RequestRepo.get(self())
-      assert {:error, :registry_not_running} == RequestRepo.get("id")
-    end
-
-    test "update/2 returns error" do
-      assert {:error, :registry_not_running} == RequestRepo.update("id", %{})
-      assert {:error, :registry_not_running} == RequestRepo.update(self(), %{})
-    end
-
-    test "all/0 returns error" do
-      assert {:error, :registry_not_running} == RequestRepo.all()
-    end
-
-    test "purge/0 returns error" do
-      assert {:error, :registry_not_running} == RequestRepo.purge()
-    end
   end
 end
