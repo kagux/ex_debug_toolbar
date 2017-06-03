@@ -1,14 +1,15 @@
 defmodule ExDebugToolbar.CollectorCase do
   use ExUnit.CaseTemplate
   import ExDebugToolbar.Test.Support.RequestHelpers
-
-  @request_id "request_id"
+  alias ExDebugToolbar.Toolbar
 
   using do
     quote do
       @request_id "request_id"
       import ExDebugToolbar.Test.Support.RequestHelpers
       import ExDebugToolbar.Test.Support.Data.TimelineHelpers
+
+      def start_request(_context \\ %{}), do: Toolbar.start_request(@request_id)
     end
   end
 
@@ -17,9 +18,7 @@ defmodule ExDebugToolbar.CollectorCase do
   end
 
   setup do
-    Process.put(:request_id, @request_id)
     on_exit &delete_all_requests/0
-    :ok
   end
 end
 
