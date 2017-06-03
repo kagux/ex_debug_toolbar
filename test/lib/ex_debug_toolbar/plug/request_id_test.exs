@@ -15,8 +15,8 @@ defmodule ExDebugToolbar.Plug.RequestIdTest do
   end
 
   test "it updates request headers with request id" do
-    [request_id] = build_conn() |> get_req_header("x-request-id")
-    assert Process.get(:request_id) == request_id
+    conn = build_conn()
+    assert conn |> get_req_header("x-request-id") == conn |> get_resp_header("x-request-id")
   end
 
   defp build_conn(opts \\ []) do
