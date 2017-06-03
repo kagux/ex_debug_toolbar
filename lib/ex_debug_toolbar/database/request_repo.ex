@@ -2,7 +2,6 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   use GenServer
   use Amnesia
   alias ExDebugToolbar.Database.Request
-  alias ExDebugToolbar.Database
 
   def insert(%Request{} = request) do
     Amnesia.transaction do: %Request{} = Request.write request
@@ -45,12 +44,6 @@ defmodule ExDebugToolbar.Database.RequestRepo do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
-  def init(_) do
-    Process.flag(:trap_exit, true)
-    [:ok, :ok] = Database.create
-    {:ok, nil}
-  end
-
   def handle_cast({:update, id, changes}, _state) do
     Amnesia.transaction do
       case get(id) do
@@ -59,11 +52,6 @@ defmodule ExDebugToolbar.Database.RequestRepo do
       end
     end
     {:noreply, nil}
-  end
-
-  def terminate(reason, _state) do
-    Database.destroy
-    reason
   end
 
   defp apply_changes(request, changes) when is_map(changes) do
