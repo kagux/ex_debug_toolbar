@@ -11,14 +11,14 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
   end
 
   test "insert/1 creates new request record" do
-    request = %Request{id: 1}
+    request = %Request{pid: self()}
     assert :ok = RequestRepo.insert(request)
     assert Request.count() == 1
   end
 
   describe "get/1" do
     test "returns request by id" do
-      request = %Request{id: "request_id"}
+      request = %Request{id: "request_id", pid: self()}
       :ok = RequestRepo.insert(request)
       assert {:ok, request} == RequestRepo.get("request_id")
     end
@@ -98,11 +98,13 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
     end
 
     test "returns all requests" do
-      requests = [%Request{id: 1}, %Request{id: 2}]
+      pid_1 = spawn fn -> :ok end
+      pid_2 = spawn fn -> :ok end
+      requests = [%Request{pid: pid_1, id: 1}, %Request{pid: pid_2, id: 2}]
       for request <- requests do
         :ok = RequestRepo.insert(request)
       end
-      assert requests == RequestRepo.all
+      assert requests == RequestRepo.all |> Enum.sort_by(&(&1.id))
     end
   end
 

@@ -15,7 +15,7 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   end
 
   def all do
-    Amnesia.transaction do: Request.stream |> Enum.reverse
+    Amnesia.transaction do: Request.stream |> Enum.to_list
   end
 
   def purge do
@@ -25,12 +25,12 @@ defmodule ExDebugToolbar.Database.RequestRepo do
 
   def get(pid) when is_pid(pid) do
     do_get fn ->
-      Amnesia.transaction(do: Request.read_at(pid, :pid)) |> List.wrap |> List.first
+      Amnesia.transaction do: Request.read(pid)
     end
   end
   def get(id) do
     do_get fn ->
-      Amnesia.transaction do: Request.read(id)
+      Amnesia.transaction(do: Request.read_at(id, :id)) |> List.wrap |> List.first
     end
   end
 

@@ -6,8 +6,8 @@ defdatabase ExDebugToolbar.Database do
 
   deftable Request,
     [
-      id: nil,
       pid: nil,
+      id: nil,
       created_at: nil,
       conn: %Plug.Conn{},
       ecto: [],
@@ -16,5 +16,5 @@ defdatabase ExDebugToolbar.Database do
     ],
     type: :set,
     copying: :memory,
-    index: [:pid] do end
+    index: [:id] do end
 end
