@@ -1,15 +1,17 @@
 defmodule ExDebugToolbar.Toolbar do
-  alias ExDebugToolbar.Database.RequestRepo
-  alias ExDebugToolbar.Request
+  alias ExDebugToolbar.Database.{RequestRepo, Request}
   alias ExDebugToolbar.Data.Collection
 
-  def start_request do
-    request = %Request{id: get_request_id(), created_at: NaiveDateTime.utc_now()}
-    :ok = RequestRepo.insert(request)
+  def start_request(id) do
+    :ok = RequestRepo.insert(%Request{
+      id: id,
+      pid: self(),
+      created_at: NaiveDateTime.utc_now()
+    })
   end
 
-  def get_request, do: get_request_id() |> get_request()
-  defdelegate get_request(request_id), to: RequestRepo, as: :get
+  def get_request, do: self() |> get_request()
+  defdelegate get_request(id), to: RequestRepo, as: :get
 
   defdelegate get_all_requests, to: RequestRepo, as: :all
 
@@ -32,10 +34,10 @@ defmodule ExDebugToolbar.Toolbar do
     add_data(:timeline, {:add_finished_event, name, duration})
   end
 
-  def add_data(key, data), do: get_request_id() |> add_data(key, data)
-  def add_data(request_id, key, data) do
+  def add_data(key, data), do: self() |> add_data(key, data)
+  def add_data(id, key, data) do
     if Map.has_key?(%Request{}, key) do
-      :ok = RequestRepo.update(request_id, &update_request(&1, key, data))
+      :ok = RequestRepo.update(id, &update_request(&1, key, data))
     else
       {:error, :undefined_collection}
     end
@@ -43,9 +45,5 @@ defmodule ExDebugToolbar.Toolbar do
 
   defp update_request(%Request{} = request, key, data) do
     request |> Map.get(key) |> Collection.add(data) |> (&Map.put(request, key, &1)).()
-  end
-
-  defp get_request_id do
-    Process.get(:request_id)
   end
 end
