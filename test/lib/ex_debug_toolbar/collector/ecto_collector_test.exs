@@ -19,4 +19,23 @@ defmodule ExDebugToolbar.Collector.EctoCollectorTest do
     assert request.ecto |> length == 1
     assert %{query: "query"} = request.ecto |> hd
   end
+
+  test "adds query to correct request when it's has caller_pid" do
+    pid = self()
+    spawn fn ->
+      %Ecto.LogEntry{query: "query", caller_pid: pid, query_time: 10} |> Collector.log
+      send pid, :done
+    end
+
+    msg = receive do
+      :done -> :ok
+    after
+      200 -> :error
+    end
+
+    assert :ok == msg
+    assert {:ok, request} = get_request()
+    assert request.ecto |> length > 0
+    assert request.timeline.duration == 10
+  end
 end

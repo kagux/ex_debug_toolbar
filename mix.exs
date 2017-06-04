@@ -33,7 +33,7 @@ defmodule ExDebugToolbar.Mixfile do
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_html, "~> 2.6"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
-      {:ecto, "~> 2.1", optional: true},
+      {:ecto, github: "elixir-ecto/ecto", branch: "master", optional: true}, #until caller_id gets merged
       {:postgrex, "~> 0.13", optional: true},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
