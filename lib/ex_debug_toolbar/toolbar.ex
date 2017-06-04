@@ -13,28 +13,29 @@ defmodule ExDebugToolbar.Toolbar do
     })
   end
 
-  def get_request, do: self() |> get_request()
-  defdelegate get_request(id), to: RequestRepo, as: :get
-
+  defdelegate get_request(id \\ self()), to: RequestRepo, as: :get
   defdelegate get_all_requests, to: RequestRepo, as: :all
 
-  def start_event(name) do
-    add_data(:timeline, {:start_event, name})
+  def start_event(id \\ self(), name) do
+    add_data(id, :timeline, {:start_event, name})
   end
 
-  def finish_event(name, opts \\ []) do
-    add_data(:timeline, {:finish_event, name, opts[:duration]})
+  def finish_event(name), do: finish_event(self(), name, [])
+  def finish_event(name, opts) when is_list(opts), do: finish_event(self(), name, opts)
+  def finish_event(id, name) when is_bitstring(name), do: finish_event(id, name, [])
+  def finish_event(id, name, opts) do
+    add_data(id, :timeline, {:finish_event, name, opts[:duration]})
   end
 
-  def record_event(name, func) do
-    start_event(name)
+  def record_event(id \\ self(), name, func) do
+    start_event(id, name)
     result = func.()
-    finish_event(name)
+    finish_event(id, name)
     result
   end
 
-  def add_finished_event(name, duration) do
-    add_data(:timeline, {:add_finished_event, name, duration})
+  def add_finished_event(id \\ self(), name, duration) do
+    add_data(id, :timeline, {:add_finished_event, name, duration})
   end
 
   def add_data(id \\ self(), key, data) do
