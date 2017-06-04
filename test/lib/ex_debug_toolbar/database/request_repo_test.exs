@@ -2,18 +2,18 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
   use ExUnit.Case, async: false
 
   import ExDebugToolbar.Test.Support.RequestHelpers
-  alias ExDebugToolbar.Database.{RequestRepo, Request}
-  alias ExDebugToolbar.Database
+  alias ExDebugToolbar.Database.RequestRepo
+  alias ExDebugToolbar.Request
 
   setup do
-    Database.tables |> Enum.each(&Amnesia.Table.clear/1)
+    :mnesia.system_info(:tables) |> Enum.each(&:mnesia.clear_table/1)
     :ok
   end
 
   test "insert/1 creates new request record" do
     request = %Request{pid: self()}
     assert :ok = RequestRepo.insert(request)
-    assert Request.count() == 1
+    assert :mnesia.table_info(Request, :size) == 1
   end
 
   describe "get/1" do

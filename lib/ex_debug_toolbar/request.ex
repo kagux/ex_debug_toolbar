@@ -2,7 +2,8 @@ defmodule ExDebugToolbar.Request do
   alias ExDebugToolbar.Data.Timeline
 
   defstruct [
-    id: nil,
+    pid: nil,
+    uuid: nil,
     created_at: nil,
     conn: %Plug.Conn{},
     ecto: [],

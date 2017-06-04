@@ -1,25 +1,9 @@
-use Amnesia
-
-defdatabase ExDebugToolbar.Database do
+defmodule ExDebugToolbar.Database do
+  alias ExDebugToolbar.Request
   use GenServer
 
-  alias ExDebugToolbar.Data.Timeline
-  alias ExDebugToolbar.Database.Request
-  alias ExDebugToolbar.Database
-
-  deftable Request,
-    [
-      pid: nil,
-      uuid: nil,
-      created_at: nil,
-      conn: %Plug.Conn{},
-      ecto: [],
-      logs: [],
-      timeline: %Timeline{}
-    ],
-    type: :set,
-    copying: :memory,
-    index: [:uuid] do end
+  @request_attributes [:pid, :uuid, :request]
+  @tables [Request]
 
   def start_link do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
@@ -27,12 +11,26 @@ defdatabase ExDebugToolbar.Database do
 
   def init(_) do
     Process.flag(:trap_exit, true)
-    [:ok, :ok] = Database.create
+    :mnesia.start()
+    create_tables()
     {:ok, nil}
   end
 
   def terminate(reason, _state) do
-    Database.destroy
+    destroy_tables()
     reason
+  end
+
+  defp destroy_tables do
+    @tables |> Enum.each(&:mnesia.delete_table/1)
+  end
+
+  defp create_tables do
+    {:atomic, :ok} = :mnesia.create_table(
+      Request,
+      type: :set,
+      attributes: @request_attributes,
+      index: [:uuid]
+    )
   end
 end

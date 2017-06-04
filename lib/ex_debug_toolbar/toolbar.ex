@@ -1,6 +1,7 @@
 defmodule ExDebugToolbar.Toolbar do
-  alias ExDebugToolbar.Database.{RequestRepo, Request}
+  alias ExDebugToolbar.Database.RequestRepo
   alias ExDebugToolbar.Data.Collection
+  alias ExDebugToolbar.Request
 
   def start_request(uuid) do
     :ok = RequestRepo.insert(%Request{

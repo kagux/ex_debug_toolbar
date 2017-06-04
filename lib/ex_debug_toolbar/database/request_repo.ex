@@ -1,11 +1,11 @@
 defmodule ExDebugToolbar.Database.RequestRepo do
   use GenServer
-  use Amnesia
-  alias ExDebugToolbar.Database.Request
+  alias ExDebugToolbar.Request
 
   def insert(%Request{} = request) do
-    Amnesia.transaction do: %Request{} = Request.write request
-    :ok
+    transaction fn ->
+      :mnesia.write({Request, request.pid, request.uuid, request})
+    end
   end
 
   def update(id, changes) do
@@ -14,29 +14,30 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   end
 
   def all do
-    Amnesia.transaction do: Request.stream |> Enum.to_list
+    transaction fn ->
+      :mnesia.select(Request, [{{Request, :"_", :"_", :"$1"},[],[:"$1"]}])
+    end
   end
 
   def purge do
-    Request.clear
-    :ok
+    :mnesia.clear_table(Request) |> result
   end
 
   def get(pid) when is_pid(pid) do
     do_get fn ->
-      Amnesia.transaction do: Request.read(pid)
+      :mnesia.read(Request, pid)
     end
   end
   def get(uuid) do
     do_get fn ->
-      Amnesia.transaction(do: Request.read_at(uuid, :uuid)) |> List.wrap |> List.first
+      :mnesia.index_read(Request, uuid, :uuid)
     end
   end
 
   defp do_get(func) do
-    case func.() do
-      %Request{} = request -> {:ok, request}
-      nil -> {:error, :not_found}
+    case transaction(func) do
+      [{Request, _, _, request}] -> {:ok, request}
+      [] -> {:error, :not_found}
     end
   end
 
@@ -45,9 +46,9 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   end
 
   def handle_cast({:update, id, changes}, _state) do
-    Amnesia.transaction do
+    transaction fn ->
       case get(id) do
-        {:ok, request} -> request |> apply_changes(changes) |> Request.write
+        {:ok, request} -> request |> apply_changes(changes) |> insert
         _ -> :error
       end
     end
@@ -60,4 +61,11 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   defp apply_changes(request, changes) when is_function(changes) do
     changes.(request)
   end
+
+  def transaction(func) do
+    :mnesia.transaction(func) |> result 
+  end
+
+  def result({:atomic, result}), do: result
+  def result({:aborted, reason}), do: {:error, reason}
 end
