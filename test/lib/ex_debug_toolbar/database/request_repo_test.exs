@@ -5,29 +5,29 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
   alias ExDebugToolbar.Database.RequestRepo
   alias ExDebugToolbar.Request
 
+  @request_id "request_id"
+
   setup do
     :mnesia.system_info(:tables) |> Enum.each(&:mnesia.clear_table/1)
-    :ok
+    request = %Request{uuid: @request_id, pid: self(), logs: [:foo]}
+    {:ok, %{request: request}}
   end
 
-  test "insert/1 creates new request record" do
-    request = %Request{pid: self()}
-    assert :ok = RequestRepo.insert(request)
+  test "insert/1 creates new request record", context do
+    assert :ok = RequestRepo.insert(context.request)
     assert :mnesia.table_info(Request, :size) == 1
   end
 
   describe "get/1" do
-    test "returns request by id" do
-      request = %Request{uuid: "request_id", pid: self()}
-      :ok = RequestRepo.insert(request)
-      assert {:ok, request} == RequestRepo.get("request_id")
+    test "returns request by id", context do
+      :ok = RequestRepo.insert(context.request)
+      assert {:ok, context.request} == RequestRepo.get(@request_id)
     end
 
-    test "returns request by pid" do
-      request = %Request{uuid: "request_id"}
+    test "returns request by pid", context do
       self_pid = self()
       pid = spawn fn ->
-        request = %{request | pid: self()}
+        request = %{context.request | pid: self()}
         :ok = RequestRepo.insert(request)
         send self_pid, :done
       end
@@ -38,7 +38,7 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
       end
       assert msg == :ok
       assert {:ok, request} = RequestRepo.get(pid)
-      assert request.uuid == "request_id"
+      assert request.uuid == @request_id
     end
 
     test "get/1 returns error if request is missing" do
@@ -49,27 +49,24 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
 
 
   describe "update/2" do
+    setup context do
+      RequestRepo.insert(context.request)
+    end
+
     test "updates request using map of changes" do
-      request = %Request{uuid: "request_id", logs: [:foo]}
-      new_request = %Request{uuid: "request_id", logs: [:bar]}
-      :ok = RequestRepo.insert(request)
-      assert :ok = RequestRepo.update("request_id", %{logs: [:bar]})
-      assert {:ok, new_request} == get_request("request_id")
+      assert :ok = RequestRepo.update(@request_id, %{logs: [:bar]})
+      assert {:ok, updated_request} = get_request(@request_id)
+      assert updated_request.logs == [:bar]
     end
 
     test "updates request using function" do
-      request = %Request{uuid: "request_id", logs: [:foo]}
-      new_request = %Request{uuid: "request_id", logs: [:bar]}
-      :ok = RequestRepo.insert(request)
       updater = fn %Request{} = r -> Map.put(r, :logs, [:bar]) end
-      assert :ok = RequestRepo.update("request_id", updater)
-      assert {:ok, new_request} == get_request("request_id")
+      assert :ok = RequestRepo.update(@request_id, updater)
+      assert {:ok, updated_request} = get_request(@request_id)
+      assert updated_request.logs == [:bar]
     end
 
     test "acceps pid instead of id" do
-      request = %Request{uuid: "request_id", pid: self(), logs: [:foo]}
-      new_request = %Request{uuid: "request_id", pid: self(), logs: [:bar]}
-      :ok = RequestRepo.insert(request)
       pid = self()
       spawn fn ->
         assert :ok = RequestRepo.update(pid, %{logs: [:bar]})
@@ -81,7 +78,8 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
         200 -> :error
       end
       assert msg == :ok
-      assert {:ok, new_request} == get_request("request_id")
+      assert {:ok, updated_request} = get_request(@request_id)
+      assert updated_request.logs == [:bar]
     end
 
     test "does not raise error if request is missing" do
