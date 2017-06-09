@@ -8,11 +8,6 @@ defmodule ExDebugToolbar.Plug.CodeInjectorTest do
   @js "<script>window.requestId='request_123';</script>\n<script src='/__ex_debug_toolbar__/js/toolbar.js'></script>\n"
   @css "<link rel='stylesheet' type='text/css' href='/__ex_debug_toolbar__/css/toolbar.css'>\n"
 
-  setup do
-    Process.put(:request_id, "request_123")
-    :ok
-  end
-
   test "it adds js and css to html" do
     html = "<html><head></head><body></body></html>"
     conn = conn_with_plug(body: html)
@@ -59,6 +54,7 @@ defmodule ExDebugToolbar.Plug.CodeInjectorTest do
   defp conn_with_plug(opts) do
     opts = Keyword.merge(@default_conn_opts, opts)
     conn(:get, opts[:path])
+    |> put_private(:request_id, "request_123")
     |> CodeInjector.call(%{})
     |> put_resp_content_type(opts[:content_type])
     |> send_resp(opts[:status], opts[:body])
