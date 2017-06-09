@@ -36,8 +36,7 @@ defmodule ExDebugToolbar.Mixfile do
       {:ecto, github: "elixir-ecto/ecto", branch: "master", optional: true}, #until caller_id gets merged
       {:postgrex, "~> 0.13", optional: true},
       {:gettext, "~> 0.11"},
-      {:cowboy, "~> 1.0"},
-      {:mock, "~> 0.2", only: :test},
+      {:cowboy, "~> 1.0"}
     ]
   end
 end
