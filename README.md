@@ -1,6 +1,8 @@
 `ex_debug_toolbar` is a toolbar for Phoenix projects to display all sorts of information
 about current and previous requests: logs, timelines, database queries etc.
 
+![Screencapture](https://media.giphy.com/media/l4FGtmDkc3XJIUW1W/giphy.gif | width = 640)
+
 # Installation
   1. Add `ex_debug_toolbar` to your list of dependencies in `mix.exs`:
 
@@ -46,6 +48,12 @@ about current and previous requests: logs, timelines, database queries etc.
       exs: ExDebugToolbar.Template.ExsEngine
   ```
 
+# Contributors
+Special thanks goes to [Juan Peri](https://github.com/epilgrim)!
+
+# Contribution
+  Contributions in the form of bug reports, pull requests, or thoughtful discussions in the GitHub issue tracker are welcome!
+
 # TODO
 - [ ] Ability to add custom messages to toolbad
 - [ ] Decorator for functions to time them
@@ -64,10 +72,6 @@ about current and previous requests: logs, timelines, database queries etc.
 - [ ] Upgrade to Phoenix 1.3
 - [ ] Configurable URL path (instead of hardcoded `__ex_debug_toolbar__`)
 - [ ] Elm/React instead of jquery?
-
-
-# Contribution
-  Contributions in the form of bug reports, pull requests, or thoughtful discussions in the GitHub issue tracker are welcome!
 
 ## Demo App
   Use [demo app](https://github.com/kagux/ex_debug_toolbar_demo) to simplify development process.
