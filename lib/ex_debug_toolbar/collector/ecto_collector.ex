@@ -10,11 +10,12 @@ defmodule ExDebugToolbar.Collector.EctoCollector do
   end
 
   defp parse_entry(entry) do
-    case entry.caller_pid do
-      nil ->
+    case entry do
+      %{caller_pid: pid} when not is_nil(pid) ->
+        pid
+      _ ->
         duration = (entry.queue_time || 0) + (entry.query_time || 0) + (entry.decode_time || 0)
         {self(), duration}
-      pid -> {pid, 0}
     end
   end
 end
