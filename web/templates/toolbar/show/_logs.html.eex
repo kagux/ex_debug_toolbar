@@ -1,9 +1,12 @@
-<span data-toggle="popover" data-title="Server Logs">
+<span data-toggle="panel" data-title="Server Logs">
   <i class="glyphicon glyphicon-book" aria-hidden="true"></i>
   <%= length @logs %>
 </span>
-<div class="hidden" data-role="popover-content">
-  <div class="fluid-container popover-container">
+<div class="panel panel-default navbar-fixed-bottom">
+  <div class="panel-heading">
+    <h3 class="panel-title">Server Logs</h3>
+  </div>
+  <div class="panel-body">
     <table class="table table-hover table-condensed">
       <thead>
         <th> Time </th>
