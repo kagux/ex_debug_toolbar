@@ -30,7 +30,7 @@ defmodule ExDebugToolbar.Mixfile do
 
   defp description do
     """
-    A toolbar for Phoenix projects to display all sorts of information about request
+    A debug web toolbar for Phoenix projects to display all sorts of information about request
     """
   end
 
