@@ -9,6 +9,8 @@ defmodule ExDebugToolbar.Mixfile do
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     name: "ExDebugToolbar",
+     source_url: "https://github.com/kagux/ex_debug_toolbar",
      description: description(),
      deps: deps()]
   end
