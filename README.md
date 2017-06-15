@@ -1,48 +1,69 @@
+`ex_debug_toolbar` is a toolbar for Phoenix projects to display all sorts of information
+about current and previous requests: logs, timelines, database queries etc.
+
 # Installation
- 1. Add `ex_debug_toolbar` to your list of dependencies in `mix.exs`:
+  1. Add `ex_debug_toolbar` to your list of dependencies in `mix.exs`:
 
     ```elixir
     def deps do
-      [{:ex_debug_toolbar, "~> 1.0.0"}]
+      [{:ex_debug_toolbar, "~> 0.1.0"}]
     end
     ```
 
-  2. Add `ExDebugToolbar.Phoenix` to your endpoint in `lib/my_app/endpoint.ex` right before logger plug
+  2. Ensure `:ex_debug_toolbar` is started before your application:
+
+   ```elixir
+   def application do
+     [applications: [:ex_debug_toolbar, :logger]]
+   end
+   ```
+
+  2. Add `ExDebugToolbar.Phoenix` to your endpoint in `lib/my_app/endpoint.ex`
+
   ```elixir
     defmodule MyApp.Endpoint do
-      ...
+      use Phoenix.Endpoint, otp_app: :my_app
       use ExDebugToolbar.Phoenix
-      plug Plug.Logger
       ...
     end
   ```
-  3. Add forwarding rule to your router `MyApp.Router`
+
+  3. Enable toolbar in config `config/dev.exs` and setup collectors
+
   ```elixir
-    defmodule MyApp.Router
-      ...
+    # ExDebugToolbar config
+    config :ex_debug_toolbar,
+      enable: true
 
-      forward "/__ex_debug_toolbar__", ExDebugToolbar.Endpoint
-    end
+    config :my_app, ExDebugToolbarDemo.Endpoint,
+      instrumenters: [ExDebugToolbar.Collector.InstrumentationCollector]
 
+    config :my_app, ExDebugToolbarDemo.Repo,
+      loggers: [ExDebugToolbar.Collector.EctoCollector, Ecto.LogEntry]
+
+    config :phoenix, :template_engines,
+      eex: ExDebugToolbar.Template.EExEngine,
+      exs: ExDebugToolbar.Template.ExsEngine
   ```
+
 # TODO
-- [ ] Plugs
-  - [ ] Forward `__ex_debug_toolbar__` path requests to `ExDebugToolbar.Endpoint`
-  - [ ] Start `ExDebugToolbar.Request` to collect request metrics
-- [ ] UI
-  - [ ] Simple UI and connect it to channel
-  - [ ] Interactive UI (investigate JS app vs HTML)
-- [ ] Display POC metrics
-  - [ ] Request time
-  - [ ] Ecto queries count
-  - [ ] Log entries count
-  - [ ] Open channels count
-- [ ] Support nested events
+- [ ] Ability to add custom messages to toolbad
+- [ ] Decorator for functions to time them
+- [ ] System info panel
+- [ ] Help/Docs Panel
 - [ ] Cleanup unused modules
-- [ ] Docs
+- [ ] Highlight preloaded queries
+- [ ] Add specs
+- [ ] Request history
+- [ ] Improve Docs
+- [ ] Ajax calls
+- [ ] Channels info
+- [ ] Visualize timeline
+- [ ] Visualize gettext
 - [ ] Simple installer mix task
 - [ ] Upgrade to Phoenix 1.3
 - [ ] Configurable URL path (instead of hardcoded `__ex_debug_toolbar__`)
+- [ ] Elm/React instead of jquery?
 
 
 # Contribution
