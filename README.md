@@ -65,7 +65,7 @@ Special thanks goes to [Juan Peri](https://github.com/epilgrim)!
   Contributions in the form of bug reports, pull requests, or thoughtful discussions in the GitHub issue tracker are welcome!
 
 # TODO
-- [ ] Ability to add custom messages to toolbad
+- [ ] Add custom messages to toolbar
 - [ ] Decorator for functions to time them
 - [ ] System info panel
 - [ ] Help/Docs Panel
