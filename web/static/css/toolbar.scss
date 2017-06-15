@@ -19,14 +19,15 @@
     }
   }
 
-  .popover {
-    max-width: 1000px;
-  }
+  .panel {
+    margin-bottom: 0;
+    bottom: 50px;
+    display: none;
 
-  .popover-container {
-    max-height: 400px;
-    overflow-y: auto;
-    overflow-x: hidden;
+    .table {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
   }
 
  .nowrap {

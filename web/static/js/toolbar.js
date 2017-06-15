@@ -8,6 +8,7 @@ require('bootstrap-sass');
 class App {
   constructor(opts) {
     this.opts = opts;
+    this.resetActivePanel();
   }
 
   render() {
@@ -28,22 +29,46 @@ class App {
     console.log("Request: ", request);
     const toolbar = $(`<div class="ex-debug-toolbar">${html}</div>`);
     toolbar.appendTo('body');
-    this.renderPopovers(toolbar);
+    this.renderPanels(toolbar);
     this.highlightCode(toolbar);
   }
 
-  renderPopovers(toolbar) {
-    toolbar.find('[data-toggle="popover"]').each((i, el) => {
-      $(el).popover({
-        container: el,
-        placement: 'top',
-        trigger: 'hover',
-        html: true,
-        content: function() {
-          return $(this).parent().find('[data-role="popover-content"]').html();
-        }
-      });
-    });
+  renderPanels(toolbar) {
+    toolbar
+    .mouseleave(this.hideActivePanel.bind(this))
+    .find('[data-toggle="panel"]')
+    .hover(this.showPanel.bind(this));
+  }
+
+  hideActivePanel() {
+    if(this.activePanel){
+      this.activePanel.slideUp(150);
+      this.resetActivePanel();
+    }
+  }
+
+  showPanel({target: target}) {
+    const panel = $(target).parent().find('.panel');
+    const id = this.getPanelId(panel);
+    if (this.activePanelId != id) {
+      panel.slideDown(150);
+      if(this.activePanel) this.activePanel.slideUp(50);
+      this.activePanel = panel;
+      this.activePanelId = id;
+    }
+  }
+
+  resetActivePanel() {
+    this.activePanel = null;
+    this.activePanelId = null;
+  }
+
+  getPanelId(panel) {
+    if (!panel.data('panel-id')) {
+      const id = Math.round(new Date().getTime() + (Math.random() * 100));
+      panel.data('panel-id', id);
+    }
+    return panel.data('panel-id');
   }
 
   highlightCode(toolbar) {
