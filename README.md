@@ -1,7 +1,7 @@
 `ex_debug_toolbar` is a toolbar for Phoenix projects to display all sorts of information
 about current and previous requests: logs, timelines, database queries etc.
 
-![Screencapture](https://media.giphy.com/media/l4FGtmDkc3XJIUW1W/giphy.gif | width = 640)
+![Screencapture](https://media.giphy.com/media/l4FGtmDkc3XJIUW1W/giphy.gif)
 
 # Installation
   1. Add `ex_debug_toolbar` to your list of dependencies in `mix.exs`:
