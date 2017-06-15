@@ -12,6 +12,7 @@ defmodule ExDebugToolbar.Mixfile do
      name: "ExDebugToolbar",
      source_url: "https://github.com/kagux/ex_debug_toolbar",
      description: description(),
+     package: package(),
      deps: deps()]
   end
 
@@ -31,6 +32,15 @@ defmodule ExDebugToolbar.Mixfile do
     """
     A toolbar for Phoenix projects to display all sorts of information about request
     """
+  end
+
+  defp package do
+    [
+      maintainers: ["Juan Peri", "Boris Mikhaylov"],
+      licenses: ["Apache 2.0"],
+      links: %{"GitHub" => "https://github.com/kagux/ex_debug_toolbar"},
+      files: ~w(mix.exs README.md lib web priv/static)
+    ]
   end
 
   # Specifies your project dependencies.
