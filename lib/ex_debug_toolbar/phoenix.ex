@@ -15,7 +15,7 @@ if Application.get_env(:ex_debug_toolbar, :enable, false) do
             %{private: %{phoenix_endpoint: ExDebugToolbar.Endpoint}} = conn ->
               conn
             conn ->
-            Endpoint.instrument(conn, :ex_debug_toolbar, fn ->
+            Endpoint.instrument(conn, :ex_debug_toolbar, %{conn: conn}, fn ->
               super(conn, opts)
             end)
           end

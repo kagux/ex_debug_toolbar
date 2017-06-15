@@ -22,7 +22,7 @@ defmodule ExDebugToolbar.Plug.CodeInjector do
   end
 
   defp inject_js(conn) do
-    static_path("/js/toolbar.js") |> js_code |> inject_code(conn, "</body>")
+    static_path("/js/toolbar.js") |> js_code(conn) |> inject_code(conn, "</body>")
   end
 
   defp inject_css(conn) do
@@ -39,10 +39,9 @@ defmodule ExDebugToolbar.Plug.CodeInjector do
     put_in conn.resp_body, body
   end
 
-  defp js_code(path) do
-    request_id = Process.get(:request_id)
+  defp js_code(path, conn) do
     """
-    <script>window.requestId='#{request_id}';</script>
+    <script>window.requestId='#{conn.private.request_id}';</script>
     <script src='#{path}'></script>
     """
   end

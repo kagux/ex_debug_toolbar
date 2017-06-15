@@ -1,6 +1,6 @@
 defmodule ExDebugToolbar.Test.Support.RequestHelpers do
   alias ExDebugToolbar.Toolbar
-  alias ExDebugToolbar.Request.Registry
+  alias ExDebugToolbar.Database.RequestRepo
 
   def wait_for_registry do
     :timer.sleep 20
@@ -17,8 +17,6 @@ defmodule ExDebugToolbar.Test.Support.RequestHelpers do
   end
 
   def delete_all_requests do
-    :ok = Registry.purge()
+    :ok = RequestRepo.purge()
   end
-
-  def start_request(_context \\ %{}), do: Toolbar.start_request
 end

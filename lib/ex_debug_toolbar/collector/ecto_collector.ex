@@ -3,9 +3,18 @@ defmodule ExDebugToolbar.Collector.EctoCollector do
   alias Ecto.LogEntry
 
   def log(%LogEntry{} = entry) do
-    duration = (entry.queue_time || 0) + (entry.query_time || 0) + (entry.decode_time || 0)
-    Toolbar.add_finished_event("ecto.query", duration)
-    Toolbar.add_data(:ecto, {entry, duration})
+    {id, duration} = parse_entry(entry)
+    Toolbar.add_finished_event(id, "ecto.query", duration)
+    Toolbar.add_data(id, :ecto, {entry, duration})
     entry
+  end
+
+  defp parse_entry(entry) do
+    case entry.caller_pid do
+      nil ->
+        duration = (entry.queue_time || 0) + (entry.query_time || 0) + (entry.decode_time || 0)
+        {self(), duration}
+      pid -> {pid, 0}
+    end
   end
 end

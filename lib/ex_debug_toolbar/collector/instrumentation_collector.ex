@@ -1,8 +1,8 @@
 defmodule ExDebugToolbar.Collector.InstrumentationCollector do
   alias ExDebugToolbar.Toolbar
 
-  def ex_debug_toolbar(:start, _, _) do
-    Toolbar.start_request
+  def ex_debug_toolbar(:start, _, %{conn: conn}) do
+    conn.private.request_id |> Toolbar.start_request
   end
   def ex_debug_toolbar(:stop, _, _), do: :ok
 
