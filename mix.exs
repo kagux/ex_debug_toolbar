@@ -55,7 +55,8 @@ defmodule ExDebugToolbar.Mixfile do
       {:ecto, "~> 2.1", optional: true},
       {:postgrex, "~> 0.13", optional: true},
       {:gettext, "~> 0.11"},
-      {:cowboy, "~> 1.0"}
+      {:cowboy, "~> 1.0"},
+      {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
 end
