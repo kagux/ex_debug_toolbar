@@ -1,7 +1,7 @@
 `ex_debug_toolbar` is a toolbar for Phoenix projects to display all sorts of information
 about current and previous requests: logs, timelines, database queries etc.
 
-![Screencapture](https://giphy.com/gifs/l4FGtmDkc3XJIUW1W/html5)
+![Screencapture](https://media.giphy.com/media/xUPGcm4teakeuY2U6Y/giphy.gif)
 
 # Installation
   1. Add `ex_debug_toolbar` to your list of dependencies in `mix.exs`:
@@ -47,6 +47,16 @@ about current and previous requests: logs, timelines, database queries etc.
       eex: ExDebugToolbar.Template.EExEngine,
       exs: ExDebugToolbar.Template.ExsEngine
   ```
+
+  4. To display parallel Ecto preloads you have to use `master` branch
+  ```elixir
+    defp deps do
+      [
+       {:ecto, github: "https://github.com/elixir-ecto/ecto", branch: "master", override: true}
+      ]
+    end
+  ```
+
 
 # Contributors
 Special thanks goes to [Juan Peri](https://github.com/epilgrim)!
