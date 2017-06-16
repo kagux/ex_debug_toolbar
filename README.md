@@ -30,17 +30,17 @@ about current and previous requests: logs, timelines, database queries etc.
     end
   ```
 
-  3. Enable toolbar in config `config/dev.exs` and setup collectors
+  3. Enable toolbar in config `config/dev.exs` and setup collectors. Replace `:my_app` and `MyApp` with your application name
 
   ```elixir
     # ExDebugToolbar config
     config :ex_debug_toolbar,
       enable: true
 
-    config :my_app, ExDebugToolbarDemo.Endpoint,
+    config :my_app, MyApp.Endpoint,
       instrumenters: [ExDebugToolbar.Collector.InstrumentationCollector]
 
-    config :my_app, ExDebugToolbarDemo.Repo,
+    config :my_app, MyApp.Repo,
       loggers: [ExDebugToolbar.Collector.EctoCollector, Ecto.LogEntry]
 
     config :phoenix, :template_engines,
