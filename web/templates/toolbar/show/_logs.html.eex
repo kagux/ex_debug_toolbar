@@ -18,7 +18,7 @@
           <tr class="<%= log_color_class(entry) %>">
             <td class="nowrap"><%= log_timestamp_to_string entry.timestamp %></td>
             <td><%= entry.level %></td>
-            <td class="nowrap"><%= entry.message |> to_string |> text_to_html %></td>
+            <td><%= entry.message |> to_string |> text_to_html %></td>
           </tr>
         <% end %>
       </tbody>

@@ -23,7 +23,7 @@
             <td><%= query.queue_time |> native_time_to_string %></td>
             <td><%= query.query_time |> native_time_to_string %></td>
             <td><%= query.decode_time |> native_time_to_string %></td>
-            <td class="nowrap"><span class="code"><%= query.query %></span></td>
+            <td><span class="code"><%= query.query %></span></td>
             <td><%= query.params |> inspect %></td>
           </tr>
         <% end %>
