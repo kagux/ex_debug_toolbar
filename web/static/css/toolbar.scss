@@ -22,9 +22,12 @@
   .panel {
     margin-bottom: 0;
     bottom: 50px;
-    max-height: 30%;
-    overflow-y: auto;
     display: none;
+
+    .panel-body {
+      max-height: 300px;
+      overflow-y: auto;
+    }
 
     .table {
       margin-top: 0;
