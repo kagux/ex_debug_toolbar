@@ -19,12 +19,12 @@
       <tbody>
         <%= for {query, total_time} <- @ecto |> Enum.reverse do %>
           <tr class="<%= ecto_color_class(total_time) %>">
-            <td><%= total_time |> native_time_to_string %></td>
-            <td><%= query.queue_time |> native_time_to_string %></td>
-            <td><%= query.query_time |> native_time_to_string %></td>
-            <td><%= query.decode_time |> native_time_to_string %></td>
-            <td><span class="code"><%= query.query %></span></td>
-            <td><%= query.params |> inspect %></td>
+            <td class="col-lg-1"><%= total_time |> native_time_to_string %></td>
+            <td class="col-lg-1"><%= query.queue_time |> native_time_to_string %></td>
+            <td class="col-lg-1"><%= query.query_time |> native_time_to_string %></td>
+            <td class="col-lg-1"><%= query.decode_time |> native_time_to_string %></td>
+            <td class="col-lg-6"><span class="code"><%= query.query %></span></td>
+            <td class="col-lg-2"><%= query.params |> inspect %></td>
           </tr>
         <% end %>
       </tbody>
