@@ -70,7 +70,7 @@ Special thanks goes to [Juan Peri](https://github.com/epilgrim)!
 - [ ] System info panel
 - [ ] Help/Docs Panel
 - [ ] Cleanup unused modules
-- [ ] Highlight preloaded queries
+- [ ] Highlight preloaded queries on timeline
 - [ ] Add specs
 - [ ] Request history
 - [ ] Improve Docs

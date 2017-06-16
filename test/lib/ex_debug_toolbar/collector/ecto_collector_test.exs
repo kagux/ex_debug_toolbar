@@ -20,32 +20,32 @@ defmodule ExDebugToolbar.Collector.EctoCollectorTest do
     assert {%{query: "query"}, _} = request.ecto |> hd
   end
 
-  if %Ecto.LogEntry{} |> Map.has_key?(:caller_pid) do
-    describe "parallel preload" do
-      setup do
-        pid = self()
-        spawn fn ->
-          %Ecto.LogEntry{query: "query", caller_pid: pid, query_time: 10} |> Collector.log
-          send pid, :done
-        end
-        result = receive do
-          :done -> :ok
-        after
-          200 -> :error
-        end
-        {:ok, request} = get_request()
-
-        {result, request: request}
+  describe "parallel preload" do
+    setup do
+      pid = self()
+      spawn fn ->
+        %Ecto.LogEntry{query: "query", query_time: 10}
+        |> Map.put(:caller_pid, pid)
+        |> Collector.log
+        send pid, :done
       end
-
-      test "adds query to correct request when it's has caller_pid", context do
-        assert context.request.ecto |> length > 0
+      result = receive do
+        :done -> :ok
+      after
+        200 -> :error
       end
+      {:ok, request} = get_request()
 
-      test "it adds this query to timeline without duration", context do
-        assert context.request.timeline.events |> length == 1
-        assert context.request.timeline.duration == 0
-      end
+      {result, request: request}
+    end
+
+    test "adds query to correct request when it's has caller_pid", context do
+      assert context.request.ecto |> length > 0
+    end
+
+    test "it adds this query to timeline without duration", context do
+      assert context.request.timeline.events |> length == 1
+      assert context.request.timeline.duration == 10
     end
   end
 end
