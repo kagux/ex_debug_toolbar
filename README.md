@@ -52,7 +52,7 @@ about current and previous requests: logs, timelines, database queries etc.
   ```elixir
     defp deps do
       [
-       {:ecto, github: "https://github.com/elixir-ecto/ecto", branch: "master", override: true}
+       {:ecto, github: "elixir-ecto/ecto", branch: "master", override: true}
       ]
     end
   ```
