@@ -22,6 +22,8 @@
   .panel {
     margin-bottom: 0;
     bottom: 50px;
+    max-height: 30%;
+    overflow-y: auto;
     display: none;
 
     .table {
