@@ -1,4 +1,30 @@
-<span class="toolbar-item">
+<span class="toolbar-item" data-toggle="panel">
   <i class="glyphicon glyphicon-time" aria-hidden="true"></i>
   <%= native_time_to_string @timeline.duration %>
 </span>
+<div class="panel panel-default navbar-fixed-bottom">
+  <div class="panel-heading">
+    <h3 class="panel-title">Timings</h3>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-lg-6">
+        <table class="table table-hover table-condensed table-bordered">
+          <caption>Controller times</caption>
+          <thead>
+            <th> Event </th>
+            <td> Duration </td>
+          </thead>
+          <tbody>
+            <%= for {event, duration} <- controller_times(@timeline) do %>
+              <tr>
+                <td class="col-lg-2"><%= event %></td>
+                <td class="col-lg-10"><%= native_time_to_string duration %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

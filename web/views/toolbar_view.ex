@@ -70,6 +70,17 @@ defmodule ExDebugToolbar.ToolbarView do
     end)
   end
 
+  def controller_times(%Timeline{} = timeline) do
+    events = MapSet.new ~w(controller.call controller.render)
+    [call, render] = timeline
+    |> Timeline.get_all_events
+    |> Enum.filter(&MapSet.member?(events, &1.name))
+    [
+      "controller": call.duration - render.duration,
+      "view": render.duration,
+    ]
+  end
+
   defp get_controller(%Plug.Conn{private: private}) do
     private.phoenix_controller |> to_string |> String.trim_leading("Elixir.")
   end

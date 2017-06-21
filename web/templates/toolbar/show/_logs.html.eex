@@ -8,6 +8,7 @@
   </div>
   <div class="panel-body">
     <table class="table table-hover table-condensed">
+      <caption>Log entries for current request only</caption>
       <thead>
         <th> Time </th>
         <th> Level </th>
