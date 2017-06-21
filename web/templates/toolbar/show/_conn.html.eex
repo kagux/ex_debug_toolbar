@@ -14,13 +14,13 @@
           <caption> Connection parameters </caption>
           <thead>
             <th> Parameter </th>
-            <td> Value </td>
+            <th> Value </th>
           </thead>
           <tbody>
             <%= for {key, value} <- conn_details(@request_conn) do %>
               <tr>
-                <td class="col-lg-2"><%= key %></td>
-                <td class="col-lg-10"><%= value %></td>
+                <td class="col-lg-2 text-muted"><%= key %></td>
+                <td class="col-lg-10 text-info"><%= value %></td>
               </tr>
             <% end %>
           </tbody>
@@ -36,8 +36,8 @@
           <tbody>
             <%= for {name, count} <- rendered_templates(@timeline) do %>
               <tr>
-                <td class="col-lg-2"><%= name %></td>
-                <td class="col-lg-10"><%= count %></td>
+                <td class="col-lg-2 text-muted"><%= name %></td>
+                <td class="col-lg-10 text-info"><%= count %></td>
               </tr>
             <% end %>
           </tbody>

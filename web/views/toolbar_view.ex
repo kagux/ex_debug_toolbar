@@ -49,13 +49,13 @@ defmodule ExDebugToolbar.ToolbarView do
     conn = conn_with_defaults(conn)
     {layout_view, layout_template} = conn.assigns.layout
     [
-      endpoint: conn.private.phoenix_endpoint,
-      controller: get_controller(conn),
-      action: conn.private.phoenix_action,
-      template: conn.private.phoenix_template,
-      view: conn.private.phoenix_view,
-      layout_view: layout_view,
-      layout_template: layout_template,
+      "Endpoint": conn.private.phoenix_endpoint,
+      "Controller": get_controller(conn),
+      "Action": conn.private.phoenix_action,
+      "Template": conn.private.phoenix_template,
+      "View": conn.private.phoenix_view,
+      "Layout View": layout_view,
+      "Layout Template": layout_template,
     ]
   end
 
@@ -78,7 +78,7 @@ defmodule ExDebugToolbar.ToolbarView do
     |> Enum.filter(&MapSet.member?(events, &1.name))
     [
       "controller": call.duration - render.duration,
-      "view": render.duration,
+      "templates": render.duration,
     ]
   end
 

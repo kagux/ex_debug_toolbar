@@ -51,15 +51,25 @@
     display: none;
 
     .panel-body {
+      padding: 5px 15px;
       max-height: 200px;
       overflow-y: auto;
+    }
+
+    .panel-heading {
+      padding: 5px 15px;
     }
 
     .table {
       margin-top: 0;
       margin-bottom: 0;
 
-      td {
+      caption {
+        padding-top: 4px;
+        padding-bottom: 4px;
+      }
+
+      td, th {
         padding-left: 5px;
         padding-right: 5px;
         padding-top: 1px;
