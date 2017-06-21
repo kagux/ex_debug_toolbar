@@ -1,0 +1,48 @@
+<span class="toolbar-item" data-toggle="panel">
+  <i class="glyphicon glyphicon-cog" aria-hidden="true"></i>
+  <span class="label label-success"><%= @request_conn.status %></span>
+  <span class="label label-default"><%= controller_action(@request_conn) %></span>
+</span>
+<div class="panel panel-default navbar-fixed-bottom">
+  <div class="panel-heading">
+    <h3 class="panel-title">Conn details</h3>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-lg-6">
+        <table class="table table-hover table-condensed table-bordered">
+          <caption> Connection parameters </caption>
+          <thead>
+            <th> Parameter </th>
+            <td> Value </td>
+          </thead>
+          <tbody>
+            <%= for {key, value} <- conn_details(@request_conn) do %>
+              <tr>
+                <td class="col-lg-2"><%= key %></td>
+                <td class="col-lg-10"><%= value %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-lg-6">
+        <table class="table table-hover table-condensed table-bordered">
+          <caption> Rendered templates </caption>
+          <thead>
+            <th> Name </th>
+            <th> Count </th>
+          </thead>
+          <tbody>
+            <%= for {name, count} <- rendered_templates(@timeline) do %>
+              <tr>
+                <td class="col-lg-2"><%= name %></td>
+                <td class="col-lg-10"><%= count %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

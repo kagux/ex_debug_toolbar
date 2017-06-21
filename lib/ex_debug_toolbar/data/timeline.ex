@@ -45,6 +45,12 @@ defmodule ExDebugToolbar.Data.Timeline do
   def empty?(%Timeline{events: []}), do: true
   def empty?(%Timeline{}), do: false
 
+  def get_all_events(%Timeline{events: events}), do: get_all_events(events)
+  def get_all_events(%Event{events: events}), do: get_all_events(events)
+  def get_all_events(events) when is_list(events) do
+    Enum.flat_map(events, &([&1 | get_all_events(&1)]))
+  end
+
   defp update_duration(event, nil) do
     duration = System.monotonic_time() - event.started_at
     update_duration(event, duration)

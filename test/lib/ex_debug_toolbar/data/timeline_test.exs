@@ -110,4 +110,16 @@ defmodule ExDebugToolbar.Data.TimelineTest do
       assert %Event{name: "event", duration: 5} = timeline.events |> hd
     end
   end
+
+  describe "get_all_events/1" do
+    test "returns all events in a list" do
+      timeline = %Timeline{events: [
+        %Event{name: "depth1", events: [
+          %Event{name: "depth2"}
+        ]}
+      ]}
+      event_names = Timeline.get_all_events(timeline) |> Enum.map(&(&1.name))
+      assert event_names == ["depth1", "depth2"]
+    end
+  end
 end

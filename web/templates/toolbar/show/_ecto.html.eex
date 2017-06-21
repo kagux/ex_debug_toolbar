@@ -1,4 +1,4 @@
-<span data-toggle="panel">
+<span class="toolbar-item" data-toggle="panel">
   <i class="glyphicon glyphicon-hdd" aria-hidden="true"></i>
   <%= length @ecto %>
 </span>

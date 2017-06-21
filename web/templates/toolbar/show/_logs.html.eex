@@ -1,4 +1,4 @@
-<span data-toggle="panel" data-title="Server Logs">
+<span class="toolbar-item" data-toggle="panel" data-title="Server Logs">
   <i class="glyphicon glyphicon-book" aria-hidden="true"></i>
   <%= length @logs %>
 </span>

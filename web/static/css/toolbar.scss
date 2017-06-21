@@ -8,10 +8,18 @@
   // namespacing to avoid conflicts
   @import "bootstrap";
 
+ // TOOLBAR
+
+  .navbar {
+    min-height: 30px;
+    height: 30px;
+  }
+
   .navbar-nav.nav > li > span {
     @extend a;
     padding-left: 5px;
     padding-right: 5px;
+    padding-top: 5px;
     cursor: pointer;
 
     &> i {
@@ -19,9 +27,27 @@
     }
   }
 
+  .navbar-brand {
+    padding: 2px 2px;
+    height: 30px;
+
+    img {
+      height: 100%;
+    }
+  }
+
+  .toolbar-item {
+    .label { // FIX ME
+      position: relative;
+      top: -2px;
+    }
+  }
+
+  // SLIDE UP PANELS
+
   .panel {
     margin-bottom: 0;
-    bottom: 50px;
+    bottom: 30px;
     display: none;
 
     .panel-body {
