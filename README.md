@@ -66,10 +66,10 @@ Special thanks goes to [Juan Peri](https://github.com/epilgrim)!
 
 # TODO
 - [ ] Add custom messages to toolbar
+- [ ] Add metadata to events and use groupable names (template.render, controller.render etc)
 - [ ] Decorator for functions to time them
 - [ ] System info panel
 - [ ] Help/Docs Panel
-- [ ] Cleanup unused modules
 - [ ] Highlight preloaded queries on timeline
 - [ ] Add specs
 - [ ] Request history
