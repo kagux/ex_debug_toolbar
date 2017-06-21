@@ -65,6 +65,7 @@ Special thanks goes to [Juan Peri](https://github.com/epilgrim)!
   Contributions in the form of bug reports, pull requests, or thoughtful discussions in the GitHub issue tracker are welcome!
 
 # TODO
+- [ ] Hide debug logs/output behind `debug: true` config
 - [ ] Add custom messages to toolbar
 - [ ] Add metadata to events and use groupable names (template.render, controller.render etc)
 - [ ] Decorator for functions to time them
