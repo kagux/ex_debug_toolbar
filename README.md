@@ -70,7 +70,6 @@ Special thanks goes to [Juan Peri](https://github.com/epilgrim)!
 - [ ] Decorator for functions to time them
 - [ ] System info panel
 - [ ] Help/Docs Panel
-- [ ] Highlight preloaded queries on timeline
 - [ ] Add specs
 - [ ] Request history
 - [ ] Improve Docs
