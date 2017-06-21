@@ -81,6 +81,14 @@ defmodule ExDebugToolbar.ToolbarView do
     ]
   end
 
+  def ecto_inline_queries(queries) do
+    queries |> Enum.filter(fn {_, _, type} -> type == :inline end)
+  end
+
+  def ecto_parallel_queries(queries) do
+    queries |> Enum.filter(fn {_, _, type} -> type == :parallel end)
+  end
+
   defp get_controller(%Plug.Conn{private: private}) do
     private.phoenix_controller |> to_string |> String.trim_leading("Elixir.")
   end

@@ -1,34 +1,13 @@
 <span class="toolbar-item" data-toggle="panel">
   <i class="glyphicon glyphicon-hdd" aria-hidden="true"></i>
-  <%= length @ecto %>
+  <%= length @queries %>
 </span>
 <div class="panel panel-default navbar-fixed-bottom">
   <div class="panel-heading">
     <h3 class="panel-title">Ecto Queries</h3>
   </div>
   <div class="panel-body">
-    <table class="table table-hover table-condensed table-bordered">
-      <caption>Queries executed during current request</caption>
-      <thead>
-        <th> Total</th>
-        <th> Queue</th>
-        <th> Query</th>
-        <th> Decode</th>
-        <th> Query </th>
-        <th> Params </th>
-      </thead>
-      <tbody>
-        <%= for {query, total_time} <- @ecto |> Enum.reverse do %>
-          <tr class="<%= ecto_color_class(total_time) %>">
-            <td class="col-lg-1"><%= total_time |> native_time_to_string %></td>
-            <td class="col-lg-1"><%= query.queue_time |> native_time_to_string %></td>
-            <td class="col-lg-1"><%= query.query_time |> native_time_to_string %></td>
-            <td class="col-lg-1"><%= query.decode_time |> native_time_to_string %></td>
-            <td class="col-lg-6"><span class="code"><%= query.query %></span></td>
-            <td class="col-lg-2"><%= query.params |> inspect %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+    <%= render "show/ecto/_queries.html", caption: "Queries executed inline", queries: ecto_inline_queries(@queries) %>
+    <%= render "show/ecto/_queries.html", caption: "Queries executed in a different process", queries: ecto_parallel_queries(@queries) %>
   </div>
-</div>
+</divecto>

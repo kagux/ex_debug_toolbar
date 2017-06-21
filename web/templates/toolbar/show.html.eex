@@ -15,7 +15,7 @@
           <li> <%= render "show/_logs.html", logs: @request.logs %> </li>
         <% end %>
         <%= unless Enum.empty? @request.ecto do %>
-          <li> <%= render "show/_ecto.html", ecto: @request.ecto %> </li>
+          <li> <%= render "show/_ecto.html", queries: @request.ecto %> </li>
         <% end %>
       </ul>
     </div>

@@ -17,7 +17,19 @@ defmodule ExDebugToolbar.Collector.EctoCollectorTest do
     %Ecto.LogEntry{query: "query"} |> Collector.log
     assert {:ok, request} = get_request()
     assert request.ecto |> length == 1
-    assert {%{query: "query"}, _} = request.ecto |> hd
+    assert {%{query: "query"}, _, _} = request.ecto |> hd
+  end
+
+  test "it marks query as inline when there is no caller_pid" do
+    %Ecto.LogEntry{query: "query"} |> Collector.log
+    assert {:ok, request} = get_request()
+    assert {_, _, :inline} = request.ecto |> hd
+  end
+
+  test "it marks query as inline when caller_pid is same process" do
+    %Ecto.LogEntry{query: "query"} |> Map.put(:caller_pid, self()) |> Collector.log
+    assert {:ok, request} = get_request()
+    assert {_, _, :inline} = request.ecto |> hd
   end
 
   describe "parallel preload" do
@@ -46,6 +58,10 @@ defmodule ExDebugToolbar.Collector.EctoCollectorTest do
     test "it adds this query to timeline without duration", context do
       assert context.request.timeline.events |> length == 1
       assert context.request.timeline.duration == 10
+    end
+
+    test "it marks query as parallel", context do
+      assert {_, _, :parallel} = context.request.ecto |> hd
     end
   end
 end

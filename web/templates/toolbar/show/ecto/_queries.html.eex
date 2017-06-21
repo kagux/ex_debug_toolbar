@@ -1,0 +1,23 @@
+<table class="table table-hover table-condensed table-bordered">
+  <caption><%= @caption %></caption>
+  <thead>
+    <th> Total</th>
+    <th> Queue</th>
+    <th> Query</th>
+    <th> Decode</thecto>
+    <th> Query </th>
+    <th> Params </th>
+  </thead>
+  <tbody>
+    <%= for {query, total_time, _} <- @queries do %>
+      <tr class="<%= ecto_color_class(total_time) %>">
+        <td class="col-lg-1"><%= total_time |> native_time_to_string %></td>
+        <td class="col-lg-1"><%= query.queue_time |> native_time_to_string %></td>
+        <td class="col-lg-1"><%= query.query_time |> native_time_to_string %></td>
+        <td class="col-lg-1"><%= query.decode_time |> native_time_to_string %></td>
+        <td class="col-lg-6"><span class="code"><%= query.query %></span></td>
+        <td class="col-lg-2"><%= query.params |> inspect %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

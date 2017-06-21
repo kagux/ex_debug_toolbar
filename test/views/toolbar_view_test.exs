@@ -35,7 +35,7 @@ defmodule ExDebugToolbar.ToolbarViewTest do
       }}
     }
     duration = 15000
-    request = %Request{ecto: [{log_entry, duration}]}
+    request = %Request{ecto: [{log_entry, duration, :inline}]}
     assert request |> render |> is_bitstring
   end
 
