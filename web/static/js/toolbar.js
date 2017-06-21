@@ -53,7 +53,7 @@ class App {
 
   hideActivePanel() {
     if(this.activePanel){
-      this.activePanel.slideUp(150);
+      // this.activePanel.slideUp(150);
       this.resetActivePanel();
     }
   }

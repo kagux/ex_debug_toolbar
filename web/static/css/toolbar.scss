@@ -58,6 +58,17 @@
     .table {
       margin-top: 0;
       margin-bottom: 0;
+
+      td {
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-top: 1px;
+        padding-bottom: 1px;
+
+        p {
+          margin: 0;
+        }
+      }
     }
   }
 
