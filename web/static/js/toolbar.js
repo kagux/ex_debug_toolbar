@@ -38,6 +38,17 @@ class App {
     .mouseleave(this.hideActivePanel.bind(this))
     .find('[data-toggle="panel"]')
     .hover(this.showPanel.bind(this));
+
+    toolbar
+    .find('.panel-body')
+    .on( 'mousewheel DOMMouseScroll', this.scrollDivOnly);
+  }
+
+  scrollDivOnly(event) {
+    event.preventDefault();
+    const original = event.originalEvent;
+    const delta = original.wheelDelta || -original.detail;
+    this.scrollTop -= delta;
   }
 
   hideActivePanel() {
