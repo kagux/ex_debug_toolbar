@@ -6,28 +6,17 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollector do
   end
   def ex_debug_toolbar(:stop, _, _), do: :ok
 
-  def phoenix_controller_call(:start, _, %{conn: conn}) do
-    event_name = controller_event_name(conn)
-    Toolbar.start_event(event_name)
-    event_name
+  def phoenix_controller_call(:start, _, _) do
+    Toolbar.start_event("controller.call")
   end
-  def phoenix_controller_call(:stop, time_diff, event_name) do
-    Toolbar.finish_event(event_name, duration: time_diff)
+  def phoenix_controller_call(:stop, time_diff, _) do
+    Toolbar.finish_event("controller.call", duration: time_diff)
   end
 
-  def phoenix_controller_render(:start, _, %{template: template}) do
-    Toolbar.start_event(template)
-    template
+  def phoenix_controller_render(:start, _, _) do
+    Toolbar.start_event("controller.render")
   end
-  def phoenix_controller_render(:stop, time_diff, template) do
-    Toolbar.finish_event(template, duration: time_diff)
-  end
-
-  defp controller_event_name(%{private: %{phoenix_controller: controller, phoenix_action: action}}) do
-    module_name = controller |> to_string |> String.trim_leading("Elixir.")
-    "#{module_name}:#{to_string(action)}"
-  end
-  defp controller_event_name(_) do
-    "UnknownController"
+  def phoenix_controller_render(:stop, time_diff, _) do
+    Toolbar.finish_event("controller.render", duration: time_diff)
   end
 end
