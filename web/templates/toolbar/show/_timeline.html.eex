@@ -13,13 +13,13 @@
           <caption>Controller times</caption>
           <thead>
             <th> Event </th>
-            <td> Duration </td>
+            <th> Duration </th>
           </thead>
           <tbody>
             <%= for {event, duration} <- controller_times(@timeline) do %>
               <tr>
-                <td class="col-lg-2"><%= event %></td>
-                <td class="col-lg-10"><%= native_time_to_string duration %></td>
+                <td class="col-lg-2 text-muted"><%= event %></td>
+                <td class="col-lg-10 text-info"><%= native_time_to_string duration %></td>
               </tr>
             <% end %>
           </tbody>

@@ -77,8 +77,8 @@ defmodule ExDebugToolbar.ToolbarView do
     |> Timeline.get_all_events
     |> Enum.filter(&MapSet.member?(events, &1.name))
     [
-      "controller": call.duration - render.duration,
-      "templates": render.duration,
+      "Controller": call.duration - render.duration,
+      "Templates": render.duration,
     ]
   end
 
