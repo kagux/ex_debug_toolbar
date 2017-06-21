@@ -68,6 +68,7 @@ defmodule ExDebugToolbar.ToolbarView do
     |> Enum.reduce(%{}, fn name, acc ->
       Map.update acc, name, 1, &(&1 + 1)
     end)
+    |> Enum.sort_by(fn {_, count} -> -count end)
   end
 
   def controller_times(%Timeline{} = timeline) do
