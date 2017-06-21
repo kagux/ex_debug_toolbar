@@ -5,6 +5,7 @@
     <th> Queue</th>
     <th> Query</th>
     <th> Decode</thecto>
+    <th> Table </th>
     <th> Query </th>
     <th> Params </th>
   </thead>
@@ -15,7 +16,8 @@
         <td class="col-lg-1"><%= query.queue_time |> native_time_to_string %></td>
         <td class="col-lg-1"><%= query.query_time |> native_time_to_string %></td>
         <td class="col-lg-1"><%= query.decode_time |> native_time_to_string %></td>
-        <td class="col-lg-6"><span class="code"><%= query.query %></span></td>
+        <td class="col-lg-1"><%= query.source %></td>
+        <td class="col-lg-5"><span class="code"><%= query.query %></span></td>
         <td class="col-lg-2"><%= query.params |> inspect %></td>
       </tr>
     <% end %>
