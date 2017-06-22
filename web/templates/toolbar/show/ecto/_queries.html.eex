@@ -24,7 +24,6 @@
                 data-toggle="popover"
                 title="Params"
                 data-content="<%= inspect(query.params) %>"
-                data-container="body"
                 data-placement="top"
                 data-trigger="hover"
           ></i>
