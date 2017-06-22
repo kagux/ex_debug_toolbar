@@ -3,7 +3,7 @@ defmodule ExDebugToolbar.Toolbar do
   alias ExDebugToolbar.Data.Collection
   alias ExDebugToolbar.Request
   alias ExDebugToolbar.Toolbar.Macros
-  require Macros
+  use Macros
 
   def start_request(uuid) do
     :ok = RequestRepo.insert(%Request{
@@ -13,8 +13,13 @@ defmodule ExDebugToolbar.Toolbar do
     })
   end
 
-  defdelegate get_request(id \\ self()), to: RequestRepo, as: :get
-  defdelegate get_all_requests, to: RequestRepo, as: :all
+  def get_request(id \\ self()) do
+    if_enabled do: RequestRepo.get(id), else: {:error, :toolbar_disabled}
+  end
+
+  def get_all_requests do
+    if_enabled do: RequestRepo.all, else: {:error, :toolbar_disabled}
+  end
 
   def start_event(id \\ self(), name) do
     add_data(id, :timeline, {:start_event, name})
@@ -39,7 +44,7 @@ defmodule ExDebugToolbar.Toolbar do
   end
 
   def add_data(id \\ self(), key, data) do
-    Macros.if_enabled do: do_add_data(id, key, data)
+    if_enabled do: do_add_data(id, key, data)
   end
 
   defp do_add_data(id, key, data) do

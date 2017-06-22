@@ -18,6 +18,7 @@ defmodule ExDebugToolbar.Database do
 
   def terminate(reason, _state) do
     destroy_tables()
+    :mnesia.stop()
     reason
   end
 

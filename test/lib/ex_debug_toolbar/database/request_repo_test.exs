@@ -47,7 +47,6 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
     end
   end
 
-
   describe "update/2" do
     setup context do
       RequestRepo.insert(context.request)
