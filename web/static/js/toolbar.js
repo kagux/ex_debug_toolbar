@@ -31,6 +31,7 @@ class App {
     toolbar.appendTo('body');
     this.renderPanels(toolbar);
     this.highlightCode(toolbar);
+    this.renderPopovers();
   }
 
   renderPanels(toolbar) {
@@ -86,6 +87,10 @@ class App {
     toolbar.find(".code").each((i, block) => {
       Highlight.highlightBlock(block)
     })
+  }
+
+  renderPopovers() {
+    $('[data-toggle="popover"]').popover();
   }
 }
 

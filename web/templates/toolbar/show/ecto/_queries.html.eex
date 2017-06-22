@@ -7,7 +7,7 @@
     <th> Decode</thecto>
     <th> Table </th>
     <th> Query </th>
-    <th> Params </th>
+    <td></td>
   </thead>
   <tbody>
     <%= for {query, total_time, _} <- @queries do %>
@@ -17,8 +17,18 @@
         <td class="col-lg-1"><%= query.query_time |> native_time_to_string %></td>
         <td class="col-lg-1"><%= query.decode_time |> native_time_to_string %></td>
         <td class="col-lg-1"><%= query.source %></td>
-        <td class="col-lg-5"><span class="code"><%= query.query %></span></td>
-        <td class="col-lg-2"><%= query.params |> inspect %></td>
+        <td class="col-lg-5"> <span class="code"><%= query.query %></span></td>
+        <td class="col-lg-1">
+          <i 
+                class="glyphicon glyphicon-info-sign pointer"
+                data-toggle="popover"
+                title="Params"
+                data-content="<%= inspect(query.params) %>"
+                data-container="body"
+                data-placement="top"
+                data-trigger="hover"
+          ></i>
+        </td>
       </tr>
     <% end %>
   </tbody>
