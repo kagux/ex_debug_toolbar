@@ -62,13 +62,23 @@ defmodule ExDebugToolbar.ToolbarView do
   def rendered_templates(%Timeline{} = timeline) do
     timeline
     |> Timeline.get_all_events
-    |> Stream.map(&(&1.name))
-    |> Stream.filter(&String.starts_with?(&1, "template#"))
-    |> Stream.map(&String.trim_leading(&1, "template#"))
-    |> Enum.reduce(%{}, fn name, acc ->
-      Map.update acc, name, 1, &(&1 + 1)
+    |> Stream.filter(&String.starts_with?(&1.name, "template#"))
+    |> Enum.reduce(%{}, fn event, acc ->
+      Map.update(
+        acc,
+        event.name,
+        %{count: 1, durations: [event.duration], min: 0, max: 0, avg: 0},
+        &(%{&1 | count: &1.count + 1, durations: [event.duration | &1.durations]})
+      )
     end)
-    |> Enum.sort_by(fn {_, count} -> -count end)
+    |> Stream.map(fn {name, stats} ->
+      {name, %{stats |
+        min: Enum.min(stats.durations),
+        max: Enum.max(stats.durations),
+        avg: div(Enum.sum(stats.durations), Enum.count(stats.durations))
+      }}
+    end)
+    |> Enum.sort_by(fn {_, stats} -> -stats.count end)
   end
 
   def controller_times(%Timeline{} = timeline) do
