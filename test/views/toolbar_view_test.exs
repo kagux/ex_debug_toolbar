@@ -1,7 +1,7 @@
 defmodule ExDebugToolbar.ToolbarViewTest do
   use ExUnit.Case, async: true
   alias ExDebugToolbar.Request
-  alias ExDebugToolbar.Data.{LogEntry}
+  alias ExDebugToolbar.Data.{LogEntry, Timeline}
   alias Phoenix.View
   alias ExDebugToolbar.ToolbarView
 
@@ -36,6 +36,26 @@ defmodule ExDebugToolbar.ToolbarViewTest do
     }
     duration = 15000
     request = %Request{ecto: [{log_entry, duration, :inline}]}
+    assert request |> render |> is_bitstring
+  end
+
+  test "it renders toolbar with timeline" do
+    timeline = %Timeline{
+      duration: 50,
+      events: [%Timeline.Event{
+        name: "controller.call",
+        duration: 5,
+        events: [%Timeline.Event{
+          name: "controller.render",
+          duration: 7,
+          events: [%Timeline.Event{
+            name: "template#app.html",
+            duration: 10
+          }]
+        }]
+      }]
+    }
+    request = %Request{timeline: timeline}
     assert request |> render |> is_bitstring
   end
 
