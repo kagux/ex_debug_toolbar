@@ -9,7 +9,7 @@
   </div>
   <div class="panel-body">
     <div class="row">
-      <div class="col-lg-6">
+      <div class="col-lg-4">
         <table class="table table-hover table-condensed table-bordered">
           <caption> Connection parameters </caption>
           <thead>
@@ -26,7 +26,7 @@
           </tbody>
         </table>
       </div>
-      <div class="col-lg-6">
+      <div class="col-lg-8">
         <table class="table table-hover table-condensed table-bordered">
           <caption> Rendered templates </caption>
           <thead>
@@ -41,8 +41,8 @@
               <tr>
                 <td class="col-lg-2 text-muted"><%= name %></td>
                 <td class="col-lg-10 text-info"><%= stats.count %></td>
-                <td class="col-lg-10 text-info"><%= native_time_to_string stats.min %></td>
                 <td class="col-lg-10 text-info"><%= native_time_to_string stats.max %></td>
+                <td class="col-lg-10 text-info"><%= native_time_to_string stats.min %></td>
                 <td class="col-lg-10 text-info"><%= native_time_to_string stats.avg %></td>
               </tr>
             <% end %>
