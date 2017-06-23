@@ -20,5 +20,11 @@ defmodule ExDebugToolbar.Data.ConnTest do
       new_conn = %Plug.Conn{resp_headers: [{:foo, :bar}]}
       assert %Conn{resp_headers: [{:foo, :bar}]} = Collection.add(conn, {:response, new_conn})
     end
+
+    test "add/2 does not persist conn body" do
+      conn = %Conn{resp_body: "hello"}
+      refute Collection.add(%Conn{}, {:request, conn}).resp_body
+      refute Collection.add(%Conn{}, {:response, conn}).resp_body
+    end
   end
 end
