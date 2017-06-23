@@ -19,7 +19,7 @@
         <td class="col-lg-1"><%= query.source %></td>
         <td class="col-lg-5"> <span class="code"><%= query.query %></span></td>
         <td class="col-lg-1">
-          <i 
+          <i
                 class="glyphicon glyphicon-info-sign pointer"
                 data-toggle="popover"
                 title="Params"

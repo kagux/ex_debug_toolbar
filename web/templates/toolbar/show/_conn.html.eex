@@ -9,7 +9,7 @@
   </div>
   <div class="panel-body">
     <div class="row">
-      <div class="col-lg-4">
+      <div class="col-lg-6">
         <table class="table table-hover table-condensed table-bordered">
           <caption> Connection parameters </caption>
           <thead>
@@ -26,26 +26,32 @@
           </tbody>
         </table>
       </div>
-      <div class="col-lg-8">
+      <div class="col-lg-6">
         <table class="table table-hover table-condensed table-bordered">
           <caption> Rendered templates </caption>
           <thead>
             <th> Name </th>
             <th> Count </th>
-            <th> Slowest </th>
-            <th> Fastest </th>
             <th> Average </th>
-            <th> Total </th>
           </thead>
           <tbody>
             <%= for {name, stats} <- rendered_templates(@timeline) do %>
               <tr>
-                <td class="col-lg-2 text-muted"><%= name %></td>
+                <td class="col-lg-8 text-muted"><%= name %></td>
                 <td class="col-lg-2 text-info"><%= stats.count %></td>
-                <td class="col-lg-2 text-info"><%= native_time_to_string stats.max %></td>
-                <td class="col-lg-2 text-info"><%= native_time_to_string stats.min %></td>
-                <td class="col-lg-2 text-info"><%= native_time_to_string stats.avg %></td>
-                <td class="col-lg-2 text-info"><%= native_time_to_string stats.total %></td>
+                <td class="col-lg-2 text-info">
+                  <%= native_time_to_string stats.avg %>
+                  <i
+                        class="glyphicon glyphicon-info-sign pointer"
+                        data-toggle="popover"
+                        title="Stats"
+                        data-content="<%= stats_popover_text(stats) %>"
+                        data-container=".ex-debug-toolbar"
+                        data-placement="top"
+                        data-html=true
+                        data-trigger="hover"
+                  ></i>
+                </td>
               </tr>
             <% end %>
           </tbody>

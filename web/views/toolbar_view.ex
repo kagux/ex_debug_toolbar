@@ -82,6 +82,15 @@ defmodule ExDebugToolbar.ToolbarView do
     |> Enum.sort_by(fn {_, stats} -> -stats.count end)
   end
 
+  def stats_popover_text(stats) do
+    ~w(min max total)a
+    |> Stream.map(&Map.get(stats, &1))
+    |> Stream.map(&native_time_to_string/1)
+    |> (&Enum.zip(~w(Fastest Slowest Total), &1)).()
+    |> Enum.map(fn {label, value} -> label <> ": " <> value end)
+    |> Enum.join("<br>")
+  end
+
   def controller_times(%Timeline{} = timeline) do
     events = MapSet.new ~w(controller.call controller.render)
     [call, render] = timeline
