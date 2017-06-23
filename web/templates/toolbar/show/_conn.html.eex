@@ -45,7 +45,7 @@
                 <td class="col-lg-2 text-info"><%= native_time_to_string stats.max %></td>
                 <td class="col-lg-2 text-info"><%= native_time_to_string stats.min %></td>
                 <td class="col-lg-2 text-info"><%= native_time_to_string stats.avg %></td>
-                <td class="col-lg-2 text-info"><%= native_time_to_string stats.toal %></td>
+                <td class="col-lg-2 text-info"><%= native_time_to_string stats.total %></td>
               </tr>
             <% end %>
           </tbody>
