@@ -75,7 +75,7 @@ defmodule ExDebugToolbar.ToolbarView do
       {name, %{stats |
         min: Enum.min(stats.durations),
         max: Enum.max(stats.durations),
-        total: Enum.sum(statgs.durations),
+        total: Enum.sum(stats.durations),
         avg: div(Enum.sum(stats.durations), Enum.count(stats.durations))
       }}
     end)
