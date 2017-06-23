@@ -4,6 +4,7 @@ defmodule ExDebugToolbar.Collector.EctoCollector do
 
   def log(%LogEntry{} = entry) do
     {id, duration, type} = parse_entry(entry)
+    entry = remove_result_rows(entry)
     Toolbar.add_finished_event(id, "ecto.query", duration)
     Toolbar.add_data(id, :ecto, {entry, duration, type})
     entry
@@ -18,5 +19,10 @@ defmodule ExDebugToolbar.Collector.EctoCollector do
       _ ->
         {self(), duration, :inline}
     end
+  end
+
+  defp remove_result_rows(%{result: nil} = entry), do: entry
+  defp remove_result_rows(%{result: {status, result}} = entry) do
+    %{entry | result: {status, %{result | rows: []}}}
   end
 end

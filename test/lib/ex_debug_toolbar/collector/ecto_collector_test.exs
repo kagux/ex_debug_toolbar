@@ -32,6 +32,24 @@ defmodule ExDebugToolbar.Collector.EctoCollectorTest do
     assert {_, _, :inline} = request.ecto |> hd
   end
 
+  test "it does not keep query result rows" do
+    entry = %Ecto.LogEntry{
+      query: "query",
+      result: {:ok, %Postgrex.Result{ rows: [[:user]]}}
+    }
+    Collector.log entry
+    assert {:ok, request} = get_request()
+    {saved_entry, _, _} = request.ecto |> hd
+    assert {:ok, result} = saved_entry.result
+    assert result.rows == []
+  end
+
+  test "it does not change result when it is nil" do
+    %Ecto.LogEntry{query: "query", result: nil} |> Collector.log
+    assert {:ok, request} = get_request()
+    assert {%{result: nil}, _, _} = request.ecto |> hd
+  end
+
   describe "parallel preload" do
     setup do
       pid = self()
