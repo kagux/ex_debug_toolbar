@@ -35,15 +35,17 @@
             <th> Slowest </th>
             <th> Fastest </th>
             <th> Average </th>
+            <th> Total </th>
           </thead>
           <tbody>
             <%= for {name, stats} <- rendered_templates(@timeline) do %>
               <tr>
                 <td class="col-lg-2 text-muted"><%= name %></td>
-                <td class="col-lg-10 text-info"><%= stats.count %></td>
-                <td class="col-lg-10 text-info"><%= native_time_to_string stats.max %></td>
-                <td class="col-lg-10 text-info"><%= native_time_to_string stats.min %></td>
-                <td class="col-lg-10 text-info"><%= native_time_to_string stats.avg %></td>
+                <td class="col-lg-2 text-info"><%= stats.count %></td>
+                <td class="col-lg-2 text-info"><%= native_time_to_string stats.max %></td>
+                <td class="col-lg-2 text-info"><%= native_time_to_string stats.min %></td>
+                <td class="col-lg-2 text-info"><%= native_time_to_string stats.avg %></td>
+                <td class="col-lg-2 text-info"><%= native_time_to_string stats.toal %></td>
               </tr>
             <% end %>
           </tbody>

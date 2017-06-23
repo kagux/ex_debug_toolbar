@@ -67,7 +67,7 @@ defmodule ExDebugToolbar.ToolbarView do
       Map.update(
         acc,
         event.name,
-        %{count: 1, durations: [event.duration], min: 0, max: 0, avg: 0},
+        %{count: 1, durations: [event.duration], min: 0, max: 0, avg: 0, total: 0},
         &(%{&1 | count: &1.count + 1, durations: [event.duration | &1.durations]})
       )
     end)
@@ -75,6 +75,7 @@ defmodule ExDebugToolbar.ToolbarView do
       {name, %{stats |
         min: Enum.min(stats.durations),
         max: Enum.max(stats.durations),
+        total: Enum.sum(statgs.durations),
         avg: div(Enum.sum(stats.durations), Enum.count(stats.durations))
       }}
     end)
