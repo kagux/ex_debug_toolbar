@@ -1,5 +1,5 @@
 defmodule ExDebugToolbar.ToolbarTest do
-  use ExDebugToolbar.CollectorCase, async: false
+  use ExDebugToolbar.CollectorCase, async: true
   alias ExDebugToolbar.Toolbar
 
   describe "add_data/3" do

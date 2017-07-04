@@ -1,11 +1,12 @@
 defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
-  use ExDebugToolbar.CollectorCase, async: false
+  use ExDebugToolbar.CollectorCase, async: true
   alias ExDebugToolbar.Collector.InstrumentationCollector, as: Collector
 
   describe "ex_debug_toolbar"  do
     test "it starts request on ex_debug_toolbar start" do
       conn = %Plug.Conn{} |> Plug.Conn.put_private(:request_id, @request_id)
       Collector.ex_debug_toolbar(:start, %{}, %{conn: conn})
+      on_exit fn -> delete_request(@request_id) end
       assert {:ok, request} = get_request(@request_id)
       assert request.uuid == @request_id
       assert request.pid == self()

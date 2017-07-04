@@ -1,5 +1,5 @@
 defmodule ExDebugToolbar.ToolbarChannelTest do
-  use ExDebugToolbar.CollectorCase, async: false
+  use ExDebugToolbar.CollectorCase, async: true
   use ExDebugToolbar.ChannelCase
   alias ExDebugToolbar.ToolbarChannel
 

@@ -1,5 +1,5 @@
 defmodule ExDebugToolbar.Collector.EctoCollectorTest do
-  use ExDebugToolbar.CollectorCase, async: false
+  use ExDebugToolbar.CollectorCase, async: true
   alias ExDebugToolbar.Collector.EctoCollector, as: Collector
   alias ExDebugToolbar.Data.Timeline.Event
 

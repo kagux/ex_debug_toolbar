@@ -19,4 +19,9 @@ defmodule ExDebugToolbar.Test.Support.RequestHelpers do
   def delete_all_requests do
     :ok = RequestRepo.purge()
   end
+
+  def delete_request(id) do
+    wait_for_registry()
+    Toolbar.delete_request(id)
+  end
 end

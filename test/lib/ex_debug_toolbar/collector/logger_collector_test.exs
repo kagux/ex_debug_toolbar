@@ -1,5 +1,5 @@
 defmodule ExDebugToolbar.Collector.LoggerCollectorTest do
-  use ExDebugToolbar.CollectorCase, async: false
+  use ExDebugToolbar.CollectorCase, async: true
   alias ExDebugToolbar.Collector.LoggerCollector, as: Collector
   require Logger
 

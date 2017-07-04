@@ -3,7 +3,7 @@ defmodule ExDebugToolbar.Test.EExEngine do
 end
 
 defmodule ExDebugToolbar.Collector.TemplateTest do
-  use ExDebugToolbar.CollectorCase, async: false
+  use ExDebugToolbar.CollectorCase, async: true
   alias ExDebugToolbar.Test.EExEngine
   alias ExDebugToolbar.Data.Timeline.Event
 
