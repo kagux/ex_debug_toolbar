@@ -21,8 +21,8 @@ defmodule ExDebugToolbar.Collector.EctoCollector do
     end
   end
 
-  defp remove_result_rows(%{result: nil} = entry), do: entry
-  defp remove_result_rows(%{result: {status, result}} = entry) do
-    %{entry | result: {status, %{result | rows: []}}}
+  defp remove_result_rows(%{result: {:ok, result}} = entry) do
+    %{entry | result: {:ok, %{result | rows: []}}}
   end
+  defp remove_result_rows(entry), do: entry
 end

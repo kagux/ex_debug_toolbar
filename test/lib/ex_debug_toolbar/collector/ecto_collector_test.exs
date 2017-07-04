@@ -50,6 +50,16 @@ defmodule ExDebugToolbar.Collector.EctoCollectorTest do
     assert {%{result: nil}, _, _} = request.ecto |> hd
   end
 
+  test "it handles query with an error" do
+    entry = %Ecto.LogEntry{
+      query: "query",
+      result: {:error, %Postgrex.Error{}}
+    }
+    Collector.log entry
+    assert {:ok, request} = get_request()
+    assert {%{result: {:error, _}}, _, _} = request.ecto |> hd
+  end
+
   describe "parallel preload" do
     setup do
       pid = self()
