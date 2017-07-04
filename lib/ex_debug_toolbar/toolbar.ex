@@ -13,6 +13,10 @@ defmodule ExDebugToolbar.Toolbar do
     })
   end
 
+  def delete_request(uuid) do
+    :ok = RequestRepo.delete(uuid)
+  end
+
   def get_request(id \\ self()) do
     if_enabled do: RequestRepo.get(id), else: {:error, :toolbar_disabled}
   end

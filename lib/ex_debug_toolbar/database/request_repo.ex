@@ -23,6 +23,10 @@ defmodule ExDebugToolbar.Database.RequestRepo do
     :mnesia.clear_table(Request) |> result
   end
 
+  def delete(id) do
+    GenServer.call(__MODULE__, {:delete, id})
+  end
+
   def get(pid) when is_pid(pid) do
     do_get fn ->
       :mnesia.read(Request, pid)
@@ -55,6 +59,17 @@ defmodule ExDebugToolbar.Database.RequestRepo do
     {:noreply, nil}
   end
 
+  def handle_call({:delete, id}, _from, _state) do
+    reply = transaction fn ->
+      case get(id) do
+        {:ok, request} -> :mnesia.delete({Request, request.pid})
+        _ -> :error
+      end
+    end
+
+    {:reply, reply, nil}
+  end
+
   defp apply_changes(request, changes) when is_map(changes) do
     Map.merge(request, changes)
   end
@@ -62,10 +77,10 @@ defmodule ExDebugToolbar.Database.RequestRepo do
     changes.(request)
   end
 
-  def transaction(func) do
+  defp transaction(func) do
     :mnesia.transaction(func) |> result 
   end
 
-  def result({:atomic, result}), do: result
-  def result({:aborted, reason}), do: {:error, reason}
+  defp result({:atomic, result}), do: result
+  defp result({:aborted, reason}), do: {:error, reason}
 end

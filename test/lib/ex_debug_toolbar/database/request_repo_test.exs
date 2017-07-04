@@ -105,6 +105,33 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
     end
   end
 
+  describe "delete/1" do
+    setup do
+      pid_1 = spawn fn -> :ok end
+      pid_2 = spawn fn -> :ok end
+      requests = [%Request{pid: pid_1, uuid: 1}, %Request{pid: pid_2, uuid: 2}]
+      for request <- requests do
+        :ok = RequestRepo.insert(request)
+      end
+      {:ok, %{requests: requests, pids: [pid_1, pid_2]}}
+    end
+
+    test "deletes request by id", context do
+      assert :ok = RequestRepo.delete(1)
+      assert RequestRepo.all == context.requests |> tl
+    end
+
+    test "deletes request by pid", context do
+      assert :ok = context.pids |> List.last |> RequestRepo.delete
+      assert RequestRepo.all == context.requests |> Enum.reverse |> tl
+    end
+
+    test "it returns error if request doesn't exist" do
+      assert :error = RequestRepo.delete("no_such_request")
+      assert RequestRepo.all |> length == 2
+    end
+  end
+
   test "purge/0 removes all request" do
     :ok = RequestRepo.insert(%Request{uuid: 1})
     :ok = RequestRepo.purge()
