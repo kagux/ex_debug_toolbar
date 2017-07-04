@@ -4,8 +4,8 @@ defmodule ExDebugToolbar.Data.Timeline do
   defmodule Event do
     defstruct [
       name: nil,
-      started_at: nil,
       duration: 0,
+      started_at: nil,
       events: [],
     ]
   end
@@ -20,15 +20,15 @@ defmodule ExDebugToolbar.Data.Timeline do
     start_event(timeline, name) |> finish_event(name, duration: duration)
   end
 
-  def start_event(%Timeline{} = timeline, name) do
-    event = %Timeline.Event{name: name, started_at: System.monotonic_time()}
+  def start_event(%Timeline{} = timeline, name, opts \\ []) do
+    event = %Timeline.Event{name: name, started_at: opts[:timestamp]}
     %{timeline | queue: [event | timeline.queue]}
   end
 
   def finish_event(timeline, name, opts \\ [])
   def finish_event(%Timeline{queue: [%{name: name} = event]} = timeline, name, opts) do
     events = timeline.events
-    finished_event = update_duration(event, opts[:duration])
+    finished_event = set_duration(event, opts)
     %{timeline |
       queue: [],
       events: [finished_event | events],
@@ -36,7 +36,7 @@ defmodule ExDebugToolbar.Data.Timeline do
     }
   end
   def finish_event(%Timeline{queue: [%{name: name} = event | [parent | rest]]} = timeline, name, opts) do
-    finished_event = update_duration(event, opts[:duration])
+    finished_event = set_duration(event, opts)
     new_parent = %{parent | events: [finished_event | parent.events]}
     %{timeline | queue: [new_parent | rest]}
   end
@@ -51,22 +51,25 @@ defmodule ExDebugToolbar.Data.Timeline do
     Enum.flat_map(events, &([&1 | get_all_events(&1)]))
   end
 
-  defp update_duration(event, nil) do
-    duration = System.monotonic_time() - event.started_at
-    update_duration(event, duration)
+  defp set_duration(event, opts) do
+    duration = case {opts[:duration], opts[:timestamp]} do
+      {nil, nil} -> 0
+      {nil, timestamp} -> timestamp - event.started_at
+      {duration, _} -> duration
+    end
+    %{event | duration: duration}
   end
-  defp update_duration(event, duration), do: %{event | duration: duration}
 end
 
 alias ExDebugToolbar.Data.{Collection, Timeline}
 
 defimpl Collection, for: Timeline do
-  def add(timeline, {:start_event, name}) do
-    Timeline.start_event(timeline, name)
+  def add(timeline, {:start_event, name, timestamp}) do
+    Timeline.start_event(timeline, name, timestamp: timestamp)
   end
 
-  def add(timeline, {:finish_event, name, duration}) do
-    Timeline.finish_event(timeline, name, duration: duration)
+  def add(timeline, {:finish_event, name, timestamp, duration}) do
+    Timeline.finish_event(timeline, name, duration: duration, timestamp: timestamp)
   end
 
   def add(timeline, {:add_finished_event, name, duration}) do

@@ -22,14 +22,14 @@ defmodule ExDebugToolbar.Toolbar do
   end
 
   def start_event(id \\ self(), name) do
-    add_data(id, :timeline, {:start_event, name})
+    add_data(id, :timeline, {:start_event, name, System.monotonic_time})
   end
 
   def finish_event(name), do: finish_event(self(), name, [])
   def finish_event(name, opts) when is_list(opts), do: finish_event(self(), name, opts)
   def finish_event(id, name) when is_bitstring(name), do: finish_event(id, name, [])
   def finish_event(id, name, opts) do
-    add_data(id, :timeline, {:finish_event, name, opts[:duration]})
+    add_data(id, :timeline, {:finish_event, name, System.monotonic_time, opts[:duration]})
   end
 
   def record_event(id \\ self(), name, func) do

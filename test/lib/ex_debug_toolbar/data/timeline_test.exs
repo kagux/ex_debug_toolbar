@@ -4,7 +4,7 @@ defmodule ExDebugToolbar.Data.TimelineTest do
   alias ExDebugToolbar.Data.{Timeline, Collection}
 
   describe "events management" do
-    test "tracks events and computes duration" do
+    test "tracks events" do
       timeline =
         %Timeline{}
         |> Timeline.start_event("name")
@@ -15,8 +15,25 @@ defmodule ExDebugToolbar.Data.TimelineTest do
 
       assert %Event{} = event
       assert event.name == "name"
-      assert is_integer(event.started_at)
-      assert event.duration > 0
+      assert event.duration == 0
+    end
+
+    test "optionally accepts precalculated event duration" do
+      timeline = %Timeline{}
+      |> Timeline.start_event("A")
+      |> Timeline.finish_event("A", duration: 1000)
+      
+      assert %{duration: 1000} = timeline.events |> hd
+      assert timeline.duration == 1000
+    end
+
+    test "optionally accepts start and finish timestamps" do
+      timeline = %Timeline{}
+      |> Timeline.start_event("A", timestamp: 1000)
+      |> Timeline.finish_event("A", timestamp: 1050)
+      
+      assert %{duration: 50} = timeline.events |> hd
+      assert timeline.duration == 50
     end
 
     test "accepts nested events" do
@@ -68,13 +85,6 @@ defmodule ExDebugToolbar.Data.TimelineTest do
       end
     end
 
-    test "optionally accepts precalculated event duration" do
-      timeline = %Timeline{}
-      |> Timeline.start_event("A")
-      |> Timeline.finish_event("A", duration: 1000)
-      assert timeline.duration == 1000
-    end
-
     test "adds an event that already happened" do
       timeline = %Timeline{} |> Timeline.add_finished_event("A", 5000)
       assert timeline.events |> length == 1
@@ -84,25 +94,34 @@ defmodule ExDebugToolbar.Data.TimelineTest do
   end
 
   describe "collection protocol" do
-    test "passing :start_event action add/2 starts new event" do
+    test "passing :start_event action to add/2 starts new event" do
       timeline = %Timeline{}
-      |> Collection.add({:start_event, "event"})
+      |> Collection.add({:start_event, "event", 12345})
       |> Timeline.finish_event("event")
 
       assert timeline.events |> length == 1
-      assert %Event{name: "event"} = timeline.events |> hd
+      assert %Event{name: "event", started_at: 12345} = timeline.events |> hd
     end
 
-    test "passing :finish_event action add/2 finishes event" do
+    test "passing :finish_event action to add/2 with duration finishes event with that duration" do
       timeline = %Timeline{}
       |> Timeline.start_event("event")
-      |> Collection.add({:finish_event, "event", 5})
+      |> Collection.add({:finish_event, "event", nil, 5})
 
       assert timeline.events |> length == 1
       assert %Event{name: "event", duration: 5} = timeline.events |> hd
     end
 
-    test "passing :add_finished_event action add/2 adds event" do
+    test "passing :finish_event action to add/2 with timestamp finishes event with relative duration" do
+      timeline = %Timeline{}
+      |> Timeline.start_event("event", timestamp: 100)
+      |> Collection.add({:finish_event, "event", 125, nil})
+
+      assert timeline.events |> length == 1
+      assert %Event{name: "event", duration: 25} = timeline.events |> hd
+    end
+
+    test "passing :add_finished_event action to add/2 adds event with duration" do
       timeline = %Timeline{}
       |> Collection.add({:add_finished_event, "event", 5})
 
