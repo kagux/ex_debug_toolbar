@@ -79,6 +79,7 @@ defmodule ExDebugToolbar.ToolbarView do
         avg: div(Enum.sum(stats.durations), Enum.count(stats.durations))
       }}
     end)
+    |> Stream.map(fn {name, stats} -> {String.trim_leading(name, "template#"), stats} end)
     |> Enum.sort_by(fn {_, stats} -> -stats.count end)
   end
 
