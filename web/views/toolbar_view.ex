@@ -80,7 +80,7 @@ defmodule ExDebugToolbar.ToolbarView do
       }}
     end)
     |> Stream.map(fn {name, stats} -> {String.trim_leading(name, "template#"), stats} end)
-    |> Enum.sort_by(fn {_, stats} -> -stats.count end)
+    |> Enum.sort_by(fn {_, stats} -> -stats.total end)
   end
 
   def stats_popover_text(stats) do
