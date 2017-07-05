@@ -4,7 +4,10 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollector do
   def ex_debug_toolbar(:start, _, %{conn: conn}) do
     conn.private.request_id |> Toolbar.start_request
   end
-  def ex_debug_toolbar(:stop, _, _), do: :ok
+  def ex_debug_toolbar(:stop, _, _) do
+    Toolbar.stop_request(self())
+    ExDebugToolbar.ToolbarChannel.broadcast_request
+  end
 
   def phoenix_controller_call(:start, _, _) do
     Toolbar.start_event("controller.call")

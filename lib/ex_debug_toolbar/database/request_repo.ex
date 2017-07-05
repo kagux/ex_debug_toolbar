@@ -8,9 +8,13 @@ defmodule ExDebugToolbar.Database.RequestRepo do
     end
   end
 
-  def update(id, changes) do
-    GenServer.cast(__MODULE__, {:update, id, changes})
-    :ok
+  def update(id, changes, opts \\ []) do
+    if Keyword.get(opts, :async, true) do
+      GenServer.cast(__MODULE__, {:update, id, changes})
+      :ok
+    else
+      GenServer.call(__MODULE__, {:update, id, changes})
+    end
   end
 
   def all do
@@ -50,13 +54,12 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   end
 
   def handle_cast({:update, id, changes}, _state) do
-    transaction fn ->
-      case get(id) do
-        {:ok, request} -> request |> apply_changes(changes) |> insert
-        _ -> :error
-      end
-    end
+    do_update(id, changes)
     {:noreply, nil}
+  end
+
+  def handle_call({:update, id, changes}, _from, _state) do
+    {:reply, do_update(id, changes), nil}
   end
 
   def handle_call({:delete, id}, _from, _state) do
@@ -68,6 +71,15 @@ defmodule ExDebugToolbar.Database.RequestRepo do
     end
 
     {:reply, reply, nil}
+  end
+
+  defp do_update(id, changes) do
+    transaction fn ->
+      case get(id) do
+        {:ok, request} -> request |> apply_changes(changes) |> insert
+        _ -> :error
+      end
+    end
   end
 
   defp apply_changes(request, changes) when is_map(changes) do

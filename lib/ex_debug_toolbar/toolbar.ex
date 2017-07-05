@@ -13,8 +13,12 @@ defmodule ExDebugToolbar.Toolbar do
     })
   end
 
+  def stop_request(id) do
+    :ok = RequestRepo.update(id, &(%{&1 | stopped?: true}), async: false)
+  end
+
   def delete_request(uuid) do
-    :ok = RequestRepo.delete(uuid)
+    RequestRepo.delete(uuid)
   end
 
   def get_request(id \\ self()) do

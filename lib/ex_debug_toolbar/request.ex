@@ -8,6 +8,7 @@ defmodule ExDebugToolbar.Request do
     conn: %Plug.Conn{},
     ecto: [],
     logs: [],
-    timeline: %Timeline{}
+    timeline: %Timeline{},
+    stopped?: false
   ]
 end

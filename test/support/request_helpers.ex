@@ -21,7 +21,11 @@ defmodule ExDebugToolbar.Test.Support.RequestHelpers do
   end
 
   def delete_request(id) do
-    wait_for_registry()
     Toolbar.delete_request(id)
+  end
+
+  def stop_request(id) do
+    Toolbar.stop_request(id)
+    wait_for_registry()
   end
 end

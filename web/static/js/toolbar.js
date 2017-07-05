@@ -18,11 +18,21 @@ class App {
   joinChannel() {
     const socket = new Socket("/__ex_debug_toolbar__/socket");
     socket.connect();
-    socket
-    .channel("toolbar:request", {id: this.opts.requestId})
+    const channel = socket.channel(`toolbar:request:${this.opts.requestId}`)
+    channel
     .join()
-    .receive("ok", this.renderToolbar.bind(this))
-    .receive("error", resp => { console.log("Unable to join", resp) })
+    .receive("ok", this.onChannelResponse.bind(this))
+    .receive("error", resp => { console.log("Unable to join", resp) });
+
+    channel.on("ready", this.onChannelResponse.bind(this));
+  }
+
+  onChannelResponse(response){
+    if (response.html) {
+      this.renderToolbar(response);
+    } else {
+      console.log(response);
+    }
   }
 
   renderToolbar({html: html, request: request}){

@@ -2,20 +2,31 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
   use ExDebugToolbar.CollectorCase, async: true
   alias ExDebugToolbar.Collector.InstrumentationCollector, as: Collector
 
-  describe "ex_debug_toolbar"  do
-    test "it starts request on ex_debug_toolbar start" do
+  describe "ex_debug_toolbar" do
+    setup do
       conn = %Plug.Conn{} |> Plug.Conn.put_private(:request_id, @request_id)
-      Collector.ex_debug_toolbar(:start, %{}, %{conn: conn})
       on_exit fn -> delete_request(@request_id) end
+
+      {:ok, %{conn: conn}}
+    end
+
+    test "it starts request on start", context do
+      Collector.ex_debug_toolbar(:start, %{}, %{conn: context.conn})
       assert {:ok, request} = get_request(@request_id)
       assert request.uuid == @request_id
       assert request.pid == self()
       assert %NaiveDateTime{} = request.created_at
     end
+
+    test "it stops request on stop", context do
+      call_collector(&Collector.ex_debug_toolbar/3, context: %{conn: context.conn})
+      assert {:ok, request} = get_request(@request_id)
+      assert request.stopped? == true
+    end
   end
 
   describe "phoenix_controller_call"  do
-    setup [:start_request]
+    setup :start_request
 
     test "it records a phoenix controller event" do
       call_collector(&Collector.phoenix_controller_call/3, duration: 19)
@@ -27,7 +38,7 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollectorTest do
   end
 
   describe "phoenix_controller_render"  do
-    setup [:start_request]
+    setup :start_request
 
     test "it records a phoenix render event" do
       call_collector(&Collector.phoenix_controller_render/3, duration: 7)

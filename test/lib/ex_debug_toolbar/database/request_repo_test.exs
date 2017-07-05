@@ -47,7 +47,7 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
     end
   end
 
-  describe "update/2" do
+  describe "update/3" do
     setup context do
       RequestRepo.insert(context.request)
     end
@@ -78,6 +78,16 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
       end
       assert msg == :ok
       assert {:ok, updated_request} = get_request(@request_id)
+      assert updated_request.logs == [:bar]
+    end
+
+    test "it can execute a synchronous update" do
+      updater = fn %Request{} = r ->
+        :timer.sleep 10
+        Map.put(r, :logs, [:bar])
+      end
+      assert :ok = RequestRepo.update(@request_id, updater, async: false)
+      assert {:ok, updated_request} = RequestRepo.get(@request_id)
       assert updated_request.logs == [:bar]
     end
 

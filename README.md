@@ -37,6 +37,9 @@ about current and previous requests: logs, timelines, database queries etc.
     config :ex_debug_toolbar,
       enable: true
 
+    config :ex_debug_toolbar, ExDebugToolbar.Endpoint,
+      pubsub: [name: ExDebugToolbar.PubSub, adapter: Phoenix.PubSub.PG2]
+
     config :my_app, MyApp.Endpoint,
       instrumenters: [ExDebugToolbar.Collector.InstrumentationCollector]
 
