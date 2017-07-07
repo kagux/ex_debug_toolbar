@@ -37,9 +37,6 @@ about current and previous requests: logs, timelines, database queries etc.
     config :ex_debug_toolbar,
       enable: true
 
-    config :ex_debug_toolbar, ExDebugToolbar.Endpoint,
-      pubsub: [name: ExDebugToolbar.PubSub, adapter: Phoenix.PubSub.PG2]
-
     config :my_app, MyApp.Endpoint,
       instrumenters: [ExDebugToolbar.Collector.InstrumentationCollector]
 
@@ -60,6 +57,21 @@ about current and previous requests: logs, timelines, database queries etc.
     end
   ```
 
+# Configuration
+
+To change configuration, update `:ex_debug_toolbar` config key in your `config/dev.exs`. For example: 
+```elixir
+    config :ex_debug_toolbar,
+      enable: true,
+      path: "/toolbar"
+```
+
+### Available options:
+
+| Option | Values       | Default                 | Description                                                                                                         |
+|--------|--------------|-------------------------|---------------------------------------------------------------------------------------------------------------------|
+| enable | boolean      | false                   | Enable/disable toolbar. When disabled, toolbar code is not injected in page and toolbar functions are mostly no-op. |
+| path   | string       | "/\__ex_debug_toolbar__" | Relative path used to mount toolbar's endpoint                                                                      |
 
 # Contributors
 Special thanks goes to [Juan Peri](https://github.com/epilgrim)!
@@ -83,7 +95,6 @@ Special thanks goes to [Juan Peri](https://github.com/epilgrim)!
 - [ ] Visualize gettext
 - [ ] Simple installer mix task
 - [ ] Upgrade to Phoenix 1.3
-- [ ] Configurable URL path (instead of hardcoded `__ex_debug_toolbar__`)
 - [ ] Elm/React instead of jquery?
 
 ## Demo App

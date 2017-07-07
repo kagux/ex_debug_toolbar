@@ -5,8 +5,6 @@ defmodule ExDebugToolbar.Plug.CodeInjector do
 
   @behaviour Plug
 
-  @path_prefix "/__ex_debug_toolbar__"
-
   def init(options), do: options
 
   def call(conn, _opts) do
@@ -31,7 +29,7 @@ defmodule ExDebugToolbar.Plug.CodeInjector do
   end
 
   defp static_path(path) do
-    @path_prefix <> RouterHelpers.static_path(ExDebugToolbar.Endpoint, path)
+    RouterHelpers.static_path(ExDebugToolbar.Endpoint, path)
   end
 
   defp inject_code(code, %{resp_body: body} = conn, tag) do

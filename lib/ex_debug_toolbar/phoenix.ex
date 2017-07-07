@@ -11,7 +11,8 @@ defmodule ExDebugToolbar.Phoenix do
 
       Logger.add_backend(ExDebugToolbar.Collector.LoggerCollector)
 
-      Endpoint.socket "/__ex_debug_toolbar__/socket", ExDebugToolbar.UserSocket
+      @path Application.get_env(:ex_debug_toolbar, ExDebugToolbar.Endpoint, :url)[:path]
+      Endpoint.socket "#{@path}/socket", ExDebugToolbar.UserSocket
 
       def call(conn, opts) do
         case dispatch_router(conn, opts) do

@@ -21,6 +21,7 @@ defmodule ExDebugToolbar do
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: ExDebugToolbar.Supervisor]
+    update_config()
     Supervisor.start_link(children, opts)
   end
 
@@ -30,4 +31,14 @@ defmodule ExDebugToolbar do
     ExDebugToolbar.Endpoint.config_change(changed, removed)
     :ok
   end
+
+  def update_config do
+    path = Application.get_env(:ex_debug_toolbar, :path, "/__ex_debug_toolbar__")
+    config = Application.get_env(:ex_debug_toolbar, ExDebugToolbar.Endpoint, [])
+     |> Keyword.put(:pubsub, [name: ExDebugToolbar.PubSub, adapter: Phoenix.PubSub.PG2])
+     |> Keyword.put(:url, [host: "localhost", path: path])
+    Application.put_env(:ex_debug_toolbar, ExDebugToolbar.Endpoint, config, persistent: true)
+  end
 end
+
+ExDebugToolbar.update_config()
