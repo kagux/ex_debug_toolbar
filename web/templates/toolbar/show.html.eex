@@ -2,7 +2,7 @@
   <div class="container-fluid">
     <div class="navbar-header">
       <a class="navbar-brand" href="#">
-        <%= img_tag "/__ex_debug_toolbar__" <> static_path(ExDebugToolbar.Endpoint, "/images/logo.svg") %>
+        <%= img_tag static_path(ExDebugToolbar.Endpoint, "/images/logo.svg") %>
       </a>
     </div>
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">

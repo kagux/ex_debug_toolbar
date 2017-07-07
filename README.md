@@ -62,8 +62,7 @@ about current and previous requests: logs, timelines, database queries etc.
 To change configuration, update `:ex_debug_toolbar` config key in your `config/dev.exs`. For example: 
 ```elixir
     config :ex_debug_toolbar,
-      enable: true,
-      path: "/toolbar"
+      enable: true
 ```
 
 ### Available options:
@@ -71,7 +70,6 @@ To change configuration, update `:ex_debug_toolbar` config key in your `config/d
 | Option | Values       | Default                 | Description                                                                                                         |
 |--------|--------------|-------------------------|---------------------------------------------------------------------------------------------------------------------|
 | enable | boolean      | false                   | Enable/disable toolbar. When disabled, toolbar code is not injected in page and toolbar functions are mostly no-op. |
-| path   | string       | "/\__ex_debug_toolbar__" | Relative path used to mount toolbar's endpoint                                                                      |
 
 # Contributors
 Special thanks goes to [Juan Peri](https://github.com/epilgrim)!
