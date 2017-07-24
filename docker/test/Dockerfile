@@ -9,11 +9,8 @@ RUN mix local.rebar --force
 
 WORKDIR /app
 
-ADD mix.exs mix.exs
-ADD mix.lock mix.lock
+ADD . /app
 
 RUN mix deps.get
 RUN mix deps.compile
-
-ADD . /app
 RUN mix compile

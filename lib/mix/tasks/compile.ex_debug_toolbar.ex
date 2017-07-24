@@ -6,4 +6,3 @@ defmodule Mix.Tasks.Compile.ExDebugToolbar do
      ExDebugToolbar.update_config()
    end
 end
-
