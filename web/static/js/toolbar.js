@@ -1,7 +1,14 @@
 import 'phoenix_html';
 import {Socket} from 'phoenix';
-import $ from "jquery";
-import Highlight from "highlight.js";
+import $ from 'jquery';
+import BreakpointsPanel from './toolbar/breakpoints_panel.js';
+import Prism from 'prismjs';
+import 'prismjs/components/prism-elixir';
+import 'prismjs/components/prism-sql';
+import 'prismjs/plugins/normalize-whitespace/prism-normalize-whitespace';
+import 'prismjs/plugins/line-numbers/prism-line-numbers';
+import 'prismjs/plugins/line-highlight/prism-line-highlight';
+
 window.jQuery = $;
 require('bootstrap-sass');
 
@@ -12,12 +19,18 @@ class App {
   }
 
   render() {
-    this.joinChannel();
+    const socket = this.initSocket();
+    this.joinToolbarChannel(socket);
+    this.breakpointsPanel = new BreakpointsPanel(socket);
   }
 
-  joinChannel() {
+  initSocket() {
     const socket = new Socket("/__ex_debug_toolbar__/socket");
     socket.connect();
+    return socket;
+  }
+
+  joinToolbarChannel(socket) {
     const channel = socket.channel(`toolbar:request:${this.opts.requestId}`)
     channel
     .join()
@@ -37,11 +50,12 @@ class App {
 
   renderToolbar({html: html, request: request}){
     console.log("Request: ", request);
-    const toolbar = $(`<div class="ex-debug-toolbar">${html}</div>`);
+    const toolbar = $(`<div id="ex-debug-toolbar"><div>${html}</div></div>`);
     toolbar.appendTo('body');
     this.renderPanels(toolbar);
-    this.highlightCode(toolbar);
     this.renderPopovers();
+    this.breakpointsPanel.render();
+    this.highlightCode(toolbar);
   }
 
   renderPanels(toolbar) {
@@ -94,8 +108,15 @@ class App {
   }
 
   highlightCode(toolbar) {
-    toolbar.find(".code").each((i, block) => {
-      Highlight.highlightBlock(block)
+    Prism.plugins.NormalizeWhitespace.setDefaults({
+      'remove-trailing': true,
+      'remove-indent': true,
+      'left-trim': true,
+      'right-trim': true,
+      'remove-initial-line-feed': true,
+    });
+    toolbar.find(".code").each((i, el) => {
+      Prism.highlightElement(el, false)
     })
   }
 

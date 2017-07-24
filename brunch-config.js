@@ -9,6 +9,9 @@ exports.config = {
     stylesheets: {
       joinTo: {
         "css/toolbar.css": /^(web\/static\/css\/toolbar)|^node_modules/,
+      },
+      order: {
+        after: /prism/
       }
     },
     templates: {
@@ -49,7 +52,10 @@ exports.config = {
     sass: {
       options: {
         mode: 'ruby',
-        includePaths: ['node_modules/bootstrap-sass/assets/stylesheets/']
+        includePaths: [
+          'node_modules/bootstrap-sass/assets/stylesheets/',
+          'node_modules/'
+        ],
       }
     }
   },
@@ -62,7 +68,9 @@ exports.config = {
 
   npm: {
     styles: {
-      'highlight.js': ['styles/default.css']
+      // 'highlight.js': ['styles/default.css'],
+      'xterm': ['dist/xterm.css', 'dist/addons/fullscreen/fullscreen.css'],
+      // 'prismjs': ['themes/prism-coy.css', 'plugins/line-numbers/prism-line-numbers.css']
     },
     enabled: true
   }

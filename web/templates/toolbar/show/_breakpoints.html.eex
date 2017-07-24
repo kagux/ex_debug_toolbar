@@ -1,0 +1,74 @@
+<span class="toolbar-item" data-toggle="panel" data-title="Breakpoints">
+  <i class="glyphicon glyphicon-list" aria-hidden="true"></i>
+  <%= count_current_request_breakpoints(@request, @breakpoints) %> / <%= Enum.count(@breakpoints) %>
+</span>
+<div id="breakpoint" class="panel panel-default navbar-fixed-bottom">
+  <div class="panel-heading">
+    <h3 class="panel-title">Breakpoints</h3>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-lg-6">
+        <table class="table table-hover table-condensed">
+          <caption>Available breakpoints. The ones set in currect request's process are <span class="bg-success">green</span></caption>
+          <thead>
+            <th> Timestamp </th>
+            <th> File </th>
+            <th> Line </th>
+          </thead>
+          <tbody>
+            <%= for breakpoint <- @breakpoints do %>
+              <tr id="<%= breakpoint.id %>" class="breakpoint pointer <%= breakpoint_color_class(breakpoint, @request) %>">
+                <td><%= breakpoint.inserted_at %></td>
+                <td><%= breakpoint.file %></td>
+                <td>
+                  <%= breakpoint.line %>
+                  <div class="hidden code-snippet">
+                    <p class="text-warning"> Click on current row to open IEx session </p>
+                    <pre class="language-elixir line-numbers"
+                         data-start="<%= breakpoint_code_snippet_start_line(breakpoint) %>"
+                         data-line="<%= breakpoint_relative_line(breakpoint) %>">
+                      <code class="code">
+                        <%= for {line_text, _} <- breakpoint.code_snippet, do: line_text %>
+                      </code>
+                    </pre>
+                  </div>
+                  <div class="hidden binding-popover">
+                    List of available bound variable names:
+                    <ul class="list-unstyled">
+                      <%= for key <- breakpoint_sorted_binding(breakpoint) do %>
+                        <li> <%= key %> </li>
+                      <% end %>
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <div id="code-snippet-container" class="col-lg-6">
+        <p class="text-warning"> Hover table rows to see breakpoint code snippet </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="breakpoints-modal" tabindex="-1" role="dialog" aria-labelledby="breakpoints-modal-label">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="close modal-top-action" data-toggle="fullscreen" aria-label="Fullscreen">
+          <span class="glyphicon glyphicon-fullscreen"></span>
+        </button>
+        <button type="button" class="close modal-top-action" data-toggle="binding" aria-label="Binding">
+          <span class="glyphicon glyphicon-info-sign"></span>
+        </button>
+        <h4 class="modal-title" id="breakpoints-modal-label">IEx</h4> </div>
+      <div class="modal-body">
+        <div id="terminal-container"></div>
+      </div>
+    </div>
+  </div>
+</div>

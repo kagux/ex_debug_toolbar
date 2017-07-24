@@ -17,7 +17,7 @@
         <td class="col-lg-1"><%= query.query_time |> native_time_to_string %></td>
         <td class="col-lg-1"><%= query.decode_time |> native_time_to_string %></td>
         <td class="col-lg-1"><%= query.source %></td>
-        <td class="col-lg-5"> <span class="code"><%= query.query %></span></td>
+        <td class="col-lg-5"> <span class="code language-sql"><%= query.query %></span></td>
         <td class="col-lg-1">
           <i
                 class="glyphicon glyphicon-info-sign pointer"

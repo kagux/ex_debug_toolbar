@@ -1,2 +1,0 @@
-[ ] wait for all events to finish before rendering
-[ ] measure event times in main process, instead of collector

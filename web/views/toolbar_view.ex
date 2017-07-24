@@ -1,6 +1,7 @@
 defmodule ExDebugToolbar.ToolbarView do
   use ExDebugToolbar.Web, :view
   alias ExDebugToolbar.Data.Timeline
+  alias ExDebugToolbar.{Breakpoint, Request}
 
   @millisecond System.convert_time_unit(1, :millisecond, :native)
 
@@ -110,6 +111,27 @@ defmodule ExDebugToolbar.ToolbarView do
   def ecto_parallel_queries(queries) do
     queries |> Enum.filter(fn {_, _, type} -> type == :parallel end)
   end
+
+  def count_current_request_breakpoints(%Request{pid: pid}, breakpoints) do
+    breakpoints |> Enum.filter(&(&1.pid == pid)) |> Enum.count
+  end
+
+  def breakpoint_code_snippet_start_line(%Breakpoint{code_snippet: code_snippet}) do
+    code_snippet |> hd |> Tuple.to_list |> List.last
+  end
+
+  def breakpoint_sorted_binding(%Breakpoint{binding: binding}) do
+    binding |> Keyword.keys |> Enum.sort
+  end
+
+  def breakpoint_relative_line(%Breakpoint{code_snippet: code_snippet, line: line}) do
+    code_snippet
+    |> Enum.find_index(fn {_, n} -> n == line end)
+    |> Kernel.+(1)
+  end
+
+  def breakpoint_color_class(%Breakpoint{pid: pid}, %Request{pid: pid}), do: "bg-success"
+  def breakpoint_color_class(_, _), do: ""
 
   defp get_controller(%Plug.Conn{private: private}) do
     private.phoenix_controller |> to_string |> String.trim_leading("Elixir.")

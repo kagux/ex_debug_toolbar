@@ -1,7 +1,10 @@
 use Mix.Config
 
 config :ex_debug_toolbar,
-  enable: true
+  enable: true,
+  iex_shell: "/bin/sh",
+  iex_shell_cmd: "stty echo\n",
+  breakpoints_limit: 3
 
 config :ex_debug_toolbar, ExDebugToolbar.Fixtures.Endpoint,
   instrumenters: [ExDebugToolbar.Collector.InstrumentationCollector]

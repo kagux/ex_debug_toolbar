@@ -1,3 +1,4 @@
+Code.require_file "lib/mix/tasks/compile.ex_debug_toolbar.ex"
 defmodule ExDebugToolbar.Mixfile do
   use Mix.Project
 
@@ -6,7 +7,7 @@ defmodule ExDebugToolbar.Mixfile do
      version: "0.2.2",
      elixir: "~> 1.4",
      elixirc_paths: elixirc_paths(Mix.env),
-     compilers: [:phoenix, :gettext] ++ Mix.compilers,
+     compilers: [:phoenix, :gettext, :ex_debug_toolbar] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      name: "ExDebugToolbar",
@@ -56,6 +57,8 @@ defmodule ExDebugToolbar.Mixfile do
       {:postgrex, "~> 0.13", optional: true},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
+      {:erlexec, "~> 1.7", runtime: false},
+      {:decorator, "~> 0.4"},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end

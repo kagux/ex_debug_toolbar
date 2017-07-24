@@ -1,4 +1,6 @@
-.ex-debug-toolbar {
+#ex-debug-toolbar {
+  $panel-max-height: 200px;
+
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 1.42857;
@@ -7,8 +9,11 @@
 
   // namespacing to avoid conflicts
   @import "bootstrap";
+  @import "prismjs/themes/prism";
+  @import "prismjs/plugins/line-numbers/prism-line-numbers";
+  @import "prismjs/plugins/line-highlight/prism-line-highlight";
 
- // TOOLBAR
+  // TOOLBAR
 
   .navbar {
     min-height: 30px;
@@ -54,7 +59,7 @@
 
     .panel-body {
       padding: 5px 15px;
-      max-height: 200px;
+      max-height: $panel-max-height;
       overflow-y: auto;
     }
 
@@ -84,8 +89,8 @@
     }
   }
 
- .nowrap {
-   white-space:nowrap;
+  .nowrap {
+    white-space:nowrap;
   }
 
   table {
@@ -98,5 +103,44 @@
   .pointer {
     cursor: pointer;
   }
-}
 
+  #terminal-container {
+    width: auto;
+    height: 480px;
+  }
+
+  .modal-top-action {
+    margin-right: 10px;
+  }
+
+  .fullscreen {
+    .modal-dialog {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    .modal-content {
+      height: auto;
+      min-height: 100%;
+      border-radius: 0;
+    }
+
+    #terminal-container {
+      height: 100%;
+    }
+  }
+
+  .xterm.fullscreen {
+    top: 55px;
+  }
+
+  #code-snippet-container {
+    margin-top: 40px;
+  }
+
+  #breakpoint .panel-body {
+    height: $panel-max-height;
+  }
+}

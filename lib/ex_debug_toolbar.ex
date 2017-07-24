@@ -13,9 +13,10 @@ defmodule ExDebugToolbar do
     # Define workers and child supervisors to be supervised
     children = [
       # Start the endpoint when the application starts
+      worker(ExDebugToolbar.Breakpoint.ServerNode, []),
       supervisor(ExDebugToolbar.Endpoint, []),
       supervisor(ExDebugToolbar.Database.Supervisor, []),
-      # Start your own worker by calling: ExDebugToolbar.Worker.start_link(arg1, arg2, arg3)
+      worker(:exec, [[env: [{'SHELL', get_shell()}, {'MIX_ENV', to_charlist(Mix.env)}]]]),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
@@ -33,12 +34,14 @@ defmodule ExDebugToolbar do
   end
 
   def update_config do
-    path = Application.get_env(:ex_debug_toolbar, :path, "/__ex_debug_toolbar__")
     config = Application.get_env(:ex_debug_toolbar, ExDebugToolbar.Endpoint, [])
      |> Keyword.put(:pubsub, [name: ExDebugToolbar.PubSub, adapter: Phoenix.PubSub.PG2])
-     |> Keyword.put(:url, [host: "localhost", path: path])
+     |> Keyword.put(:url, [host: "localhost", path: "/__ex_debug_toolbar__"])
     Application.put_env(:ex_debug_toolbar, ExDebugToolbar.Endpoint, config, persistent: true)
   end
-end
 
-ExDebugToolbar.update_config()
+  defp get_shell do
+    default = (System.get_env("SHELL") || "/bin/bash")
+    Application.get_env(:ex_debug_toolbar, :iex_shell, default) |> String.to_charlist
+  end
+end

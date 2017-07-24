@@ -1,14 +1,55 @@
 `ex_debug_toolbar` is a toolbar for Phoenix projects to display all sorts of information
 about current and previous requests: logs, timelines, database queries etc.
 
-![Screencapture](https://media.giphy.com/media/xUPGcm4teakeuY2U6Y/giphy.gif)
+Project is in it's early stages and under active development. Contributions to code, feedback and suggestions will be much appreciated!
+
+![Screencapture](screenshots/toolbar.gif)
+
+# Features
+
+After enabling the toolbar, it automatically injects itself at the bottom of html pages.
+Some panels on the toolbar are optional and only appear when relevant data is available (ecto queries, for example).
+![Toolbar](screenshots/toolbar.png)
+
+Let's take a look at available panels:
+
+### Timings
+It shows overall time spent rendering current controller as reported by Phoenix instrumentation.
+In addition, it provides aggregated stats for each template.
+![Timings](screenshots/timings.png)
+
+### Connection details
+Surfaces information from `conn` struct of current request.
+![Connection Details](screenshots/conn_details.png)
+
+### Logs 
+Log entries relevant to current request only
+![Logs](screenshots/logs.png)
+
+### Ecto queries
+A list of executed ecto queries including parallel preloads when possible.
+![Ecto Queries](screenshots/ecto_queries.png)
+
+### Breakpoints
+Think of having multiply `IEx.pry` breakpoints available on demand right from the toolbar.
+Note, unlike `IEx.pry`, this does not interfere with execution flow of phoenix server.
+
+Usage is similar to `IEx`.
+Drop `require ExDebugToolbar.Toolbar; ExDebugToolbar.Toolbar.pry` in a file you'd like to debug
+and breakpoint will appear in this panel. Breakpoints are not limited to current request, but are capped at 
+configurable number (100 by default).
+![Breakpoints](screenshots/breakpoints.png)
+
+A click on any breakpoint will take you to familiar `iex` session with context as it was at execution time.
+![Breakpoint Sesssion](screenshots/breakpoint_session.png)
+
 
 # Installation
   1. Add `ex_debug_toolbar` to your list of dependencies in `mix.exs`:
 
     ```elixir
     def deps do
-      [{:ex_debug_toolbar, "~> 0.1.0"}]
+      [{:ex_debug_toolbar, "~> 0.2.0"}]
     end
     ```
 
@@ -67,9 +108,14 @@ To change configuration, update `:ex_debug_toolbar` config key in your `config/d
 
 ### Available options:
 
-| Option | Values       | Default                 | Description                                                                                                         |
-|--------|--------------|-------------------------|---------------------------------------------------------------------------------------------------------------------|
-| enable | boolean      | false                   | Enable/disable toolbar. When disabled, toolbar code is not injected in page and toolbar functions are mostly no-op. |
+
+| Option            | Values       | Default                                                                                      | Description                                                                                                         |
+|-------------------|--------------|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
+| enable            | boolean      | false                                                                                        | Enable/disable toolbar. When disabled, toolbar code is not injected in page and toolbar functions are mostly no-op. |
+| iex_shell         | string       | "/bin/sh"                                                                                    | Shell executable to be used for breakpoint session                                                                  |
+| iex_shell_cmd     | string       | """ stty echo; clear; iex --sname %{node_name} -S mix breakpoint.client %{breakpoint_id} """ | Shell command to launch breakpoint iex session                                                                      |
+| breakpoints_limit | integer      | 100                                                                                          | Maximum number of available breakpoints. After reaching this cap, new breakpoints will push out oldest ones.        |
+
 
 # Contributors
 Special thanks goes to [Juan Peri](https://github.com/epilgrim)!
@@ -78,19 +124,28 @@ Special thanks goes to [Juan Peri](https://github.com/epilgrim)!
   Contributions in the form of bug reports, pull requests, or thoughtful discussions in the GitHub issue tracker are welcome!
 
 # TODO
+- [ ] Toolbar panels
+  - [ ] Messages output panel (Toolbar.inspect and Toolbar.puts)
+  - [ ] System info panel (versions, vm info, etc)
+  - [ ] Help/Docs Panel (links to dev resources)
+  - [ ] Request time panel
+    - [ ] Request history (historical graphs?)
+    - [ ] Visualize timeline
+  - [ ] Ajax requests panel
+  - [ ] Channels info panel
+  - [ ] Visualize gettext
+- [ ] Toolbar API
+  - [ ] Decorator for functions to time them
+  - [ ] Add metadata to events and use groupable names (template.render, controller.render etc)
+- [ ] Documentation
+  - [ ] Add function specs
+  - [ ] Document top level API, hide internal modules from docs
+- [ ] Tests
+  - [ ] breakpoints
+    - [ ] client test
+    - [ ] server test
+    - [ ] terminal test
 - [ ] Hide debug logs/output behind `debug: true` config
-- [ ] Add custom messages to toolbar
-- [ ] Add metadata to events and use groupable names (template.render, controller.render etc)
-- [ ] Decorator for functions to time them
-- [ ] System info panel
-- [ ] Help/Docs Panel
-- [ ] Add specs
-- [ ] Request history
-- [ ] Improve Docs
-- [ ] Ajax calls
-- [ ] Channels info
-- [ ] Visualize timeline
-- [ ] Visualize gettext
 - [ ] Simple installer mix task
 - [ ] Upgrade to Phoenix 1.3
 - [ ] Elm/React instead of jquery?
