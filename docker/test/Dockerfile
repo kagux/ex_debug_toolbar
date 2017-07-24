@@ -4,13 +4,16 @@ MAINTAINER Juan Peri
 
 ENV MIX_ENV test
 
-RUN mix local.hex --force
-RUN mix local.rebar --force
+RUN groupadd dev && useradd -m -g dev dev
 
 WORKDIR /app
 
 ADD . /app
 
-RUN mix deps.get
-RUN mix deps.compile
-RUN mix compile
+RUN chown -R dev:dev /app
+
+USER dev
+
+RUN mix local.hex --force \
+&& mix local.rebar --force \
+&& mix do deps.get, deps.compile, compile
