@@ -1,7 +1,7 @@
 defmodule ExDebugToolbar.Decorator.Noop do
   @moduledoc false
 
-  use Decorator.Define, [noop_when_toolbar_disabled: 1]
+  use Decorator.Define, [noop_when_toolbar_disabled: 1, noop_when_toolbar_disabled: 0]
 
   @enabled Application.get_env(:ex_debug_toolbar, :enable, false)
   @default_noop_result {:error, :toolbar_disabled}
