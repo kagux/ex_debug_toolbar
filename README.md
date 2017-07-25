@@ -4,12 +4,15 @@
 `ex_debug_toolbar` is a toolbar for Phoenix projects to display all sorts of information
 about current and previous requests: logs, timelines, database queries etc.
 
-Project is in it's early stages and under active development. Contributions to code, feedback and suggestions will be much appreciated!
+Project is in its early stages and under active development.
+Contributions to code, feedback and suggestions will be much appreciated!
 
 
 ![Screencapture](screenshots/toolbar.gif)
 
 # Features
+Toolbar is built with development environment in mind. It's up to you to enable or disable it in configuration.
+Calls to toolbar functions such as `Toolbar.pry` are no-op when it is disabled.
 
 After enabling the toolbar, it automatically injects itself at the bottom of html pages.
 Some panels on the toolbar are optional and only appear when relevant data is available (ecto queries, for example).
