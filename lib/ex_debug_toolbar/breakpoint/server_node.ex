@@ -1,5 +1,4 @@
 defmodule ExDebugToolbar.Breakpoint.ServerNode do
-  alias ExDebugToolbar.Toolbar
   @cookie :secret
   @server :breakpoint_host
 
@@ -21,7 +20,7 @@ defmodule ExDebugToolbar.Breakpoint.ServerNode do
   end
 
   def get_breakpoint(breakpoint_id) do
-    case :rpc.call(get_name(), Toolbar, :get_breakpoint, [breakpoint_id]) do
+    case :rpc.call(get_name(), ExDebugToolbar, :get_breakpoint, [breakpoint_id]) do
       {:ok, breakpoint} -> breakpoint
       _ -> :error
     end

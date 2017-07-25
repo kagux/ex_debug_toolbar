@@ -1,5 +1,4 @@
 defmodule ExDebugToolbar.Collector.LoggerCollector do
-  alias ExDebugToolbar.Toolbar
   alias ExDebugToolbar.Data.LogEntry
   @behaviour :gen_event
 
@@ -41,6 +40,6 @@ defmodule ExDebugToolbar.Collector.LoggerCollector do
       message: message,
       timestamp: timestamp
     }
-    Toolbar.add_data metadata[:request_id], :logs, log_entry
+    ExDebugToolbar.add_data metadata[:request_id], :logs, log_entry
   end
 end

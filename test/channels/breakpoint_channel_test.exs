@@ -1,12 +1,12 @@
 defmodule ExDebugToolbar.BreakpointChannelTest do
   use ExDebugToolbar.ChannelCase, async: true
 
-  alias ExDebugToolbar.{BreakpointChannel, Toolbar}
-  require Toolbar
+  alias ExDebugToolbar.BreakpointChannel
+  require ExDebugToolbar
 
   test "joining and interacting with breakpoint" do
-    Toolbar.pry
-    breakpoint = Toolbar.get_all_breakpoints() |> hd
+    ExDebugToolbar.pry
+    breakpoint = ExDebugToolbar.get_all_breakpoints() |> hd
     topic = "breakpoint:" <> breakpoint.id
 
     # initial output
@@ -15,7 +15,7 @@ defmodule ExDebugToolbar.BreakpointChannelTest do
     # echo input
     push socket, "input", %{"input" => "€"}
 
-    Toolbar.delete_breakpoint breakpoint.id
+    ExDebugToolbar.delete_breakpoint breakpoint.id
   end
 
   test "it returns error on join if breakpoint doesn't exist" do

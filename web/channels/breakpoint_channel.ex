@@ -1,9 +1,9 @@
 defmodule ExDebugToolbar.BreakpointChannel do
   use ExDebugToolbar.Web, :channel
-  alias ExDebugToolbar.{Breakpoint, Toolbar}
+  alias ExDebugToolbar.Breakpoint
 
   def join("breakpoint:" <> id, _payload, socket) do
-    case Toolbar.get_breakpoint(id) do
+    case ExDebugToolbar.get_breakpoint(id) do
       {:ok, _} ->
         {:ok, iex} = Breakpoint.start_iex(id, self())
         {:ok, assign(socket, :iex, iex)}

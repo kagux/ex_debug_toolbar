@@ -21,7 +21,7 @@ defmodule ExDebugToolbar.Mixfile do
   #
   # Type `mix help compile.app` for more information.
   def application do
-    [mod: {ExDebugToolbar, []},
+    [mod: {ExDebugToolbar.Application, []},
      extra_applications: [:logger]]
   end
 

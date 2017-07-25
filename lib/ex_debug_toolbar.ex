@@ -1,47 +1,116 @@
 defmodule ExDebugToolbar do
-  use Application
+  alias ExDebugToolbar.Database.{BreakpointRepo, RequestRepo}
+  alias ExDebugToolbar.Data.Collection
+  alias ExDebugToolbar.{Breakpoint, Request}
+  use ExDebugToolbar.Decorator.Noop
 
-  # See http://elixir-lang.org/docs/stable/elixir/Application.html
-  # for more information on OTP Applications
-  def start(_type, _args) do
-    Application.get_env(:ex_debug_toolbar, :enable, false) |> do_start()
+  @decorate noop_when_toolbar_disabled()
+  def start_request(uuid) do
+    :ok = RequestRepo.insert(%Request{
+      pid: self(),
+      uuid: uuid,
+      created_at: NaiveDateTime.utc_now()
+    })
   end
 
-  defp do_start(false), do: {:ok, self()}
-  defp do_start(true) do
-    import Supervisor.Spec
-    # Define workers and child supervisors to be supervised
-    children = [
-      # Start the endpoint when the application starts
-      worker(ExDebugToolbar.Breakpoint.ServerNode, []),
-      supervisor(ExDebugToolbar.Endpoint, []),
-      supervisor(ExDebugToolbar.Database.Supervisor, []),
-      worker(:exec, [[env: [{'SHELL', get_shell()}, {'MIX_ENV', to_charlist(Mix.env)}]]]),
-    ]
-
-    # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
-    # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: ExDebugToolbar.Supervisor]
-    update_config()
-    Supervisor.start_link(children, opts)
+  @decorate noop_when_toolbar_disabled()
+  def stop_request(id) do
+    :ok = RequestRepo.update(id, &(%{&1 | stopped?: true}), async: false)
   end
 
-  # Tell Phoenix to update the endpoint configuration
-  # whenever the application is updated.
-  def config_change(changed, _new, removed) do
-    ExDebugToolbar.Endpoint.config_change(changed, removed)
-    :ok
+  @decorate noop_when_toolbar_disabled()
+  def delete_request(uuid) do
+    RequestRepo.delete(uuid)
   end
 
-  def update_config do
-    config = Application.get_env(:ex_debug_toolbar, ExDebugToolbar.Endpoint, [])
-     |> Keyword.put(:pubsub, [name: ExDebugToolbar.PubSub, adapter: Phoenix.PubSub.PG2])
-     |> Keyword.put(:url, [host: "localhost", path: "/__ex_debug_toolbar__"])
-    Application.put_env(:ex_debug_toolbar, ExDebugToolbar.Endpoint, config, persistent: true)
+  @decorate noop_when_toolbar_disabled()
+  def get_request(id \\ self()) do
+    RequestRepo.get(id)
   end
 
-  defp get_shell do
-    default = (System.get_env("SHELL") || "/bin/bash")
-    Application.get_env(:ex_debug_toolbar, :iex_shell, default) |> String.to_charlist
+  @decorate noop_when_toolbar_disabled([])
+  def get_all_requests do
+    RequestRepo.all
+  end
+
+  @decorate noop_when_toolbar_disabled()
+  def start_event(id \\ self(), name) do
+    add_data(id, :timeline, {:start_event, name, System.monotonic_time})
+  end
+
+  @decorate noop_when_toolbar_disabled()
+  def finish_event(name), do: finish_event(self(), name, [])
+
+  @decorate noop_when_toolbar_disabled()
+  def finish_event(name, opts) when is_list(opts), do: finish_event(self(), name, opts)
+
+  @decorate noop_when_toolbar_disabled()
+  def finish_event(id, name) when is_bitstring(name), do: finish_event(id, name, [])
+
+  @decorate noop_when_toolbar_disabled()
+  def finish_event(id, name, opts) do
+    add_data(id, :timeline, {:finish_event, name, System.monotonic_time, opts[:duration]})
+  end
+
+  @decorate noop_when_toolbar_disabled()
+  def record_event(id \\ self(), name, func) do
+    start_event(id, name)
+    result = func.()
+    finish_event(id, name)
+    result
+  end
+
+  @decorate noop_when_toolbar_disabled()
+  def add_finished_event(id \\ self(), name, duration) do
+    add_data(id, :timeline, {:add_finished_event, name, duration})
+  end
+
+  @decorate noop_when_toolbar_disabled()
+  def add_data(id \\ self(), key, data) do
+    do_add_data(id, key, data)
+  end
+
+  @decorate noop_when_toolbar_disabled()
+  defmacro pry do
+    code_snippet = Breakpoint.code_snippet(__CALLER__)
+    quote do
+      BreakpointRepo.insert(%Breakpoint{
+        id: System.unique_integer |> to_string,
+        pid: self(),
+        file: __ENV__.file,
+        line: __ENV__.line,
+        env: __ENV__,
+        binding: binding(),
+        code_snippet: unquote(code_snippet),
+        inserted_at: NaiveDateTime.utc_now()
+      })
+    end
+  end
+
+  @decorate noop_when_toolbar_disabled([])
+  def get_all_breakpoints do
+    BreakpointRepo.all
+  end
+
+  @decorate noop_when_toolbar_disabled()
+  def get_breakpoint(id) do
+    BreakpointRepo.get(id)
+  end
+
+  @decorate noop_when_toolbar_disabled()
+  def delete_breakpoint(id) do
+    BreakpointRepo.delete(id)
+  end
+
+  defp do_add_data(id, key, data) do
+    if Map.has_key?(%Request{}, key) do
+      :ok = RequestRepo.update(id, &update_request(&1, key, data))
+    else
+      {:error, :undefined_collection}
+    end
+  end
+
+  defp update_request(%Request{} = request, key, data) do
+    request |> Map.get(key) |> Collection.add(data) |> (&Map.put(request, key, &1)).()
   end
 end

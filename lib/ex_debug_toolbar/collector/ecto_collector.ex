@@ -1,12 +1,11 @@
 defmodule ExDebugToolbar.Collector.EctoCollector do
-  alias ExDebugToolbar.Toolbar
   alias Ecto.LogEntry
 
   def log(%LogEntry{} = entry) do
     {id, duration, type} = parse_entry(entry)
     entry = remove_result_rows(entry)
-    Toolbar.add_finished_event(id, "ecto.query", duration)
-    Toolbar.add_data(id, :ecto, {entry, duration, type})
+    ExDebugToolbar.add_finished_event(id, "ecto.query", duration)
+    ExDebugToolbar.add_data(id, :ecto, {entry, duration, type})
     entry
   end
 

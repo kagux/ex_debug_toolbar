@@ -3,7 +3,6 @@ defmodule ExDebugToolbar.Fixtures.Endpoint do
   use ExDebugToolbar.Phoenix
   require Logger
   import Plug.Conn
-  alias ExDebugToolbar.Toolbar
 
   plug Plug.RequestId
 
@@ -11,7 +10,7 @@ defmodule ExDebugToolbar.Fixtures.Endpoint do
   plug :tracked_plug
 
   def tracked_plug(conn, _) do
-    Toolbar.record_event "test_request", fn ->
+    ExDebugToolbar.record_event "test_request", fn ->
       Logger.debug "log entry"
       conn = conn
       |> Plug.Conn.assign(:called?, true)

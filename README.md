@@ -42,7 +42,7 @@ Think of having multiply `IEx.pry` breakpoints available on demand right from th
 Note, unlike `IEx.pry`, this does not interfere with execution flow of phoenix server.
 
 Usage is similar to `IEx`.
-Drop `require ExDebugToolbar.Toolbar; ExDebugToolbar.Toolbar.pry` in a file you'd like to debug
+Drop `require ExDebugToolbar; ExDebugToolbar.pry` in a file you'd like to debug
 and breakpoint will appear in this panel. Breakpoints are not limited to current request, but are capped at 
 configurable number (100 by default).
 ![Breakpoints](screenshots/breakpoints.png)
