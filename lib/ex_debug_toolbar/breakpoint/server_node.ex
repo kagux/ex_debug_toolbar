@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.Breakpoint.ServerNode do
+  @moduledoc false
+
   @cookie :secret
   @server :breakpoint_host
 

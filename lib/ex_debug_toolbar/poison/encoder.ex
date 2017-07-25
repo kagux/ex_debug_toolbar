@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.Poison.Encoder do
+  @moduledoc false
+
   def encode_inspect(term, options) do
     term |> inspect |> Poison.Encoder.encode(options)
   end

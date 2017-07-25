@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.Collector.InstrumentationCollector do
+  @moduledoc false
+
   def ex_debug_toolbar(:start, _, %{conn: conn}) do
     conn.private.request_id |> ExDebugToolbar.start_request
   end

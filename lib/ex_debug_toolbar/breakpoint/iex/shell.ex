@@ -1,4 +1,5 @@
 defmodule ExDebugToolbar.Breakpoint.IEx.Shell do
+  @moduledoc false
 
   @default_cmd """
     stty echo

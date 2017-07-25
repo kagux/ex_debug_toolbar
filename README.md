@@ -1,7 +1,7 @@
 [![Travis](https://img.shields.io/travis/kagux/ex_debug_toolbar.svg)]()
 [![Hex.pm](https://img.shields.io/hexpm/v/ex_debug_toolbar.svg)]()
 
-`ex_debug_toolbar` is a toolbar for Phoenix projects to display all sorts of information
+A toolbar for Phoenix projects to display all sorts of information
 about current and previous requests: logs, timelines, database queries etc.
 
 Project is in its early stages and under active development.

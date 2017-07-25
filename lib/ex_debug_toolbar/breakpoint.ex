@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.Breakpoint do
+  @moduledoc false
+
   alias ExDebugToolbar.Breakpoint.{IEx.Server, Pry}
 
   defstruct [

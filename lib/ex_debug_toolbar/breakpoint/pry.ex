@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.Breakpoint.Pry do
+  @moduledoc false
+
   def code_snippet(%Macro.Env{file: file, line: line}) do
     case whereami(file, line, 2) do
       {:ok, lines} -> lines

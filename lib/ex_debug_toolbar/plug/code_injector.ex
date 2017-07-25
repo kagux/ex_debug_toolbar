@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.Plug.CodeInjector do
+  @moduledoc false
+
   import Plug.Conn
   alias Plug.Conn
   alias ExDebugToolbar.Router.Helpers, as: RouterHelpers

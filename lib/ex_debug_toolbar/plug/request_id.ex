@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.Plug.RequestId do
+  @moduledoc false
+
   use Plug.Builder
 
   @behaviour Plug

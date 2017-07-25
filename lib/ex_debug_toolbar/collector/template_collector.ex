@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.Collector.TemplateCollector do
+  @moduledoc false
+
   defmacro __using__(opts) do
     quote do
       @behaviour Phoenix.Template.Engine

@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.Breakpoint.IEx.Server do
+  @moduledoc false
+
   alias ExDebugToolbar.Breakpoint.IEx.Shell
   use GenServer
 

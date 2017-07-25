@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.Plug.Router do
+  @moduledoc false
+
   use Plug.Router
 
   plug :match

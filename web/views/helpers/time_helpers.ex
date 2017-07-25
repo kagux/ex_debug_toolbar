@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.View.Helpers.TimeHelpers do
+  @moduledoc false
+
   def native_time_to_string(native_time) do
     native_time
     |> System.convert_time_unit(:native, :micro_seconds)

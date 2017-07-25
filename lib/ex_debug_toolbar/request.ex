@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.Request do
+  @moduledoc false
+
   alias ExDebugToolbar.Data.Timeline
 
   defstruct [

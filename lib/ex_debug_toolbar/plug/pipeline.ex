@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.Plug.Pipeline do
+  @moduledoc false
+
   use Plug.Builder
 
   plug ExDebugToolbar.Plug.RequestId

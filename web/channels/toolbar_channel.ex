@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.ToolbarChannel do
+  @moduledoc false
+
   use Phoenix.Channel
   alias ExDebugToolbar.ToolbarView
   alias ExDebugToolbar.Endpoint

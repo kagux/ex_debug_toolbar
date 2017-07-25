@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.Collector.EctoCollector do
+  @moduledoc false
+
   alias Ecto.LogEntry
 
   def log(%LogEntry{} = entry) do

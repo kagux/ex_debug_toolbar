@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.Collector.LoggerCollector do
+  @moduledoc false
+
   alias ExDebugToolbar.Data.LogEntry
   @behaviour :gen_event
 

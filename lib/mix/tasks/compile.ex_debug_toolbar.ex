@@ -1,4 +1,6 @@
 defmodule Mix.Tasks.Compile.ExDebugToolbar do
+  @moduledoc false
+
   use Mix.Task
 
    def run(_) do

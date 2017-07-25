@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.ToolbarView do
+  @moduledoc false
+
   use ExDebugToolbar.Web, :view
   alias ExDebugToolbar.Data.Timeline
   alias ExDebugToolbar.{Breakpoint, Request}

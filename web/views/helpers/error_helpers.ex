@@ -1,7 +1,5 @@
 defmodule ExDebugToolbar.ErrorHelpers do
-  @moduledoc """
-  Conveniences for translating and building error messages.
-  """
+  @moduledoc false
 
   use Phoenix.HTML
 

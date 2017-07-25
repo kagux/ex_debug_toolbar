@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.Phoenix do
+  @moduledoc false
+
   defmacro __using__(_) do
     if Application.get_env(:ex_debug_toolbar, :enable), do: build_plug_ast()
   end

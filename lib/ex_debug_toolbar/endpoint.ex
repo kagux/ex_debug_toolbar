@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.Endpoint do
+  @moduledoc false
+
   use Phoenix.Endpoint, otp_app: :ex_debug_toolbar
 
   socket "/socket", ExDebugToolbar.UserSocket

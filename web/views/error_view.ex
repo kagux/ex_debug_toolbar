@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.ErrorView do
+  @moduledoc false
+
   use ExDebugToolbar.Web, :view
 
   def render("404.html", _assigns) do

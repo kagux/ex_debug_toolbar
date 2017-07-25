@@ -1,9 +1,13 @@
 defmodule ExDebugToolbar.Database.BreakpointRepo do
+  @moduledoc false
+
   alias ExDebugToolbar.Breakpoint
 
   @default_capacity_limit 100
 
   defmodule State do
+    @moduledoc false
+
     defstruct [map: %{}, count: 0, next_add_id: 0, next_remove_id: 1]
   end
 

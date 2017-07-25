@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.BreakpointChannel do
+  @moduledoc false
+
   use ExDebugToolbar.Web, :channel
   alias ExDebugToolbar.Breakpoint
 

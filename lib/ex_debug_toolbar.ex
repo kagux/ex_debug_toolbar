@@ -1,9 +1,22 @@
 defmodule ExDebugToolbar do
+  @moduledoc ExDebugToolbar.Docs.load!("README.md")
+
   alias ExDebugToolbar.Database.{BreakpointRepo, RequestRepo}
   alias ExDebugToolbar.Data.Collection
   alias ExDebugToolbar.{Breakpoint, Request}
   use ExDebugToolbar.Decorator.Noop
 
+  @type uuid :: String.t
+  @type id :: uuid | pid()
+  @type ok :: :ok
+
+  # @doc """
+  # Creates a new request record linked to provided `uuid` and current process pid.
+
+  # Request is required to be present before adding new timeline events. By default
+  # request is started on `:ex_debug_toolbar` `:start` intrumentation event.
+  # """
+  @spec start_request(uuid) :: ok
   @decorate noop_when_toolbar_disabled()
   def start_request(uuid) do
     :ok = RequestRepo.insert(%Request{
@@ -13,6 +26,12 @@ defmodule ExDebugToolbar do
     })
   end
 
+  # @doc  """
+  # Stops request. Toolbar waits for request to stop before rendering.
+
+  # By default request is stopped on `:ex_debug_toolbar` `:stop` instrumentation event.
+  # """
+  @spec stop_request(id) :: ok
   @decorate noop_when_toolbar_disabled()
   def stop_request(id) do
     :ok = RequestRepo.update(id, &(%{&1 | stopped?: true}), async: false)

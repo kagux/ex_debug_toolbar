@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.Breakpoint.ClientNode do
+  @moduledoc false
+
   alias ExDebugToolbar.Breakpoint.ServerNode
   alias ExDebugToolbar.Breakpoint
 

@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.Database.RequestRepo do
+  @moduledoc false
+
   use GenServer
   alias ExDebugToolbar.Request
 
