@@ -47,7 +47,7 @@ defmodule ExDebugToolbar.Plug.CodeInjector do
   end
 
   defp inject?(%Conn{request_path: "/phoenix/live_reload/frame"}), do: false
-  defp inject?(%Conn{status: status}) when status != 200, do: false
+  defp inject?(%Conn{status: status}) when not status in [200, 404], do: false
   defp inject?(%Conn{} = conn), do: html_content_type?(conn)
 
   defp html_content_type?(%Conn{} = conn) do
