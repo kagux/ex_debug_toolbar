@@ -45,7 +45,7 @@
                         data-toggle="popover"
                         title="Stats"
                         data-content="<%= stats_popover_text(stats) %>"
-                        data-container=".ex-debug-toolbar"
+                        data-container="#ex-debug-toolbar"
                         data-placement="top"
                         data-html=true
                         data-trigger="hover"

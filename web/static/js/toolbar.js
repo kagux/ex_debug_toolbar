@@ -53,7 +53,7 @@ class App {
     const toolbar = $(`<div id="ex-debug-toolbar"><div>${html}</div></div>`);
     toolbar.appendTo('body');
     this.renderPanels(toolbar);
-    this.renderPopovers();
+    this.renderPopovers(toolbar);
     this.breakpointsPanel.render();
     this.highlightCode(toolbar);
   }
@@ -120,8 +120,8 @@ class App {
     })
   }
 
-  renderPopovers() {
-    $('[data-toggle="popover"]').popover();
+  renderPopovers(toolbar) {
+    $(toolbar).find('[data-toggle="popover"]').popover();
   }
 }
 
