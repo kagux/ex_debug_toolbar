@@ -1,4 +1,3 @@
-
 defmodule ExDebugToolbar.PhoenixTest do
   use ExUnit.Case, async: true
   use Plug.Test
@@ -31,7 +30,7 @@ defmodule ExDebugToolbar.PhoenixTest do
 
   describe "requests to __ex_debug_toolbar__" do
     setup do
-      conn = make_request("/__ex_debug_toolbar__/path")
+      conn = make_request("/__ex_debug_toolbar__/api/ping")
       {:ok, conn: conn}
     end
 
