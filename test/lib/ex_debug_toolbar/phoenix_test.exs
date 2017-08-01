@@ -28,6 +28,11 @@ defmodule ExDebugToolbar.PhoenixTest do
     assert request.timeline.duration > 70 * 1000 # not sure why
   end
 
+  test "it closes connection" do
+    conn = make_request("/")
+    assert Plug.Conn.get_resp_header(conn, "connection") == ["close"]
+  end
+
   describe "requests to __ex_debug_toolbar__" do
     setup do
       conn = make_request("/__ex_debug_toolbar__/js/toolbar.js")
