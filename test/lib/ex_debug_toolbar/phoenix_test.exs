@@ -30,7 +30,7 @@ defmodule ExDebugToolbar.PhoenixTest do
 
   describe "requests to __ex_debug_toolbar__" do
     setup do
-      conn = make_request("/__ex_debug_toolbar__/api/ping")
+      conn = make_request("/__ex_debug_toolbar__/js/toolbar.js")
       {:ok, conn: conn}
     end
 
