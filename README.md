@@ -147,6 +147,7 @@ Special thanks goes to [Juan Peri](https://github.com/epilgrim)!
 - [ ] Documentation
   - [ ] Add function specs
   - [ ] Document top level API, hide internal modules from docs
+- [ ] Support multiple breakpoint servers on one host
 - [ ] Tests
   - [ ] breakpoints
     - [ ] client test

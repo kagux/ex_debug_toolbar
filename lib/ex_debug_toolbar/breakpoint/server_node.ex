@@ -2,7 +2,7 @@ defmodule ExDebugToolbar.Breakpoint.ServerNode do
   @moduledoc false
 
   @cookie :secret
-  @server System.unique_integer()
+  @server :breakpoint_host
 
   def start_link do
     System.cmd "epmd", ["-daemon"]
