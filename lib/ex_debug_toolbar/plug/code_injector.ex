@@ -7,7 +7,7 @@ defmodule ExDebugToolbar.Plug.CodeInjector do
 
   @behaviour Plug
 
-  def init(options), do: options
+  def init(opts), do: opts
 
   def call(conn, _opts) do
     register_before_send conn, &inject_debug_toolbar_code/1

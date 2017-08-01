@@ -6,4 +6,5 @@ defmodule ExDebugToolbar.Plug.Pipeline do
   plug ExDebugToolbar.Plug.RequestId
   plug ExDebugToolbar.Plug.CodeInjector
   plug ExDebugToolbar.Collector.ConnCollector
+  plug ExDebugToolbar.Plug.CloseConn
 end
