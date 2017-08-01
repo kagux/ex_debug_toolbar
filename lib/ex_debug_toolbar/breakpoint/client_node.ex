@@ -7,12 +7,21 @@ defmodule ExDebugToolbar.Breakpoint.ClientNode do
   def run(breakpoint_id) do
     set_cookie()
     true = ServerNode.get_name() |> Node.connect
-    # :timer.sleep 1000
     %Breakpoint{binding: binding, env: env} = ServerNode.get_breakpoint(breakpoint_id)
-    IEx.pry binding, env, 5000
+    if old_iex_version?() do
+      apply(IEx, :pry, [binding, env, 5000])
+    else
+      apply(IEx.Pry, :pry, [binding, env])
+    end
   end
 
   defp set_cookie do
     Node.set_cookie node(), ServerNode.get_cookie()
+  end
+
+  defp old_iex_version? do
+    :functions
+    |> IEx.__info__
+    |> Keyword.has_key?(:pry)
   end
 end
