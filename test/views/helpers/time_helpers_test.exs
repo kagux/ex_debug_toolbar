@@ -15,5 +15,9 @@ defmodule ExDebugToolbar.View.Helpers.TimeHelpersTest do
       assert TimeHelpers.native_time_to_string(5499 * @microsecond) == "5ms"
       assert TimeHelpers.native_time_to_string(5500 * @microsecond) == "6ms"
     end
+
+    test "return N/A for nil value" do
+      assert TimeHelpers.native_time_to_string(nil) == "N/A"
+    end
   end
 end
