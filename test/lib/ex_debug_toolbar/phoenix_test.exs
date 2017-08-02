@@ -33,6 +33,12 @@ defmodule ExDebugToolbar.PhoenixTest do
     assert Plug.Conn.get_resp_header(conn, "connection") == ["close"]
   end
 
+  test "it removes glob params from connection" do
+    conn = make_request("/")
+    refute Map.has_key? conn.params, "glob"
+    refute Map.has_key? conn.path_params, "glob"
+  end
+
   describe "requests to __ex_debug_toolbar__" do
     setup do
       conn = make_request("/__ex_debug_toolbar__/js/toolbar.js")

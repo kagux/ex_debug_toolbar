@@ -122,6 +122,7 @@ To change configuration, update `:ex_debug_toolbar` config key in your `config/d
 | iex_shell         | string       | "/bin/sh"                                                                                    | Shell executable to be used for breakpoint session                                                                  |
 | iex_shell_cmd     | string       | """ stty echo; clear; iex --sname %{node_name} -S mix breakpoint.client %{breakpoint_id} """ | Shell command to launch breakpoint iex session                                                                      |
 | breakpoints_limit | integer      | 100                                                                                          | Maximum number of available breakpoints. After reaching this cap, new breakpoints will push out oldest ones.        |
+| remove_glob_params| boolean      | true                                                                                         | `Plug.Router` adds `glob` params to `conn.params` and `conn.path_params` on `forward`. This option removes them     |
 
 
 # Contributors
