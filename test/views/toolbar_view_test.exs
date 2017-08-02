@@ -40,6 +40,20 @@ defmodule ExDebugToolbar.ToolbarViewTest do
     assert request |> render |> is_bitstring
   end
 
+  test "it renders toolbar with ecto query with nil queue and decode times" do
+    log_entry = %Ecto.LogEntry{
+      decode_time: nil,
+      query: "select * from users",
+      query_time: 1550583,
+      queue_time: nil,
+      source: "users",
+      result: {:ok, %Postgrex.Result{}}
+    }
+    duration = 15000
+    request = %Request{ecto: [{log_entry, duration, :inline}]}
+    assert request |> render |> is_bitstring
+  end
+
   test "it renders toolbar with timeline" do
     timeline = %Timeline{
       duration: 50,
