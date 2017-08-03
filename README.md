@@ -56,7 +56,7 @@ A click on any breakpoint will take you to familiar `iex` session with context a
 
    ```elixir
    def deps do
-     [{:ex_debug_toolbar, "~> 0.2.0"}]
+     [{:ex_debug_toolbar, "~> 0.3.0"}]
    end
    ```
 
