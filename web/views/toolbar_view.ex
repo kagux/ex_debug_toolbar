@@ -50,7 +50,10 @@ defmodule ExDebugToolbar.ToolbarView do
 
   def conn_details(%Plug.Conn{} = conn) do
     conn = conn_with_defaults(conn)
-    {layout_view, layout_template} = conn.assigns.layout
+    {layout_view, layout_template} = case conn.assigns.layout do
+      false -> @default_conn.assigns.layout
+      layout -> layout
+    end
     [
       "Endpoint": conn.private.phoenix_endpoint,
       "Controller": get_controller(conn),
