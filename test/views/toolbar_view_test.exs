@@ -5,8 +5,9 @@ defmodule ExDebugToolbar.ToolbarViewTest do
   alias Phoenix.View
   alias ExDebugToolbar.ToolbarView
   alias ExDebugToolbar.Breakpoint
+  alias Plug.Conn
 
-  test "it renderns toolbar without errors" do
+  test "it renders toolbar without errors" do
     assert %Request{} |> render |> is_bitstring
   end
 
@@ -86,6 +87,10 @@ defmodule ExDebugToolbar.ToolbarViewTest do
       inserted_at: NaiveDateTime.utc_now
     }
     assert %Request{} |> render(breakpoints: [breakpoint]) |> is_bitstring
+  end
+
+  test "it renders toolbar when conn has no layout" do
+    assert %Request{conn: %Conn{assigns: %{layout: false}}} |> render |> is_bitstring
   end
 
   defp render(request, opts \\ []) do
