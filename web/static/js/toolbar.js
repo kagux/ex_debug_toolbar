@@ -9,7 +9,7 @@ import 'prismjs/plugins/normalize-whitespace/prism-normalize-whitespace';
 import 'prismjs/plugins/line-numbers/prism-line-numbers';
 import 'prismjs/plugins/line-highlight/prism-line-highlight';
 
-window.jQuery = $;
+window.jQuery = window.jQuery || $;
 require('bootstrap-sass');
 
 class App {
