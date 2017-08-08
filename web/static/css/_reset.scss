@@ -1,0 +1,33 @@
+&::before {
+  all: unset;
+}
+
+&::after {
+  all: unset;
+}
+
+&::hover {
+  all: unset;
+}
+
+&::visited {
+  all: unset;
+}
+
+&::link {
+  all: unset;
+}
+
+&::active {
+  all: unset;
+}
+
+.row {
+  all: unset;
+}
+
+table tr {
+  background: white;
+}
+
+@import "reset-and-normalize";

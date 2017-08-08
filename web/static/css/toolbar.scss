@@ -1,28 +1,5 @@
 #ex-debug-toolbar * {
-  @import "reset-and-normalize";
-  *::before {
-    all: unset;
-  }
-
-  *::after {
-    all: unset;
-  }
-
-  *::hover {
-    all: unset;
-  }
-
-  *::visited {
-    all: unset;
-  }
-
-  *::link {
-    all: unset;
-  }
-
-  *::active {
-    all: unset;
-  }
+  @import "_reset";
 }
 
 #ex-debug-toolbar {
