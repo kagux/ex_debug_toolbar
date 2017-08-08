@@ -1,16 +1,13 @@
 import 'phoenix_html';
 import {Socket} from 'phoenix';
-import $ from 'jquery';
-import BreakpointsPanel from './toolbar/breakpoints_panel.js';
+import $ from './toolbar/jquery';
+import BreakpointsPanel from './toolbar/breakpoints_panel';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-elixir';
 import 'prismjs/components/prism-sql';
 import 'prismjs/plugins/normalize-whitespace/prism-normalize-whitespace';
 import 'prismjs/plugins/line-numbers/prism-line-numbers';
 import 'prismjs/plugins/line-highlight/prism-line-highlight';
-
-window.jQuery = $;
-require('bootstrap-sass');
 
 class App {
   constructor(opts) {

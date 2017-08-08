@@ -1,4 +1,4 @@
-import $ from 'jquery';
+import $ from './jquery';
 import {default as Term} from 'xterm';
 require('xterm/lib/addons/fit/fit');
 require('xterm/lib/addons/fullscreen/fullscreen');
