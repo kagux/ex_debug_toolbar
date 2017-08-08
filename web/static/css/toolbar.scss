@@ -1,3 +1,30 @@
+#ex-debug-toolbar * {
+  @import "reset-and-normalize";
+  *::before {
+    all: unset;
+  }
+
+  *::after {
+    all: unset;
+  }
+
+  *::hover {
+    all: unset;
+  }
+
+  *::visited {
+    all: unset;
+  }
+
+  *::link {
+    all: unset;
+  }
+
+  *::active {
+    all: unset;
+  }
+}
+
 #ex-debug-toolbar {
   $panel-max-height: 200px;
 
@@ -12,6 +39,8 @@
   @import "prismjs/themes/prism";
   @import "prismjs/plugins/line-numbers/prism-line-numbers";
   @import "prismjs/plugins/line-highlight/prism-line-highlight";
+  @import "xterm/dist/xterm";
+  @import "xterm/dist/addons/fullscreen/fullscreen";
 
   // TOOLBAR
 
