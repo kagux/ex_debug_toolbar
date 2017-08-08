@@ -58,6 +58,9 @@ exports.config = {
           'node_modules/'
         ],
       }
+    },
+    cleancss: {
+      advanced: false,
     }
   },
 
