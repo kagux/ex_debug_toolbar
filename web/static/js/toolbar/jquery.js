@@ -1,5 +1,5 @@
 // Bootstrap expects a global jQuery object, which leads to a clash
-// between user's app and toolbar jQuery.
+// between user's app and toolbar's jQuery.
 
 
 // 1. import jQuery from toolbar's package
