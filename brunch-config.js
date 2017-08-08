@@ -54,9 +54,13 @@ exports.config = {
         mode: 'ruby',
         includePaths: [
           'node_modules/bootstrap-sass/assets/stylesheets/',
+          'node_modules/css-reset-and-normalize-sass/scss/',
           'node_modules/'
         ],
       }
+    },
+    cleancss: {
+      advanced: false,
     }
   },
 
@@ -68,9 +72,6 @@ exports.config = {
 
   npm: {
     styles: {
-      // 'highlight.js': ['styles/default.css'],
-      'xterm': ['dist/xterm.css', 'dist/addons/fullscreen/fullscreen.css'],
-      // 'prismjs': ['themes/prism-coy.css', 'plugins/line-numbers/prism-line-numbers.css']
     },
     enabled: true
   }
