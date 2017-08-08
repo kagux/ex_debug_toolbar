@@ -1,6 +1,8 @@
 #ex-debug-toolbar {
   $panel-max-height: 200px;
 
+  @import "_reset";
+
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 1.42857;
@@ -12,6 +14,8 @@
   @import "prismjs/themes/prism";
   @import "prismjs/plugins/line-numbers/prism-line-numbers";
   @import "prismjs/plugins/line-highlight/prism-line-highlight";
+  @import "xterm/dist/xterm";
+  @import "xterm/dist/addons/fullscreen/fullscreen";
 
   // TOOLBAR
 

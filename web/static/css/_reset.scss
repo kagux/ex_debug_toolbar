@@ -1,0 +1,34 @@
+*::before {
+  all: unset;
+}
+
+*::after {
+  all: unset;
+}
+
+*::hover {
+  all: unset;
+}
+
+*::visited {
+  all: unset;
+}
+
+*::link {
+  all: unset;
+}
+
+*::active {
+  all: unset;
+}
+
+* {
+  max-width: inherit;
+  max-height: inherit;
+}
+
+.container-fluid * {
+  background: inherit;
+}
+
+@import "reset-and-normalize";
