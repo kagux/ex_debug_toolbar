@@ -20949,13 +20949,13 @@ require.register("web/static/js/toolbar.js", function(exports, require, module) 
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _jquery = require('./toolbar/jquery');
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
 require('phoenix_html');
 
 var _phoenix = require('phoenix');
+
+var _jquery = require('./toolbar/jquery');
+
+var _jquery2 = _interopRequireDefault(_jquery);
 
 var _breakpoints_panel = require('./toolbar/breakpoints_panel');
 
@@ -20978,8 +20978,6 @@ require('prismjs/plugins/line-highlight/prism-line-highlight');
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-require('bootstrap-sass');
 
 var App = function () {
   function App(opts) {
@@ -21278,22 +21276,42 @@ require.register("web/static/js/toolbar/jquery.js", function(exports, require, m
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-if (window.jQuery) {
-  var _$ = window.jQuery;
-} else {
-  var _$2 = require('jquery');
-  window.jQuery = _$2;
-  window.$ = _$2;
-}
-exports.default = $;
+
+var _jquery = require('jquery');
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// 2. stash global jQuery if present
+var _jQuery = window.jQuery; // Bootstrap expects a global jQuery object, which leads to a clash
+// between user's app and toolbar jQuery.
+
+
+// 1. import jQuery from toolbar's package
+
+var _$ = window.$;
+
+// 3. make toolbar's jQuery global
+window.jQuery = _jquery2.default;
+window.$ = _jquery2.default;
+
+// 4. import bootstrap that adds plugins to global jQuery
+require('bootstrap-sass');
+
+// 5. make stashed jQuery global again
+window.jQuery = _jQuery;
+window.$ = _$;
+
+exports.default = _jquery2.default;
 });
 
 require.alias("jquery/dist/jquery.js", "jquery");
+require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
 require.alias("process/browser.js", "process");
 require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");
-require.alias("prismjs/prism.js", "prismjs");
 require.alias("phoenix/priv/static/phoenix.js", "phoenix");
-require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
+require.alias("prismjs/prism.js", "prismjs");
 require.alias("xterm/lib/xterm.js", "xterm");process = require('process');require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');

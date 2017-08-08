@@ -1,7 +1,6 @@
-import $ from './toolbar/jquery';
-require('bootstrap-sass');
 import 'phoenix_html';
 import {Socket} from 'phoenix';
+import $ from './toolbar/jquery';
 import BreakpointsPanel from './toolbar/breakpoints_panel';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-elixir';
