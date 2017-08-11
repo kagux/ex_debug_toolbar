@@ -112,7 +112,6 @@ defmodule ExDebugToolbar do
   Returns `func` return value.
   """
   @spec record_event(id, String.t(), function()) :: any()
-  @decorate noop_when_toolbar_disabled()
   def record_event(id \\ self(), name, func) do
     start_event(id, name)
     result = func.()
