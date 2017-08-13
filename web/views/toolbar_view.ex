@@ -99,10 +99,14 @@ defmodule ExDebugToolbar.ToolbarView do
   end
 
   def controller_times(%Timeline{} = timeline) do
-    events = MapSet.new ~w(controller.call controller.render)
-    [call, render] = timeline
+    event_names = MapSet.new ~w(controller.call controller.render)
+    events = timeline
     |> Timeline.get_all_events
-    |> Enum.filter(&MapSet.member?(events, &1.name))
+    |> Enum.filter(&MapSet.member?(event_names, &1.name))
+    {call, render} = case events do
+      [call, render] -> {call, render}
+      [call] -> {call, %Timeline.Event{}}
+    end
     [
       "Controller": call.duration - render.duration,
       "Templates": render.duration,

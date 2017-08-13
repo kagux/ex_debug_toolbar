@@ -75,6 +75,18 @@ defmodule ExDebugToolbar.ToolbarViewTest do
     assert request |> render |> is_bitstring
   end
 
+  test "it renders toolbar with timeline that has controller.call event only" do
+    timeline = %Timeline{
+      duration: 50,
+      events: [%Timeline.Event{
+        name: "controller.call",
+        duration: 5,
+        }]
+    }
+    request = %Request{timeline: timeline}
+    assert request |> render |> is_bitstring
+  end
+
   test "it renders toolbar with breakpoints" do
     breakpoint = %Breakpoint{
       id: 1,
