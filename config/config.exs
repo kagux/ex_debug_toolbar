@@ -8,7 +8,8 @@ config :ex_debug_toolbar,
   remove_glob_params: true
 
 config :ex_debug_toolbar, ExDebugToolbar.Fixtures.Endpoint,
-  instrumenters: [ExDebugToolbar.Collector.InstrumentationCollector]
+  instrumenters: [ExDebugToolbar.Collector.InstrumentationCollector],
+  debug_errors: true
 
 config :ex_debug_toolbar, ExDebugToolbar.Endpoint,
   url: [host: "localhost"],
