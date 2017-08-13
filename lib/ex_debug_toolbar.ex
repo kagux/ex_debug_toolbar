@@ -142,7 +142,7 @@ defmodule ExDebugToolbar do
   Adds a breakpoint that can be interacted with using Breakpoints Panel on toolbar.
   """
   @spec pry() :: nil
-  @decorate noop_when_toolbar_disabled()
+  @decorate noop_when_toolbar_disabled(nil)
   defmacro pry do
     code_snippet = Breakpoint.code_snippet(__CALLER__)
     quote do
