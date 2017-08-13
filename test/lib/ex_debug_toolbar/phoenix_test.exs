@@ -29,7 +29,7 @@ defmodule ExDebugToolbar.PhoenixTest do
     assert request.timeline.duration > 70 * 1000 # not sure why
   end
 
-  test "it creates request on 404 errors" do
+  test "it creates request and injects toolbar on 404 errors" do
     conn = make_request "/", error: :no_route
     assert {:ok, request} = get_request()
     assert request.stopped?
@@ -38,13 +38,12 @@ defmodule ExDebugToolbar.PhoenixTest do
     assert Regex.match? ~r/src=['"].*?toolbar.js['"]/, body
   end
 
-  test "it creates request on 500 errors" do
+  test "it creates request and injects toolbar on 500 errors" do
     {_, _, body} = assert_error_sent 500, fn ->
       make_request "/", error: :exception
     end
     assert {:ok, request} = get_request()
     assert request.stopped?
-    # IO.puts body
     # cannot use simple String.contains/2 as it appears in code snippet and matches
     assert Regex.match? ~r/src=['"].*?toolbar.js['"]/, body
   end
