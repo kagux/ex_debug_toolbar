@@ -6,7 +6,7 @@ defmodule ExDebugToolbar.Phoenix do
   end
 
   def build_plug_ast do
-    quote do
+    quote location: :keep do
       require Phoenix.Endpoint
       alias Phoenix.Endpoint
       alias ExDebugToolbar.Plug.Router
@@ -15,17 +15,27 @@ defmodule ExDebugToolbar.Phoenix do
 
       Endpoint.socket "/__ex_debug_toolbar__/socket", ExDebugToolbar.UserSocket
 
+      @before_compile unquote(__MODULE__)
+    end
+  end
+
+  defmacro __before_compile__(_) do
+    quote location: :keep do
+      require Phoenix.Endpoint
+      alias Phoenix.Endpoint
+      alias ExDebugToolbar.Plug.Router
+
+      defoverridable [call: 2]
       def call(conn, opts) do
         case dispatch_router(conn, opts) do
           %{private: %{phoenix_endpoint: ExDebugToolbar.Endpoint}} = conn ->
             conn
           conn ->
-          Endpoint.instrument(conn, :ex_debug_toolbar, %{conn: conn}, fn ->
+          Endpoint.instrument(__MODULE__, :ex_debug_toolbar, %{conn: conn}, fn ->
             super(conn, opts)
           end)
         end
       end
-      defoverridable [call: 2]
 
       defp dispatch_router(conn, opts) do
         opts = Router.init(opts)

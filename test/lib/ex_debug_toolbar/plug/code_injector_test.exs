@@ -16,12 +16,13 @@ defmodule ExDebugToolbar.Plug.CodeInjectorTest do
     assert conn.resp_body == expected_html
   end
 
-  test "it injects when response status is 404" do
+  test "it adds js and css to html of error response" do
     html = "<html><head></head><body></body></html>"
-    conn = conn_with_plug(status: 404, body: html)
     expected_html = "<html><head>#{@css}</head><body>#{@js}</body></html>"
-
-    assert conn.resp_body == expected_html
+    for status <- [400, 404, 406, 500] do
+      conn = conn_with_plug(body: html, status: status)
+      assert conn.resp_body == expected_html
+    end
   end
 
   test "it does nothing if there is no body tag" do
@@ -31,11 +32,12 @@ defmodule ExDebugToolbar.Plug.CodeInjectorTest do
     assert conn.resp_body == html
   end
 
-  test "it does nothing if response status differs from 200 or 404" do
+  test "it does nothing if response is a redirect" do
     html = "<html><head></head><body></body></html>"
-    conn = conn_with_plug(body: html, status: 500)
-
-    assert conn.resp_body == html
+    for status <- [301, 302] do
+      conn = conn_with_plug(body: html, status: status)
+      assert conn.resp_body == html
+    end
   end
 
   test "it does nothing if response is not html" do

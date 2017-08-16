@@ -1,6 +1,7 @@
 defmodule ExDebugToolbar.PhoenixTest do
   use ExUnit.Case, async: true
   use Plug.Test
+  import Phoenix.ConnTest, only: [assert_error_sent: 2]
   import Supervisor.Spec
   import ExDebugToolbar.Test.Support.RequestHelpers
   alias ExDebugToolbar.Fixtures.Endpoint
@@ -26,6 +27,25 @@ defmodule ExDebugToolbar.PhoenixTest do
     make_request "/", timeout: 100
     assert {:ok, request} = get_request()
     assert request.timeline.duration > 70 * 1000 # not sure why
+  end
+
+  test "it creates request and injects toolbar on 404 errors" do
+    conn = make_request "/", error: :no_route
+    assert {:ok, request} = get_request()
+    assert request.stopped?
+    assert {404, _, body} = sent_resp(conn)
+    # cannot use simple String.contains/2 as it appears in code snippet and matches
+    assert Regex.match? ~r/src=['"].*?toolbar.js['"]/, body
+  end
+
+  test "it creates request and injects toolbar on 500 errors" do
+    {_, _, body} = assert_error_sent 500, fn ->
+      make_request "/", error: :exception
+    end
+    assert {:ok, request} = get_request()
+    assert request.stopped?
+    # cannot use simple String.contains/2 as it appears in code snippet and matches
+    assert Regex.match? ~r/src=['"].*?toolbar.js['"]/, body
   end
 
   test "it closes connection" do
@@ -56,6 +76,7 @@ defmodule ExDebugToolbar.PhoenixTest do
 
   defp make_request(path, assigns \\ %{}) do
     conn(:get, path)
+    |> put_req_header("accept", "text/html")
     |> Map.put(:assigns, Map.new(assigns))
     |> Endpoint.call(%{})
   end
