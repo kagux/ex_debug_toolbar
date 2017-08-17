@@ -2,6 +2,7 @@ defmodule ExDebugToolbar.ToolbarChannel do
   @moduledoc false
 
   use Phoenix.Channel
+  require Logger
   alias ExDebugToolbar.ToolbarView
   alias ExDebugToolbar.Endpoint
   alias Phoenix.View
@@ -25,11 +26,14 @@ defmodule ExDebugToolbar.ToolbarChannel do
   end
 
   def broadcast_request(id \\ self()) do
+    Logger.debug "Broadcasting request ID=#{inspect(id)}"
     case ExDebugToolbar.get_request(id) do
       {:ok, request} ->
         topic = "toolbar:request:#{request.uuid}"
         Endpoint.broadcast(topic, "request:ready", %{id: request.uuid})
-      _ -> :error
+      _ ->
+        Logger.debug "Request ID=#{inspect(id)} was not found"
+        :error
     end
   end
 
