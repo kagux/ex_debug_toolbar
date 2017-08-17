@@ -2,6 +2,7 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   @moduledoc false
 
   use GenServer
+  require Logger
   alias ExDebugToolbar.Request
 
   def insert(%Request{} = request) do
@@ -52,6 +53,7 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   end
 
   def handle_cast({:update, id, changes}, _state) do
+
     do_update(id, changes)
     {:noreply, nil}
   end
@@ -70,6 +72,7 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   end
 
   defp do_update(id, changes) do
+    Logger.debug "Updating request ID=#{id}"
     case get(id) do
       {:ok, request} -> request |> apply_changes(changes) |> insert
       _ -> :error
