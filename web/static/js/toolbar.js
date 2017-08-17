@@ -34,7 +34,7 @@ class App {
     .receive("ok", this.onChannelResponse.bind(this))
     .receive("error", resp => { console.log("Unable to join", resp) });
 
-    channel.on("ready", this.onChannelResponse.bind(this));
+    channel.on("request:ready", this.onChannelResponse.bind(this));
   }
 
   onChannelResponse(response){
@@ -46,7 +46,7 @@ class App {
   }
 
   renderToolbar({html: html, request: request}){
-    console.log("Request: ", request);
+    // console.log("Request: ", request);
     const toolbar = $(`<div id="ex-debug-toolbar"><div>${html}</div></div>`);
     toolbar.appendTo('body');
     this.renderPanels(toolbar);
