@@ -150,7 +150,7 @@ defmodule ExDebugToolbar.ToolbarView do
     ~w(assigns private)a
     |> Enum.reduce(conn, fn key, conn ->
       defaults = Map.get(@default_conn, key)
-      Map.update! conn, key, &Map.merge(defaults, &1)
+      Map.update! conn, key, &Map.merge(defaults, &1 || %{})
     end)
   end
 end
