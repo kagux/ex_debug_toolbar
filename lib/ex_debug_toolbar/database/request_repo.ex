@@ -14,7 +14,7 @@ defmodule ExDebugToolbar.Database.RequestRepo do
       GenServer.cast(__MODULE__, {:update, id, changes})
       :ok
     else
-      GenServer.call(__MODULE__, {:update, id, changes})
+      GenServer.call(__MODULE__, {:update, id, changes}, :infinity)
     end
   end
 
