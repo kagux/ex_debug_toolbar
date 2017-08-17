@@ -32,16 +32,19 @@ class App {
     channel
     .join()
     .receive("ok", this.onChannelResponse.bind(this))
-    .receive("error", resp => { console.log("Unable to join", resp) });
+    .receive("error", resp => {
+      console.debug("ExDebugToolbar: unable to join websocket channel", resp)
+    });
 
     channel.on("request:ready", this.onChannelResponse.bind(this));
   }
 
   onChannelResponse(response){
     if (response.html) {
+      console.debug('ExDebugToolbar: rendering toolbar');
       this.renderToolbar(response);
     } else {
-      console.log(response);
+      console.debug('ExDebugToolbar: waiting for data to be processed');
     }
   }
 
