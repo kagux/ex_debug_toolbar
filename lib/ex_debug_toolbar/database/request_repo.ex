@@ -5,9 +5,7 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   alias ExDebugToolbar.Request
 
   def insert(%Request{} = request) do
-    transaction fn ->
-      :mnesia.write({Request, request.pid, request.uuid, request})
-    end
+    :mnesia.dirty_write({Request, request.pid, request.uuid, request}) |> result
   end
 
   def update(id, changes, opts \\ []) do
@@ -20,9 +18,7 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   end
 
   def all do
-    transaction fn ->
-      :mnesia.select(Request, [{{Request, :"_", :"_", :"$1"},[],[:"$1"]}])
-    end
+    :mnesia.dirty_select(Request, [{{Request, :"_", :"_", :"$1"},[],[:"$1"]}])
   end
 
   def purge do
@@ -35,17 +31,17 @@ defmodule ExDebugToolbar.Database.RequestRepo do
 
   def get(pid) when is_pid(pid) do
     do_get fn ->
-      :mnesia.read(Request, pid)
+      :mnesia.dirty_read(Request, pid)
     end
   end
   def get(uuid) do
     do_get fn ->
-      :mnesia.index_read(Request, uuid, :uuid)
+      :mnesia.dirty_index_read(Request, uuid, :uuid)
     end
   end
 
   defp do_get(func) do
-    case transaction(func) do
+    case func.() do
       [{Request, _, _, request}] -> {:ok, request}
       [] -> {:error, :not_found}
     end
@@ -65,22 +61,18 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   end
 
   def handle_call({:delete, id}, _from, _state) do
-    reply = transaction fn ->
-      case get(id) do
-        {:ok, request} -> :mnesia.delete({Request, request.pid})
-        _ -> :error
-      end
+    reply = case get(id) do
+      {:ok, request} -> :mnesia.dirty_delete({Request, request.pid})
+      _ -> :error
     end
 
     {:reply, reply, nil}
   end
 
   defp do_update(id, changes) do
-    transaction fn ->
-      case get(id) do
-        {:ok, request} -> request |> apply_changes(changes) |> insert
-        _ -> :error
-      end
+    case get(id) do
+      {:ok, request} -> request |> apply_changes(changes) |> insert
+      _ -> :error
     end
   end
 
@@ -91,10 +83,7 @@ defmodule ExDebugToolbar.Database.RequestRepo do
     changes.(request)
   end
 
-  defp transaction(func) do
-    :mnesia.transaction(func) |> result 
-  end
-
   defp result({:atomic, result}), do: result
   defp result({:aborted, reason}), do: {:error, reason}
+  defp result(result), do: result
 end
