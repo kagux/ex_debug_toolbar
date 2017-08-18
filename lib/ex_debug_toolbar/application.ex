@@ -6,11 +6,14 @@ defmodule ExDebugToolbar.Application do
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
   def start(_type, _args) do
-    Application.get_env(:ex_debug_toolbar, :enable, false) |> do_start()
+    if enabled?() and phoenix_server?() do
+      do_start()
+    else
+      {:ok, self()}
+    end
   end
 
-  defp do_start(false), do: {:ok, self()}
-  defp do_start(true) do
+  defp do_start do
     import Supervisor.Spec
     # Define workers and child supervisors to be supervised
     children = [
@@ -46,5 +49,12 @@ defmodule ExDebugToolbar.Application do
     default = (System.get_env("SHELL") || "/bin/bash")
     Application.get_env(:ex_debug_toolbar, :iex_shell, default) |> String.to_charlist
   end
-end
 
+  defp enabled? do
+    Application.get_env(:ex_debug_toolbar, :enable, false)
+  end
+
+  defp phoenix_server? do
+    Application.get_env(:phoenix, :serve_endpoints, false)
+  end
+end
