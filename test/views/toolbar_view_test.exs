@@ -105,6 +105,10 @@ defmodule ExDebugToolbar.ToolbarViewTest do
     assert %Request{conn: %Conn{assigns: %{layout: false}}} |> render |> is_bitstring
   end
 
+  test "it renders toolbar when conn has no assigns" do
+    assert %Request{conn: %Conn{assigns: nil}} |> render |> is_bitstring
+  end
+
   defp render(request, opts \\ []) do
     assigns = [
       request: request,
