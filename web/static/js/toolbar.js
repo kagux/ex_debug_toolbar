@@ -1,4 +1,3 @@
-import 'phoenix_html';
 import {Socket} from 'phoenix';
 import $ from './toolbar/jquery';
 import BreakpointsPanel from './toolbar/breakpoints_panel';

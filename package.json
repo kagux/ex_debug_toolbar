@@ -11,7 +11,6 @@
     "css-reset-and-normalize-sass": "^0.1.2",
     "jquery": "^3.2.1",
     "phoenix": "file:deps/phoenix",
-    "phoenix_html": "file:deps/phoenix_html",
     "prismjs": "^1.6.0",
     "sass-brunch": "^2.10.4",
     "xterm": "^2.8.0"
