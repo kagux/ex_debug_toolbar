@@ -1,0 +1,30 @@
+<span class="toolbar-item" data-toggle="panel" data-title="All Requests">
+  <i class="glyphicon glyphicon-time" aria-hidden="true"></i>
+  <%= length @all_requests %>
+</span>
+<div class="panel panel-default navbar-fixed-bottom">
+  <div class="panel-heading">
+    <h3 class="panel-title">All Requests</h3>
+  </div>
+  <div class="panel-body">
+    <table class="table table-hover table-condensed">
+      <caption>List of historical requests</caption>
+      <thead>
+        <th> UUID </th>
+        <th> Path </th>
+        <th> Method </th>
+        <th> Time </th>
+      </thead>
+      <tbody>
+        <%= for entry <- @all_requests do %>
+          <tr>
+            <td class="nowrap"><a href="#" onclick="window.ExDebugToolbar.render('<%= entry.uuid %>')"><%= entry.uuid %></a></td>
+            <td class="nowrap"><%= entry.conn.request_path %></td>
+            <td class="nowrap"><%= entry.conn.method %></td>
+            <td class="nowrap"><%= inspect(entry.created_at) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

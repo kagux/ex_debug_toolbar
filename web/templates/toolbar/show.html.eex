@@ -20,6 +20,9 @@
         <%= unless Enum.empty? @breakpoints do %>
           <li> <%= render "show/_breakpoints.html", request: @request, breakpoints: @breakpoints %> </li>
         <% end %>
+        <%= unless Enum.empty? @all_requests do %>
+          <li> <%= render "show/_all_requests.html", request: @request, all_requests: @all_requests %> </li>
+        <% end %>
       </ul>
     </div>
   </div>

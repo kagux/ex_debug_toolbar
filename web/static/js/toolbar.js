@@ -11,13 +11,17 @@ import 'prismjs/plugins/line-highlight/prism-line-highlight';
 class App {
   constructor(opts) {
     this.opts = opts;
+    this.originalRequestId = opts.requestId;
     this.resetActivePanel();
+    this.socket = this.initSocket();
   }
 
-  render() {
-    const socket = this.initSocket();
-    this.joinToolbarChannel(socket);
-    this.breakpointsPanel = new BreakpointsPanel(socket);
+  render(requestId) {
+    if (requestId === undefined) {
+      requestId = this.originalRequestId;
+    }
+    this.joinToolbarChannel(this.socket, requestId);
+    this.breakpointsPanel = new BreakpointsPanel(this.socket);
   }
 
   initSocket() {
@@ -26,8 +30,8 @@ class App {
     return socket;
   }
 
-  joinToolbarChannel(socket) {
-    const channel = socket.channel(`toolbar:request:${this.opts.requestId}`)
+  joinToolbarChannel(socket, requestId) {
+    const channel = socket.channel(`toolbar:request:${requestId}`)
     channel
     .join()
     .receive("ok", this.onChannelResponse.bind(this))
@@ -48,9 +52,10 @@ class App {
   }
 
   renderToolbar({html: html, request: request}){
-    // console.log("Request: ", request);
-    const toolbar = $(`<div id="ex-debug-toolbar"><div>${html}</div></div>`);
-    toolbar.appendTo('body');
+    //console.log("Request: ", request);
+    const toolbar = $('#ex-debug-toolbar')
+    const content = $(`<div>${html}</div>`)
+    toolbar.html(content);
     this.renderPanels(toolbar);
     this.renderPopovers(toolbar);
     this.breakpointsPanel.render();
@@ -123,5 +128,5 @@ class App {
     $(toolbar).find('[data-toggle="popover"]').popover();
   }
 }
-
-(new App({requestId: window.requestId})).render();
+window.ExDebugToolbar = new App({requestId: window.requestId});
+window.ExDebugToolbar.render();
