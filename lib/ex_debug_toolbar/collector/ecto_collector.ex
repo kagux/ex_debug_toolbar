@@ -28,19 +28,15 @@ if Code.ensure_compiled?(Ecto) do
     end
     defp remove_result_rows(entry), do: entry
 
-    defp cast_params(entry, processed \\ [])
-    defp cast_params(%{params: params} = entry, _) do
-      %{entry | params: cast_params(params)}
+    defp cast_params(%{params: params} = entry) do
+      %{entry | params: Enum.map(params, &cast_param/1)}
     end
-    defp cast_params([value | rest], processed) when is_bitstring(value) do
-      value = case Ecto.UUID.cast(value) do
+    defp cast_param(value) when is_bitstring(value) do
+      case Ecto.UUID.cast(value) do
         {:ok, uuid} -> uuid
         :error -> "__BINARY__"
       end
-      cast_params(rest, [value | processed])
     end
-    defp cast_params([value | rest], processed), do: cast_params(rest, [value | processed])
-    defp cast_params([], processed), do: Enum.reverse(processed)
-    defp cast_params(entry, _), do: entry
+    defp cast_param(value), do: value
   end
 end
