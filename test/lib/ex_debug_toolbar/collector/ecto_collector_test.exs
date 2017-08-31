@@ -74,6 +74,12 @@ defmodule ExDebugToolbar.Collector.EctoCollectorTest do
     assert {%{params: ["__BINARY__"]}, _, _} = request.ecto |> hd
   end
 
+  test "the order of params in a query is preserved" do
+    %Ecto.LogEntry{query: "query", params: [1, 2, 3]} |> Collector.log
+    assert {:ok, request} = get_request()
+    assert {%{params: [1, 2, 3]}, _, _} = request.ecto |> hd
+  end
+
   test "it returns unmodified entry" do
     entry = %Ecto.LogEntry{
       query: "query",
