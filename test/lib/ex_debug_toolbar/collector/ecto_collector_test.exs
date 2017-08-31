@@ -60,6 +60,28 @@ defmodule ExDebugToolbar.Collector.EctoCollectorTest do
     assert {%{result: {:error, _}}, _, _} = request.ecto |> hd
   end
 
+  test "it converts binary ecto uuid to a string" do
+    uuid = <<134, 8, 204, 149, 179, 187, 75, 177, 186, 76, 144, 162, 54, 243, 218, 130>>
+    %Ecto.LogEntry{query: "query", params: [uuid]} |> Collector.log
+    assert {:ok, request} = get_request()
+    assert {%{params: ["8608cc95-b3bb-4bb1-ba4c-90a236f3da82"]}, _, _} = request.ecto |> hd
+  end
+
+  test "it replaces binary with a placeholder when it's not a uuid" do
+    uuid = <<1, 0>>
+    %Ecto.LogEntry{query: "query", params: [uuid]} |> Collector.log
+    assert {:ok, request} = get_request()
+    assert {%{params: ["__BINARY__"]}, _, _} = request.ecto |> hd
+  end
+
+  test "it returns unmodified entry" do
+    entry = %Ecto.LogEntry{
+      query: "query",
+      result: {:ok, %Postgrex.Result{ rows: [[:user]]}}
+    }
+    assert entry == Collector.log(entry)
+  end
+
   describe "parallel preload" do
     setup do
       pid = self()
