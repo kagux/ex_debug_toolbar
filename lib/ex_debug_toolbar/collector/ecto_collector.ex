@@ -4,12 +4,12 @@ if Code.ensure_compiled?(Ecto) do
 
     alias Ecto.LogEntry
 
-    def log(%LogEntry{} = entry) do
+    def log(%LogEntry{} = original_entry) do
+      entry = original_entry |> remove_result_rows |> cast_params
       {id, duration, type} = parse_entry(entry)
-      entry = remove_result_rows(entry)
       ExDebugToolbar.add_finished_event(id, "ecto.query", duration)
       ExDebugToolbar.add_data(id, :ecto, {entry, duration, type})
-      entry
+      original_entry
     end
 
     defp parse_entry(entry) do
@@ -27,5 +27,16 @@ if Code.ensure_compiled?(Ecto) do
       %{entry | result: {:ok, %{result | rows: []}}}
     end
     defp remove_result_rows(entry), do: entry
+
+    defp cast_params(%{params: params} = entry) do
+      %{entry | params: Enum.map(params, &cast_param/1)}
+    end
+    defp cast_param(value) when is_bitstring(value) do
+      case Ecto.UUID.cast(value) do
+        {:ok, uuid} -> uuid
+        :error -> "__BINARY__"
+      end
+    end
+    defp cast_param(value), do: value
   end
 end
