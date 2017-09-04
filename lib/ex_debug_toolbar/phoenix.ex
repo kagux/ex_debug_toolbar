@@ -30,6 +30,8 @@ defmodule ExDebugToolbar.Phoenix do
         case dispatch_router(conn, opts) do
           %{private: %{phoenix_endpoint: ExDebugToolbar.Endpoint}} = conn ->
             conn
+          %{private: %{toolbar_ignore_path?: true}} = conn ->
+            conn
           conn ->
           Endpoint.instrument(__MODULE__, :ex_debug_toolbar, %{conn: conn}, fn ->
             super(conn, opts)

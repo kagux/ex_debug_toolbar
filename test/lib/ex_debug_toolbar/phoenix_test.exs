@@ -13,9 +13,12 @@ defmodule ExDebugToolbar.PhoenixTest do
     :ok
   end
 
-  test "it works" do
+  test "it creates request and inejcts toolbar" do
     conn = make_request("/")
-    assert {200, _, _} = sent_resp(conn)
+    assert {200, _, body} = sent_resp(conn)
+    assert {:ok, request} = get_request()
+    assert request.stopped?
+    assert contains_toolbar?(body)
   end
 
   test "it executes existing plugs" do
@@ -34,8 +37,7 @@ defmodule ExDebugToolbar.PhoenixTest do
     assert {:ok, request} = get_request()
     assert request.stopped?
     assert {404, _, body} = sent_resp(conn)
-    # cannot use simple String.contains/2 as it appears in code snippet and matches
-    assert Regex.match? ~r/src=['"].*?toolbar.js['"]/, body
+    assert contains_toolbar?(body)
   end
 
   test "it creates request and injects toolbar on 500 errors" do
@@ -44,8 +46,7 @@ defmodule ExDebugToolbar.PhoenixTest do
     end
     assert {:ok, request} = get_request()
     assert request.stopped?
-    # cannot use simple String.contains/2 as it appears in code snippet and matches
-    assert Regex.match? ~r/src=['"].*?toolbar.js['"]/, body
+    assert contains_toolbar?(body)
   end
 
   test "it closes connection" do
@@ -57,6 +58,12 @@ defmodule ExDebugToolbar.PhoenixTest do
     conn = make_request("/")
     refute Map.has_key? conn.params, "glob"
     refute Map.has_key? conn.path_params, "glob"
+  end
+
+  test "it ignores request if it matches ignore_paths option" do
+    Application.put_env(:ex_debug_toolbar, :ignore_paths, ["/ignore_me"])
+    make_request("/ignore_me")
+    assert {:error, :not_found} = get_request()
   end
 
   describe "requests to __ex_debug_toolbar__" do
@@ -79,5 +86,10 @@ defmodule ExDebugToolbar.PhoenixTest do
     |> put_req_header("accept", "text/html")
     |> Map.put(:assigns, Map.new(assigns))
     |> Endpoint.call(%{})
+  end
+
+  defp contains_toolbar?(html) do
+    # cannot use simple String.contains/2 as it appears in code snippet and matches
+    assert Regex.match? ~r/src=['"].*?toolbar.js['"]/, html
   end
 end
