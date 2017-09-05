@@ -4,9 +4,7 @@ defmodule ExDebugToolbar.Plug.IgnorePathMatch do
 
   import Plug.Conn
 
-  def init(opts) do
-    opts
-  end
+  def init(opts), do: opts
 
   def call(conn, opts \\ []) do
     default_paths = Keyword.get(opts, :ignore_paths, [])
