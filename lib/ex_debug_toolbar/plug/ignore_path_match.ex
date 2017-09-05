@@ -4,7 +4,9 @@ defmodule ExDebugToolbar.Plug.IgnorePathMatch do
 
   import Plug.Conn
 
-  def init(opts), do: opts
+  def init(opts) do
+    opts
+  end
 
   def call(conn, opts \\ []) do
     default_paths = Keyword.get(opts, :ignore_paths, [])
@@ -17,7 +19,11 @@ defmodule ExDebugToolbar.Plug.IgnorePathMatch do
     |> Enum.any?(&ignore_path?(&1, conn))
   end
 
-  defp ignore_path?(path, conn) do
-    path |> Regex.compile! |> Regex.match?(conn.request_path)
+  defp ignore_path?(path, conn) when is_bitstring(path) do
+    path == conn.request_path
+  end
+
+  defp ignore_path?(%Regex{} = path, conn) do
+    Regex.match?(path, conn.request_path)
   end
 end

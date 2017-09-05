@@ -21,13 +21,13 @@ defmodule ExDebugToolbar.Plug.IgnorePathMatchTest do
   end
 
   test "it supports regular expressions" do
-    Application.put_env(:ex_debug_toolbar, :ignore_paths, [".*\.js"])
+    Application.put_env(:ex_debug_toolbar, :ignore_paths, [~r/.*\.js/])
     conn = make_request("/assets/app.js")
     assert conn.private.toolbar_ignore_path?
   end
 
   test "it supports multiple ignore paths" do
-    Application.put_env(:ex_debug_toolbar, :ignore_paths, [".*\.css", "/ignore"])
+    Application.put_env(:ex_debug_toolbar, :ignore_paths, [~r/.*\.css/, "/ignore"])
 
     conn = make_request("/assets/app.css")
     assert conn.private.toolbar_ignore_path?

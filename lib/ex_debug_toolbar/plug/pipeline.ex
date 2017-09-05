@@ -9,14 +9,9 @@ defmodule ExDebugToolbar.Plug.Pipeline do
   plug ExDebugToolbar.Plug.CloseConn
   plug ExDebugToolbar.Plug.RemoveGlobParams
   plug ExDebugToolbar.Plug.IgnorePathMatch, ignore_paths: [
-    ".*\.js",
-    ".*\.css",
-    ".*\.png",
-    ".*\.jpg",
-    ".*\.jpeg",
-    ".*\.ico",
-    ".*\.gif",
-    ".*\.svg",
-    ".*\.woff2",
+    ~r{^/images/},
+    ~r{^/css/},
+    ~r{^/js/},
+    ~r{^/phoenix/live_reload/}
   ]
 end
