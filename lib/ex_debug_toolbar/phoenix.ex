@@ -31,7 +31,7 @@ defmodule ExDebugToolbar.Phoenix do
           %{private: %{phoenix_endpoint: ExDebugToolbar.Endpoint}} = conn ->
             conn
           %{private: %{toolbar_ignore_path?: true}} = conn ->
-            conn
+            super(conn, opts)
           conn ->
           Endpoint.instrument(__MODULE__, :ex_debug_toolbar, %{conn: conn}, fn ->
             super(conn, opts)

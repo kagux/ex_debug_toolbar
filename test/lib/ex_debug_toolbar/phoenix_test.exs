@@ -62,8 +62,9 @@ defmodule ExDebugToolbar.PhoenixTest do
 
   test "it ignores request if it matches ignore_paths option" do
     Application.put_env(:ex_debug_toolbar, :ignore_paths, ["/ignore_me"])
-    make_request("/ignore_me")
+    conn = make_request("/ignore_me")
     assert {:error, :not_found} = get_request()
+    assert conn.assigns[:called?] == true
   end
 
   describe "requests to __ex_debug_toolbar__" do
