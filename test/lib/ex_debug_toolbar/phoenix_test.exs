@@ -13,7 +13,7 @@ defmodule ExDebugToolbar.PhoenixTest do
     :ok
   end
 
-  test "it creates request and inejcts toolbar" do
+  test "it creates request and injects toolbar" do
     conn = make_request("/")
     assert {200, _, body} = sent_resp(conn)
     assert {:ok, request} = get_request()
