@@ -8,4 +8,10 @@ defmodule ExDebugToolbar.Plug.Pipeline do
   plug ExDebugToolbar.Collector.ConnCollector
   plug ExDebugToolbar.Plug.CloseConn
   plug ExDebugToolbar.Plug.RemoveGlobParams
+  plug ExDebugToolbar.Plug.IgnorePathMatch, ignore_paths: [
+    ~r{^/images/},
+    ~r{^/css/},
+    ~r{^/js/},
+    ~r{^/phoenix/live_reload/}
+  ]
 end
