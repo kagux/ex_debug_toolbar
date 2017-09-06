@@ -8,7 +8,7 @@ defmodule ExDebugToolbar.Plug.IgnorePathMatch do
 
   def call(conn, opts \\ []) do
     default_paths = Keyword.get(opts, :ignore_paths, [])
-    conn |> put_private(:toolbar_ignore_path?, ignore?(conn, default_paths))
+    conn |> put_private(:ex_debug_toolbar_ignore?, ignore?(conn, default_paths))
   end
 
   defp ignore?(conn, default_paths) do

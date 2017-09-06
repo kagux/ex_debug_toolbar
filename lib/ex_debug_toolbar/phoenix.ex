@@ -26,16 +26,30 @@ defmodule ExDebugToolbar.Phoenix do
       alias ExDebugToolbar.Plug.Router
 
       defoverridable [call: 2]
+
+      @doc """
+      Wrapper around app endpoint. After passing connection through
+      toolbar's router we make a decision how to further process it.
+      Ignoring request in a toolbar works by not emiting `:ex_debug_toolbar` event
+      which creates new request in toolbar. The rest of data collection functions
+      become effectively no-op for ignored requests.
+      """
       def call(conn, opts) do
         case dispatch_router(conn, opts) do
+          # request to Toolbar's internal routes, it's been already
+          # processed and we leave it untouched
           %{private: %{phoenix_endpoint: ExDebugToolbar.Endpoint}} = conn ->
             conn
-          %{private: %{toolbar_ignore_path?: true}} = conn ->
+          # app request that should be ignored according to configuration,
+          # we pass it to app endpoint, but don't register in toolbar
+          %{private: %{ex_debug_toolbar_ignore?: true}} = conn ->
             super(conn, opts)
+          # otherwise it's an app request we want to register in toolbar and 
+          # processed by app's endpoint
           conn ->
-          Endpoint.instrument(__MODULE__, :ex_debug_toolbar, %{conn: conn}, fn ->
-            super(conn, opts)
-          end)
+            Endpoint.instrument(__MODULE__, :ex_debug_toolbar, %{conn: conn}, fn ->
+              super(conn, opts)
+            end)
         end
       end
 

@@ -8,43 +8,43 @@ defmodule ExDebugToolbar.Plug.IgnorePathMatchTest do
     Application.delete_env(:ex_debug_toolbar, :ignore_paths)
   end
 
-  test "it sets toolbar_ignore_path? to true if path matches exactly" do
+  test "it sets ex_debug_toolbar_ignore? to true if path matches exactly" do
     Application.put_env(:ex_debug_toolbar, :ignore_paths, ["/path"])
     conn = make_request("/path")
-    assert conn.private.toolbar_ignore_path?
+    assert conn.private.ex_debug_toolbar_ignore?
   end
 
-  test "it sets toolbar_ignore_path? to true if path does not match" do
+  test "it sets ex_debug_toolbar_ignore? to true if path does not match" do
     Application.put_env(:ex_debug_toolbar, :ignore_paths, ["/path"])
     conn = make_request("/another_path")
-    refute conn.private.toolbar_ignore_path?
+    refute conn.private.ex_debug_toolbar_ignore?
   end
 
   test "it supports regular expressions" do
     Application.put_env(:ex_debug_toolbar, :ignore_paths, [~r/.*\.js/])
     conn = make_request("/assets/app.js")
-    assert conn.private.toolbar_ignore_path?
+    assert conn.private.ex_debug_toolbar_ignore?
   end
 
   test "it supports multiple ignore paths" do
     Application.put_env(:ex_debug_toolbar, :ignore_paths, [~r/.*\.css/, "/ignore"])
 
     conn = make_request("/assets/app.css")
-    assert conn.private.toolbar_ignore_path?
+    assert conn.private.ex_debug_toolbar_ignore?
 
     conn = make_request("/ignore")
-    assert conn.private.toolbar_ignore_path?
+    assert conn.private.ex_debug_toolbar_ignore?
   end
 
   test "it accepts default ignore_paths as options" do
     conn = make_request("/ignore", ignore_paths: ["/ignore"])
-    assert conn.private.toolbar_ignore_path?
+    assert conn.private.ex_debug_toolbar_ignore?
   end
 
   test "env config takes precedence over default opts" do
     Application.put_env(:ex_debug_toolbar, :ignore_paths, [])
     conn = make_request("/ignore", ignore_paths: ["/ignore"])
-    refute conn.private.toolbar_ignore_path?
+    refute conn.private.ex_debug_toolbar_ignore?
   end
 
   defp make_request(path, opts \\ []) do
