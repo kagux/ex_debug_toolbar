@@ -4,8 +4,9 @@ require('xterm/lib/addons/fit/fit');
 require('xterm/lib/addons/fullscreen/fullscreen');
 
 class BreakpointsPanel {
-  constructor(socket) {
+  constructor(socket, toolbar) {
     this.socket = socket;
+    this.toolbar = toolbar;
   }
 
   render() {
@@ -15,7 +16,7 @@ class BreakpointsPanel {
   }
 
   appendModalToBody() {
-    $('#breakpoints-modal').detach().appendTo('#ex-debug-toolbar');
+    $('#breakpoints-modal').detach().appendTo(this.toolbar);
   }
 
   renderModal() {
@@ -29,7 +30,7 @@ class BreakpointsPanel {
   }
 
   renderCodeSnippets() {
-    $('#ex-debug-toolbar .breakpoint').each((i, el) => {
+    this.toolbar.find('.breakpoint').each((i, el) => {
       const $el = $(el);
       $el.hover(() => {
         const html = $el.find('.code-snippet').html();

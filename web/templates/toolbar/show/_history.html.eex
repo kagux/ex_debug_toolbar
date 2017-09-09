@@ -18,10 +18,10 @@
       <tbody>
         <%= for entry <- @history do %>
           <tr>
-            <td class="nowrap"><a href="#" onclick="window.ExDebugToolbar.render('<%= entry.uuid %>')"><%= entry.uuid %></a></td>
+            <td class="nowrap"><a href="#" class="history-point" data-uuid="<%= entry.uuid %>"><%= entry.uuid %></a></td>
             <td class="nowrap"><%= entry.conn.request_path %></td>
             <td class="nowrap"><%= entry.conn.method %></td>
-            <td class="nowrap"><%= inspect(entry.created_at) %></td>
+            <td class="nowrap"><%= entry.created_at %></td>
           </tr>
         <% end %>
       </tbody>

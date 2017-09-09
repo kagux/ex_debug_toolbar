@@ -14,6 +14,9 @@ class App {
     this.originalRequestId = opts.requestId;
     this.resetActivePanel();
     this.socket = this.initSocket();
+    this.toolbar = $("<div>", {id: "ex-debug-toolbar"});
+    $("body").append(this.toolbar);
+    this._setupHistoryListener(this.toolbar);
   }
 
   render(requestId) {
@@ -21,7 +24,7 @@ class App {
       requestId = this.originalRequestId;
     }
     this.joinToolbarChannel(this.socket, requestId);
-    this.breakpointsPanel = new BreakpointsPanel(this.socket);
+    this.breakpointsPanel = new BreakpointsPanel(this.socket, this.toolbar);
   }
 
   initSocket() {
@@ -53,13 +56,12 @@ class App {
 
   renderToolbar({html: html, request: request}){
     //console.log("Request: ", request);
-    const toolbar = $('#ex-debug-toolbar')
     const content = $(`<div>${html}</div>`)
-    toolbar.html(content);
-    this.renderPanels(toolbar);
-    this.renderPopovers(toolbar);
+    this.toolbar.html(content);
+    this.renderPanels(this.toolbar);
+    this.renderPopovers(this.toolbar);
     this.breakpointsPanel.render();
-    this.highlightCode(toolbar);
+    this.highlightCode(this.toolbar);
   }
 
   renderPanels(toolbar) {
@@ -127,6 +129,14 @@ class App {
   renderPopovers(toolbar) {
     $(toolbar).find('[data-toggle="popover"]').popover();
   }
+
+  _setupHistoryListener() {
+    var self = this;
+    this.toolbar.on("click", ".history-point", function(event) { 
+      event.preventDefault();
+      self.render($(event.target).data('uuid'));
+    })
+  }
+
 }
-window.ExDebugToolbar = new App({requestId: window.requestId});
-window.ExDebugToolbar.render();
+(new App({requestId: window.requestId})).render();

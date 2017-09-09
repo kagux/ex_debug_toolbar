@@ -20933,6 +20933,9 @@ var App = function () {
     this.originalRequestId = opts.requestId;
     this.resetActivePanel();
     this.socket = this.initSocket();
+    this.toolbar = (0, _jquery2.default)("<div>", { id: "ex-debug-toolbar" });
+    (0, _jquery2.default)("body").append(this.toolbar);
+    this._setupHistoryListener(this.toolbar);
   }
 
   _createClass(App, [{
@@ -20942,7 +20945,7 @@ var App = function () {
         requestId = this.originalRequestId;
       }
       this.joinToolbarChannel(this.socket, requestId);
-      this.breakpointsPanel = new _breakpoints_panel2.default(this.socket);
+      this.breakpointsPanel = new _breakpoints_panel2.default(this.socket, this.toolbar);
     }
   }, {
     key: 'initSocket',
@@ -20978,13 +20981,12 @@ var App = function () {
           request = _ref.request;
 
       //console.log("Request: ", request);
-      var toolbar = (0, _jquery2.default)('#ex-debug-toolbar');
       var content = (0, _jquery2.default)('<div>' + html + '</div>');
-      toolbar.html(content);
-      this.renderPanels(toolbar);
-      this.renderPopovers(toolbar);
+      this.toolbar.html(content);
+      this.renderPanels(this.toolbar);
+      this.renderPopovers(this.toolbar);
       this.breakpointsPanel.render();
-      this.highlightCode(toolbar);
+      this.highlightCode(this.toolbar);
     }
   }, {
     key: 'renderPanels',
@@ -21057,13 +21059,21 @@ var App = function () {
     value: function renderPopovers(toolbar) {
       (0, _jquery2.default)(toolbar).find('[data-toggle="popover"]').popover();
     }
+  }, {
+    key: '_setupHistoryListener',
+    value: function _setupHistoryListener() {
+      var self = this;
+      this.toolbar.on("click", ".history-point", function (event) {
+        event.preventDefault();
+        self.render((0, _jquery2.default)(event.target).data('uuid'));
+      });
+    }
   }]);
 
   return App;
 }();
 
-window.ExDebugToolbar = new App({ requestId: window.requestId });
-window.ExDebugToolbar.render();
+new App({ requestId: window.requestId }).render();
 });
 
 require.register("web/static/js/toolbar/breakpoints_panel.js", function(exports, require, module) {
@@ -21091,10 +21101,11 @@ require('xterm/lib/addons/fit/fit');
 require('xterm/lib/addons/fullscreen/fullscreen');
 
 var BreakpointsPanel = function () {
-  function BreakpointsPanel(socket) {
+  function BreakpointsPanel(socket, toolbar) {
     _classCallCheck(this, BreakpointsPanel);
 
     this.socket = socket;
+    this.toolbar = toolbar;
   }
 
   _createClass(BreakpointsPanel, [{
@@ -21107,7 +21118,7 @@ var BreakpointsPanel = function () {
   }, {
     key: 'appendModalToBody',
     value: function appendModalToBody() {
-      (0, _jquery2.default)('#breakpoints-modal').detach().appendTo('#ex-debug-toolbar');
+      (0, _jquery2.default)('#breakpoints-modal').detach().appendTo(this.toolbar);
     }
   }, {
     key: 'renderModal',
@@ -21121,7 +21132,7 @@ var BreakpointsPanel = function () {
   }, {
     key: 'renderCodeSnippets',
     value: function renderCodeSnippets() {
-      (0, _jquery2.default)('#ex-debug-toolbar .breakpoint').each(function (i, el) {
+      this.toolbar.find('.breakpoint').each(function (i, el) {
         var $el = (0, _jquery2.default)(el);
         $el.hover(function () {
           var html = $el.find('.code-snippet').html();
@@ -21259,8 +21270,8 @@ window.$ = _$;
 exports.default = _jquery2.default;
 });
 
-require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
 require.alias("jquery/dist/jquery.js", "jquery");
+require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
 require.alias("process/browser.js", "process");
 require.alias("prismjs/prism.js", "prismjs");
 require.alias("phoenix/priv/static/phoenix.js", "phoenix");

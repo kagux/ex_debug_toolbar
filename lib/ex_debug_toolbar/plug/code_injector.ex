@@ -15,7 +15,7 @@ defmodule ExDebugToolbar.Plug.CodeInjector do
 
   defp inject_debug_toolbar_code(conn) do
     if inject?(conn) do
-      conn |> inject_css |> inject_js |> inject_container
+      conn |> inject_css |> inject_js
     else
       conn
     end
@@ -23,10 +23,6 @@ defmodule ExDebugToolbar.Plug.CodeInjector do
 
   defp inject_js(conn) do
     static_path("/js/toolbar.js") |> js_code(conn) |> inject_code(conn, "</body>")
-  end
-
-  defp inject_container(conn) do
-    ~S(<div id="ex-debug-toolbar"></div>) |> inject_code(conn, "</body>")
   end
 
   defp inject_css(conn) do
