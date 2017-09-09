@@ -36,12 +36,13 @@ defmodule ExDebugToolbar.ToolbarChannel do
   defp build_payload(request) do
     breakpoints = ExDebugToolbar.get_all_breakpoints
     %{
-      html: View.render_to_string(ToolbarView, "show.html", request: request, breakpoints: breakpoints, all_requests: all_requests()),
+      html: View.render_to_string(ToolbarView, "show.html", request: request, breakpoints: breakpoints, history: history()),
       request: request
     }
   end
 
-  defp all_requests() do
-    ExDebugToolbar.get_all_requests() |> Enum.sort(&(NaiveDateTime.compare(&2.created_at, &1.created_at) == :lt))
+  defp history() do
+    ExDebugToolbar.get_all_requests()
+    |> Enum.sort(&(NaiveDateTime.compare(&2.created_at, &1.created_at) == :lt))
   end
 end

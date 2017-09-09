@@ -1,6 +1,6 @@
 <span class="toolbar-item" data-toggle="panel" data-title="All Requests">
   <i class="glyphicon glyphicon-time" aria-hidden="true"></i>
-  <%= length @all_requests %>
+  <%= length @history %>
 </span>
 <div class="panel panel-default navbar-fixed-bottom">
   <div class="panel-heading">
@@ -16,7 +16,7 @@
         <th> Time </th>
       </thead>
       <tbody>
-        <%= for entry <- @all_requests do %>
+        <%= for entry <- @history do %>
           <tr>
             <td class="nowrap"><a href="#" onclick="window.ExDebugToolbar.render('<%= entry.uuid %>')"><%= entry.uuid %></a></td>
             <td class="nowrap"><%= entry.conn.request_path %></td>
