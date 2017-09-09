@@ -20981,7 +20981,10 @@ var App = function () {
           request = _ref.request;
 
       //console.log("Request: ", request);
-      var content = (0, _jquery2.default)('<div>' + html + '</div>');
+      var content = (0, _jquery2.default)('<div>').html(html);
+      if (this.originalRequestId != request.uuid) {
+        content.addClass("historic-request");
+      }
       this.toolbar.html(content);
       this.renderPanels(this.toolbar);
       this.renderPopovers(this.toolbar);
@@ -21270,8 +21273,8 @@ window.$ = _$;
 exports.default = _jquery2.default;
 });
 
-require.alias("jquery/dist/jquery.js", "jquery");
 require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
+require.alias("jquery/dist/jquery.js", "jquery");
 require.alias("process/browser.js", "process");
 require.alias("prismjs/prism.js", "prismjs");
 require.alias("phoenix/priv/static/phoenix.js", "phoenix");

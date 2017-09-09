@@ -147,4 +147,14 @@
   #breakpoint .panel-body {
     height: $panel-max-height;
   }
+
+  // Historic flag
+  .historic-flag {
+    display: none;
+  }
+  .historic-request {
+    .historic-flag {
+      display: block;
+    }
+  }
 }

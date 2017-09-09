@@ -24,6 +24,9 @@
           <li> <%= render "show/_history.html", request: @request, history: @history %> </li>
         <% end %>
       </ul>
+      <div class="navbar-right navbar-header historic-flag">
+        <a class="navbar-brand" href="#">Historic Request</a>
+      </div>
     </div>
   </div>
 </nav>

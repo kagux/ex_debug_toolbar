@@ -6701,6 +6701,10 @@
     margin-top: 40px; }
   #ex-debug-toolbar #breakpoint .panel-body {
     height: 200px; }
+  #ex-debug-toolbar .historic-flag {
+    display: none; }
+  #ex-debug-toolbar .historic-request .historic-flag {
+    display: block; }
 
 
 /*# sourceMappingURL=toolbar.css.map*/

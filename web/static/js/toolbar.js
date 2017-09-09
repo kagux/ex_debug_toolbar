@@ -56,7 +56,10 @@ class App {
 
   renderToolbar({html: html, request: request}){
     //console.log("Request: ", request);
-    const content = $(`<div>${html}</div>`)
+    const content = $('<div>').html(html);
+    if (this.originalRequestId != request.uuid) {
+      content.addClass("historic-request");
+    }
     this.toolbar.html(content);
     this.renderPanels(this.toolbar);
     this.renderPopovers(this.toolbar);
