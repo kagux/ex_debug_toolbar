@@ -112,6 +112,7 @@ defmodule ExDebugToolbar.ToolbarViewTest do
   defp render(request, opts \\ []) do
     assigns = [
       request: request,
+      history: [request],
       breakpoints: Keyword.get(opts, :breakpoints, [])
     ]
     View.render_to_string ToolbarView, "show.html", assigns
