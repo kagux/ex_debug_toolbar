@@ -16,7 +16,7 @@ class App {
     this.socket = this.initSocket();
     this.toolbar = $("<div>", {id: "ex-debug-toolbar"});
     $("body").append(this.toolbar);
-    this._setupHistoryListeners(this.toolbar);
+    this.setupHistoryListeners(this.toolbar);
   }
 
   render(requestId) {
@@ -133,7 +133,7 @@ class App {
     $(toolbar).find('[data-toggle="popover"]').popover();
   }
 
-  _setupHistoryListeners() {
+  setupHistoryListeners() {
     var self = this;
     this.toolbar.on("click", ".history-point", function(event) { 
       event.preventDefault();
