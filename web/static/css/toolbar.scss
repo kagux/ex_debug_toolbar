@@ -151,7 +151,8 @@
   // Historic flag
   .historic-flag {
     display: none;
-    a {
+
+    .back-to-current-request {
       font-weight: bold;
       color: black;
       font-size: 0.85em;

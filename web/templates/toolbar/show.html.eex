@@ -25,7 +25,7 @@
         <% end %>
       </ul>
       <div class="navbar-right navbar-header historic-flag">
-        <a class="navbar-brand back-to-current-request" href="#">Back to Current Request</a>
+        <a class="navbar-brand back-to-current-request text-warning" href="#">Back to Current Request</a>
       </div>
     </div>
   </div>
