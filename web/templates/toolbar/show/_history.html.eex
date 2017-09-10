@@ -1,5 +1,5 @@
 <span class="toolbar-item" data-toggle="panel" data-title="All Requests">
-  <i class="glyphicon glyphicon-time" aria-hidden="true"></i>
+  <i class="glyphicon glyphicon-list-alt" aria-hidden="true"></i>
   <%= length @history %>
 </span>
 <div class="panel panel-default navbar-fixed-bottom">
@@ -10,15 +10,19 @@
     <table class="table table-hover table-condensed">
       <caption>List of historical requests</caption>
       <thead>
-        <th> Path </th>
         <th> Method </th>
+        <th> Path </th>
+        <th> Response Code </th>
+        <th> Duration </th>
         <th> Time </th>
       </thead>
       <tbody>
         <%= for entry <- @history do %>
           <tr class="history-point" data-uuid="<%= entry.uuid %>">
-            <td class="nowrap"><%= entry.conn.request_path %></td>
             <td class="nowrap"><%= entry.conn.method %></td>
+            <td class="nowrap"><%= entry.conn.request_path %></td>
+            <td class="nowrap"><%= entry.conn.status %></td>
+            <td class="nowrap"><%= native_time_to_string(entry.timeline.duration) %></td>
             <td class="nowrap"><%= entry.created_at %></td>
           </tr>
         <% end %>
