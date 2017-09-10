@@ -20935,7 +20935,7 @@ var App = function () {
     this.socket = this.initSocket();
     this.toolbar = (0, _jquery2.default)("<div>", { id: "ex-debug-toolbar" });
     (0, _jquery2.default)("body").append(this.toolbar);
-    this._setupHistoryListener(this.toolbar);
+    this._setupHistoryListeners(this.toolbar);
   }
 
   _createClass(App, [{
@@ -21063,12 +21063,16 @@ var App = function () {
       (0, _jquery2.default)(toolbar).find('[data-toggle="popover"]').popover();
     }
   }, {
-    key: '_setupHistoryListener',
-    value: function _setupHistoryListener() {
+    key: '_setupHistoryListeners',
+    value: function _setupHistoryListeners() {
       var self = this;
       this.toolbar.on("click", ".history-point", function (event) {
         event.preventDefault();
-        self.render((0, _jquery2.default)(event.target).data('uuid'));
+        self.render((0, _jquery2.default)(this).data('uuid'));
+      });
+      this.toolbar.on("click", ".back-to-current-request", function (event) {
+        event.preventDefault();
+        self.render();
       });
     }
   }]);
@@ -21273,11 +21277,11 @@ window.$ = _$;
 exports.default = _jquery2.default;
 });
 
-require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
 require.alias("jquery/dist/jquery.js", "jquery");
+require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
 require.alias("process/browser.js", "process");
-require.alias("prismjs/prism.js", "prismjs");
 require.alias("phoenix/priv/static/phoenix.js", "phoenix");
+require.alias("prismjs/prism.js", "prismjs");
 require.alias("xterm/lib/xterm.js", "xterm");process = require('process');require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');

@@ -151,10 +151,18 @@
   // Historic flag
   .historic-flag {
     display: none;
+    a {
+      font-weight: bold;
+      color: black;
+      font-size: 0.85em;
+    }
   }
   .historic-request {
     .historic-flag {
       display: block;
     }
+  }
+  .history-point {
+    cursor: pointer;
   }
 }

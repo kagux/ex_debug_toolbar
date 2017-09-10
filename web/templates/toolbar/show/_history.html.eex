@@ -10,17 +10,13 @@
     <table class="table table-hover table-condensed">
       <caption>List of historical requests</caption>
       <thead>
-        <th> UUID </th>
         <th> Path </th>
         <th> Method </th>
         <th> Time </th>
       </thead>
       <tbody>
         <%= for entry <- @history do %>
-          <tr>
-            <td class="nowrap">
-              <a href="#" class="history-point" data-uuid="<%= entry.uuid %>"><%= entry.uuid %></a>
-            </td>
+          <tr class="history-point" data-uuid="<%= entry.uuid %>">
             <td class="nowrap"><%= entry.conn.request_path %></td>
             <td class="nowrap"><%= entry.conn.method %></td>
             <td class="nowrap"><%= entry.created_at %></td>

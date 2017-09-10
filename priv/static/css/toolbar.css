@@ -6703,8 +6703,14 @@
     height: 200px; }
   #ex-debug-toolbar .historic-flag {
     display: none; }
+    #ex-debug-toolbar .historic-flag a, #ex-debug-toolbar .historic-flag .navbar-nav.nav > li > span {
+      font-weight: bold;
+      color: black;
+      font-size: 0.85em; }
   #ex-debug-toolbar .historic-request .historic-flag {
     display: block; }
+  #ex-debug-toolbar .history-point {
+    cursor: pointer; }
 
 
 /*# sourceMappingURL=toolbar.css.map*/
