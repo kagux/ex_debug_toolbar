@@ -35,8 +35,6 @@ defmodule ExDebugToolbar.ToolbarView do
       status <= 199 -> "label-info"
       status <= 299 -> "label-success"
       status <= 399 -> "label-info"
-      status <= 499 -> "label-danger"
-      status <= 599 -> "label-danger"
       true -> "label-danger"
     end
   end
