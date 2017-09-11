@@ -30,6 +30,17 @@ defmodule ExDebugToolbar.ToolbarView do
     end
   end
 
+  def conn_status_color_class(%{status: status}) do
+    cond do
+      status <= 199 -> "label-info"
+      status <= 299 -> "label-success"
+      status <= 399 -> "label-info"
+      status <= 499 -> "label-danger"
+      status <= 599 -> "label-danger"
+      true -> "label-danger"
+    end
+  end
+
   def log_timestamp_to_string({date, {h, m, s, _ms}}) do
     {date, {h, m, s}} |> NaiveDateTime.from_erl! |> to_string
   end
