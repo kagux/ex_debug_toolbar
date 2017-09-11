@@ -34,7 +34,7 @@ defmodule ExDebugToolbar.ToolbarChannel do
   end
 
   defp build_payload(request) do
-    breakpoints = ExDebugToolbar.get_all_breakpoints
+    breakpoints = ExDebugToolbar.get_breakpoints(request.pid)
     %{
       html: View.render_to_string(ToolbarView, "show.html", request: request, breakpoints: breakpoints, history: history()),
       request: request

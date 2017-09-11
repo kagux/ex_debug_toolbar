@@ -47,6 +47,10 @@ defmodule ExDebugToolbar.Database.BreakpointRepo do
     |> Enum.map(fn {breakpoint, _} -> breakpoint end)
   end
 
+  def find_by_pid(pid) do
+    __MODULE__.all |> Enum.filter(&(&1.pid == pid))
+  end
+
   def purge do
     Agent.update(__MODULE__, fn _ -> %State{} end)
   end

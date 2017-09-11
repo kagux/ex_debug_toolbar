@@ -30,6 +30,14 @@ defmodule ExDebugToolbar.Database.BreakpointRepoTest do
     assert BreakpointRepo.all == [other_bp, @breakpoint] 
   end
 
+  test "find_by_pid/1 returns breakpoints for a given pid" do
+    other_bp = %Breakpoint{id: "bp_other", pid: self()}
+    :ok = BreakpointRepo.insert @breakpoint
+    :ok = BreakpointRepo.insert other_bp
+
+    assert BreakpointRepo.find_by_pid(self()) == [other_bp]
+  end
+
   test "purge/0 removes all breakpoints" do
     :ok = BreakpointRepo.insert @breakpoint
     :ok = BreakpointRepo.purge()

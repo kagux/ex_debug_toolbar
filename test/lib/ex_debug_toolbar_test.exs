@@ -36,7 +36,7 @@ defmodule ExDebugToolbarTest do
       # line 3
       # line 4
       
-      breakpoints = ExDebugToolbar.get_all_breakpoints()
+      breakpoints = ExDebugToolbar.get_breakpoints(self())
       assert breakpoints |> length == 1
       breakpoint = breakpoints |> hd
       assert breakpoint.pid == self()

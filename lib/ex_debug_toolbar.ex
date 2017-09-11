@@ -160,12 +160,12 @@ defmodule ExDebugToolbar do
 
 
   @doc """
-  Returns all available breakpoints
+  Returns all available breakpoints for a given PID
   """
-  @spec get_all_breakpoints() :: [Breakpoint.t()]
+  @spec get_breakpoints(pid()) :: [Breakpoint.t()]
   @decorate noop_when_toolbar_disabled([])
-  def get_all_breakpoints do
-    BreakpointRepo.all
+  def get_breakpoints(pid) do
+    BreakpointRepo.find_by_pid(pid)
   end
 
   @doc """

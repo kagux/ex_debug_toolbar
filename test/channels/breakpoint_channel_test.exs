@@ -6,7 +6,7 @@ defmodule ExDebugToolbar.BreakpointChannelTest do
 
   test "joining and interacting with breakpoint" do
     ExDebugToolbar.pry
-    breakpoint = ExDebugToolbar.get_all_breakpoints() |> hd
+    breakpoint = ExDebugToolbar.get_breakpoints(self()) |> hd
     topic = "breakpoint:" <> breakpoint.id
 
     # initial output
