@@ -10,19 +10,21 @@
     <table class="table table-hover table-condensed">
       <caption>List of historical requests</caption>
       <thead>
-        <th> Path </th>
         <th> Method </th>
+        <th> Path </th>
+        <th> Controller </th>
         <th> Response Code </th>
         <th> Duration </th>
         <th> Timestamp </th>
       </thead>
       <tbody>
         <%= for entry <- @history do %>
-          <tr class="history-point" data-uuid="<%= entry.uuid %>">
-            <td class="nowrap"><%= entry.conn.request_path %></td>
+          <tr class="<%= conn_status_color_row(entry.conn) %> history-point" data-uuid="<%= entry.uuid %>">
             <td class="nowrap"><%= entry.conn.method %></td>
+            <td class="nowrap"><%= entry.conn.request_path %></td>
+            <td class="nowrap"><%= controller_action(entry.conn) %></td>
             <td class="nowrap">
-              <span class="label <%= conn_status_color_class(entry.conn) %>"><%= entry.conn.status %></span>
+              <span class="label label-<%= conn_status_color_class(entry.conn) %>"><%= entry.conn.status %></span>
             </td>
             <td class="nowrap"><%= native_time_to_string(entry.timeline.duration) %></td>
             <td class="nowrap"><%= entry.created_at %></td>

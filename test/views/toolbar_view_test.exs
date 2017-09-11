@@ -113,10 +113,18 @@ defmodule ExDebugToolbar.ToolbarViewTest do
 
   describe "#conn_status_color_class/1" do
     test "it converts conn status to color label" do
-      assert ToolbarView.conn_status_color_class(%Conn{status: 101}) == "label-info"
-      assert ToolbarView.conn_status_color_class(%Conn{status: 200}) == "label-success"
-      assert ToolbarView.conn_status_color_class(%Conn{status: 500}) == "label-danger"
-      assert ToolbarView.conn_status_color_class(%Conn{status: nil}) == "label-danger"
+      assert ToolbarView.conn_status_color_class(%Conn{status: 101}) == "info"
+      assert ToolbarView.conn_status_color_class(%Conn{status: 200}) == "success"
+      assert ToolbarView.conn_status_color_class(%Conn{status: 500}) == "danger"
+      assert ToolbarView.conn_status_color_class(%Conn{status: nil}) == "danger"
+    end
+  end
+
+  describe "#conn_status_color_row/1" do
+    test "it converts conn status to color row" do
+      assert ToolbarView.conn_status_color_row(%Conn{status: 200}) == nil
+      assert ToolbarView.conn_status_color_row(%Conn{status: 101}) == "info"
+      assert ToolbarView.conn_status_color_row(%Conn{status: nil}) == "danger"
     end
   end
 
