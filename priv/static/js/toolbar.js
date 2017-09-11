@@ -20935,7 +20935,7 @@ var App = function () {
     this.socket = this.initSocket();
     this.toolbar = (0, _jquery2.default)("<div>", { id: "ex-debug-toolbar" });
     (0, _jquery2.default)("body").append(this.toolbar);
-    this._setupHistoryListeners(this.toolbar);
+    this.setupHistoryListeners(this.toolbar);
   }
 
   _createClass(App, [{
@@ -21063,8 +21063,8 @@ var App = function () {
       (0, _jquery2.default)(toolbar).find('[data-toggle="popover"]').popover();
     }
   }, {
-    key: '_setupHistoryListeners',
-    value: function _setupHistoryListeners() {
+    key: 'setupHistoryListeners',
+    value: function setupHistoryListeners() {
       var self = this;
       this.toolbar.on("click", ".history-point", function (event) {
         event.preventDefault();
@@ -21280,8 +21280,8 @@ exports.default = _jquery2.default;
 require.alias("jquery/dist/jquery.js", "jquery");
 require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
 require.alias("process/browser.js", "process");
-require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("prismjs/prism.js", "prismjs");
+require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("xterm/lib/xterm.js", "xterm");process = require('process');require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');
