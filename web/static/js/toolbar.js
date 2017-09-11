@@ -11,13 +11,20 @@ import 'prismjs/plugins/line-highlight/prism-line-highlight';
 class App {
   constructor(opts) {
     this.opts = opts;
+    this.originalRequestId = opts.requestId;
     this.resetActivePanel();
+    this.socket = this.initSocket();
+    this.toolbar = $("<div>", {id: "ex-debug-toolbar"});
+    $("body").append(this.toolbar);
+    this.setupHistoryListeners(this.toolbar);
   }
 
-  render() {
-    const socket = this.initSocket();
-    this.joinToolbarChannel(socket);
-    this.breakpointsPanel = new BreakpointsPanel(socket);
+  render(requestId) {
+    if (requestId === undefined) {
+      requestId = this.originalRequestId;
+    }
+    this.joinToolbarChannel(this.socket, requestId);
+    this.breakpointsPanel = new BreakpointsPanel(this.socket, this.toolbar);
   }
 
   initSocket() {
@@ -26,8 +33,8 @@ class App {
     return socket;
   }
 
-  joinToolbarChannel(socket) {
-    const channel = socket.channel(`toolbar:request:${this.opts.requestId}`)
+  joinToolbarChannel(socket, requestId) {
+    const channel = socket.channel(`toolbar:request:${requestId}`)
     channel
     .join()
     .receive("ok", this.onChannelResponse.bind(this))
@@ -48,13 +55,16 @@ class App {
   }
 
   renderToolbar({html: html, request: request}){
-    // console.log("Request: ", request);
-    const toolbar = $(`<div id="ex-debug-toolbar"><div>${html}</div></div>`);
-    toolbar.appendTo('body');
-    this.renderPanels(toolbar);
-    this.renderPopovers(toolbar);
+    //console.log("Request: ", request);
+    const content = $('<div>').html(html);
+    if (this.originalRequestId != request.uuid) {
+      content.addClass("historic-request");
+    }
+    this.toolbar.html(content);
+    this.renderPanels(this.toolbar);
+    this.renderPopovers(this.toolbar);
     this.breakpointsPanel.render();
-    this.highlightCode(toolbar);
+    this.highlightCode(this.toolbar);
   }
 
   renderPanels(toolbar) {
@@ -122,6 +132,18 @@ class App {
   renderPopovers(toolbar) {
     $(toolbar).find('[data-toggle="popover"]').popover();
   }
-}
 
+  setupHistoryListeners() {
+    var self = this;
+    this.toolbar.on("click", ".history-point", function(event) { 
+      event.preventDefault();
+      self.render($(this).data('uuid'));
+    })
+    this.toolbar.on("click", ".back-to-current-request", function(event) {
+      event.preventDefault();
+      self.render();
+    })
+  }
+
+}
 (new App({requestId: window.requestId})).render();

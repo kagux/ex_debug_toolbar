@@ -147,4 +147,23 @@
   #breakpoint .panel-body {
     height: $panel-max-height;
   }
+
+  // Historic flag
+  .historic-flag {
+    display: none;
+
+    .back-to-current-request {
+      font-weight: bold;
+      color: black;
+      font-size: 0.85em;
+    }
+  }
+  .historic-request {
+    .historic-flag {
+      display: block;
+    }
+  }
+  .history-point {
+    cursor: pointer;
+  }
 }

@@ -20,7 +20,13 @@
         <%= unless Enum.empty? @breakpoints do %>
           <li> <%= render "show/_breakpoints.html", request: @request, breakpoints: @breakpoints %> </li>
         <% end %>
+        <%= unless Enum.empty? @history do %>
+          <li> <%= render "show/_history.html", request: @request, history: @history %> </li>
+        <% end %>
       </ul>
+      <div class="navbar-right navbar-header historic-flag">
+        <a class="navbar-brand back-to-current-request text-warning" href="#">Back to Current Request</a>
+      </div>
     </div>
   </div>
 </nav>
