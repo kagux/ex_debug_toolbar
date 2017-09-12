@@ -165,5 +165,10 @@
   }
   .history-point {
     cursor: pointer;
+
+    &.active {
+      cursor: default;
+      background: red;
+    }
   }
 }

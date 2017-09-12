@@ -6711,6 +6711,9 @@
     display: block; }
   #ex-debug-toolbar .history-point {
     cursor: pointer; }
+    #ex-debug-toolbar .history-point.active {
+      cursor: default;
+      background: red; }
 
 
 /*# sourceMappingURL=toolbar.css.map*/
