@@ -19,7 +19,7 @@
       </thead>
       <tbody>
         <%= for entry <- @history do %>
-          <tr class="<%= conn_status_color_row(entry.conn) %> history-point" data-uuid="<%= entry.uuid %>">
+          <tr class="<%= history_row_color(entry.conn) %> history-point" data-uuid="<%= entry.uuid %>">
             <td class="nowrap"><%= entry.conn.method %></td>
             <td class="nowrap"><%= entry.conn.request_path %></td>
             <td class="nowrap"><%= controller_action(entry.conn) %></td>

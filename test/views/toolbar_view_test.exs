@@ -120,11 +120,11 @@ defmodule ExDebugToolbar.ToolbarViewTest do
     end
   end
 
-  describe "#conn_status_color_row/1" do
-    test "it converts conn status to color row" do
-      assert ToolbarView.conn_status_color_row(%Conn{status: 200}) == nil
-      assert ToolbarView.conn_status_color_row(%Conn{status: 101}) == "info"
-      assert ToolbarView.conn_status_color_row(%Conn{status: nil}) == "danger"
+  describe "#history_row_color/1" do
+    test "it sets color according to connection status" do
+      assert ToolbarView.history_row_color(%Conn{status: 200}) == nil
+      assert ToolbarView.history_row_color(%Conn{status: 101}) == "info"
+      assert ToolbarView.history_row_color(%Conn{status: nil}) == "danger"
     end
   end
 

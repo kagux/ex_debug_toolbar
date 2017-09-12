@@ -39,7 +39,7 @@ defmodule ExDebugToolbar.ToolbarView do
     end
   end
 
-  def conn_status_color_row(conn) do
+  def history_row_color(conn) do
     case conn_status_color_class(conn) do
       "success" -> nil
       color -> color
