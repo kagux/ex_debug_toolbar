@@ -156,11 +156,16 @@
       font-weight: bold;
       color: black;
       font-size: 0.85em;
+      text-decoration: underline;
     }
   }
   .historic-request {
     .historic-flag {
       display: block;
+    }
+
+    .navbar {
+      background-color: #ececdb;
     }
   }
   .history-point {
@@ -171,8 +176,4 @@
     }
   }
 
-}
-
-#edt-notification img{
-  height: 25px;
 }

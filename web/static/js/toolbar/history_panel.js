@@ -1,5 +1,3 @@
-import Notification from './notification';
-
 class HistoryPanel {
   constructor(toolbar, requestId, callback) {
     this.toolbar = toolbar;
@@ -15,12 +13,10 @@ class HistoryPanel {
     this.toolbar.on("click", ".history-point:not(.active)", function(event) {
       event.preventDefault();
       callback($(this).data('uuid'));
-      Notification.send('success', "You're viewing historical request now");
     })
     this.toolbar.on("click", ".back-to-current-request", function(event) {
       event.preventDefault();
       callback(requestId);
-      Notification.send('success', "Back to original request");
     })
   }
 }
