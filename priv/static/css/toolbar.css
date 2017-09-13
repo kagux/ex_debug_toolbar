@@ -6712,8 +6712,10 @@
   #ex-debug-toolbar .history-point {
     cursor: pointer; }
     #ex-debug-toolbar .history-point.active {
-      cursor: default;
-      background: red; }
+      cursor: default; }
+
+#edt-notification img {
+  height: 25px; }
 
 
 /*# sourceMappingURL=toolbar.css.map*/

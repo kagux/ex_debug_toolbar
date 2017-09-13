@@ -15,6 +15,7 @@ window.$ = $;
 
 // 4. import bootstrap that adds plugins to global jQuery
 require('bootstrap-sass');
+require('bootstrap-notify');
 
 // 5. make stashed jQuery global again
 window.jQuery = _jQuery;

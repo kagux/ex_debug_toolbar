@@ -168,7 +168,11 @@
 
     &.active {
       cursor: default;
-      background: red;
     }
   }
+
+}
+
+#edt-notification img{
+  height: 25px;
 }
