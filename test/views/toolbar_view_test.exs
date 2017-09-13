@@ -128,6 +128,43 @@ defmodule ExDebugToolbar.ToolbarViewTest do
     end
   end
 
+  describe "#collapse_history/1" do
+    @conn %Conn{status: 200, method: "get", private: %{phoenix_controller: "users", phoenix_action: "index"}}
+    @request %Request{conn: @conn}
+
+    test "groups similar consequent requests by status" do
+      other_request = %{@request | conn: %{@conn | status: 404}}
+      history = [@request, @request, other_request, other_request]
+      collapsed_history = [[@request, @request], [other_request, other_request]]
+
+      assert ToolbarView.collapse_history(history) == collapsed_history
+    end
+
+    test "groups similar consequent requests by method" do
+      other_request = %{@request | conn: %{@conn | method: "post"}}
+      history = [@request, @request, other_request, other_request]
+      collapsed_history = [[@request, @request], [other_request, other_request]]
+
+      assert ToolbarView.collapse_history(history) == collapsed_history
+    end
+
+    test "groups similar consequent requests by controller" do
+      other_request = %{@request | conn: %{@conn | private: %{phoenix_controller: "sessions", phoenix_action: "index"}}}
+      history = [@request, @request, other_request, other_request]
+      collapsed_history = [[@request, @request], [other_request, other_request]]
+
+      assert ToolbarView.collapse_history(history) == collapsed_history
+    end
+
+    test "groups similar consequent requests by action" do
+      other_request = %{@request | conn: %{@conn | private: %{phoenix_controller: "users", phoenix_action: "create"}}}
+      history = [@request, @request, other_request, other_request]
+      collapsed_history = [[@request, @request], [other_request, other_request]]
+
+      assert ToolbarView.collapse_history(history) == collapsed_history
+    end
+  end
+
   defp render(request, opts \\ []) do
     assigns = [
       request: request,

@@ -158,6 +158,26 @@ defmodule ExDebugToolbar.ToolbarView do
   def breakpoint_color_class(%Breakpoint{pid: pid}, %Request{pid: pid}), do: "bg-success"
   def breakpoint_color_class(_, _), do: ""
 
+  def collapse_history(requests) do
+    {group, acc} = requests |> Enum.reduce({[], []}, fn
+      request, {[],[]} ->
+        {[request], []}
+      %{conn: %{status: s, method: m}} = req, {[%{conn: %{status: ss, method: mm}} | _] = group, acc}
+      when s != ss or m != mm ->
+        {[req], [group | acc]}
+      %{conn: %{private: %{phoenix_controller: c}}} = request, {[%{conn: %{private: %{phoenix_controller: cc}}} | _] = group, acc}
+      when c != cc ->
+        {[request], [group | acc]}
+      %{conn: %{private: %{phoenix_action: a}}} = request, {[%{conn: %{private: %{phoenix_action: aa}}} | _] = group, acc}
+      when a != aa ->
+        {[request], [group | acc]}
+      request, {group, acc} ->
+        {[request | group], acc}
+    end)
+
+    [group | acc] |> Enum.reverse |> Enum.map(&Enum.reverse/1)
+  end
+
   defp get_controller(%Plug.Conn{private: private}) do
     private.phoenix_controller |> to_string |> String.trim_leading("Elixir.")
   end
