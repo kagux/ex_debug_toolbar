@@ -165,20 +165,21 @@ defmodule ExDebugToolbar.ToolbarView do
      |> Enum.reduce({[], []}, fn
       request, {[],[]} ->
         {[request], []}
-      %{conn: %{status: s, method: m}} = req, {[%{conn: %{status: ss, method: mm}} | _] = group, acc}
-      when s != ss or m != mm ->
-        {[req], [group | acc]}
-      %{conn: %{private: %{phoenix_controller: c}}} = request, {[%{conn: %{private: %{phoenix_controller: cc}}} | _] = group, acc}
-      when c != cc ->
-        {[request], [group | acc]}
-      %{conn: %{private: %{phoenix_action: a}}} = request, {[%{conn: %{private: %{phoenix_action: aa}}} | _] = group, acc}
-      when a != aa ->
-        {[request], [group | acc]}
-      request, {group, acc} ->
-        {[request | group], acc}
+      request, {[prev_request | _] = group, acc} ->
+        if similar_request?(request, prev_request) do
+          {[request | group], acc}
+        else
+          {[request], [group | acc]}
+        end
     end)
 
     [group | acc] |> Enum.reverse |> Enum.map(&Enum.reverse/1)
+  end
+
+  defp similar_request?(%{conn: conn}, %{conn: prev_conn}) do
+    conn.status == prev_conn.status and
+    conn.method == prev_conn.method and
+    controller_action(conn) == controller_action(prev_conn)
   end
 
   def history_row_collapse_class(0), do: "last-request"

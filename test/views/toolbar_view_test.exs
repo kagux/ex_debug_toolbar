@@ -184,7 +184,7 @@ defmodule ExDebugToolbar.ToolbarViewTest do
   end
 
   defp to_uuid(requests) when is_list(requests) do
-    requests |> List.flatten |> Enum.map(&to_uuid/1)
+    requests |> Enum.map(&to_uuid/1)
   end
   defp to_uuid(%Request{uuid: uuid}), do: uuid
 
