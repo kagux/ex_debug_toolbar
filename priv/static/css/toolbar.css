@@ -6716,6 +6716,10 @@
     cursor: pointer; }
     #ex-debug-toolbar .history-point.active {
       cursor: default; }
+    #ex-debug-toolbar .history-point.prev-request {
+      display: none; }
+    #ex-debug-toolbar .history-point .history-collapse {
+      display: none; }
 
 
 /*# sourceMappingURL=toolbar.css.map*/

@@ -4,6 +4,7 @@ defmodule ExDebugToolbar.ToolbarView do
   use ExDebugToolbar.Web, :view
   alias ExDebugToolbar.Data.Timeline
   alias ExDebugToolbar.{Breakpoint, Request}
+  alias Plug.Conn
 
   @millisecond System.convert_time_unit(1, :millisecond, :native)
 
@@ -59,12 +60,12 @@ defmodule ExDebugToolbar.ToolbarView do
     end
   end
 
-  def controller_action(%Plug.Conn{} = conn) do
+  def controller_action(%Conn{} = conn) do
     conn = conn_with_defaults(conn)
     "#{get_controller(conn)} :: #{conn.private.phoenix_action}"
   end
 
-  def conn_details(%Plug.Conn{} = conn) do
+  def conn_details(%Conn{} = conn) do
     conn = conn_with_defaults(conn)
     {layout_view, layout_template} = case conn.assigns.layout do
       false -> @default_conn.assigns.layout
@@ -159,7 +160,9 @@ defmodule ExDebugToolbar.ToolbarView do
   def breakpoint_color_class(_, _), do: ""
 
   def collapse_history(requests) do
-    {group, acc} = requests |> Enum.reduce({[], []}, fn
+    {group, acc} = requests
+     |> Enum.map(&conn_with_defaults/1)
+     |> Enum.reduce({[], []}, fn
       request, {[],[]} ->
         {[request], []}
       %{conn: %{status: s, method: m}} = req, {[%{conn: %{status: ss, method: mm}} | _] = group, acc}
@@ -178,11 +181,17 @@ defmodule ExDebugToolbar.ToolbarView do
     [group | acc] |> Enum.reverse |> Enum.map(&Enum.reverse/1)
   end
 
-  defp get_controller(%Plug.Conn{private: private}) do
+  def history_row_collapse_class(0), do: "last-request"
+  def history_row_collapse_class(_), do: "prev-request"
+
+  defp get_controller(%Conn{private: private}) do
     private.phoenix_controller |> to_string |> String.trim_leading("Elixir.")
   end
 
-  defp conn_with_defaults(conn) do
+  defp conn_with_defaults(%Request{} = request) do
+    Map.update!(request, :conn, &conn_with_defaults/1)
+  end
+  defp conn_with_defaults(%Conn{} = conn) do
     ~w(assigns private)a
     |> Enum.reduce(conn, fn key, conn ->
       defaults = Map.get(@default_conn, key)

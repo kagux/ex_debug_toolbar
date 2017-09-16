@@ -21077,6 +21077,12 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _jquery = require('./jquery');
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var HistoryPanel = function () {
@@ -21097,12 +21103,21 @@ var HistoryPanel = function () {
     key: 'addEventListeners',
     value: function addEventListeners(callback, requestId) {
       this.toolbar.on("click", ".history-point:not(.active)", function (event) {
+        console.log('history click');
         event.preventDefault();
-        callback($(this).data('uuid'));
+        callback((0, _jquery2.default)(this).data('uuid'));
       });
       this.toolbar.on("click", ".back-to-current-request", function (event) {
         event.preventDefault();
         callback(requestId);
+      });
+      this.toolbar.on("click", ".history-expand, .history-collapse", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var tr = (0, _jquery2.default)(this).closest('tr');
+        tr.nextUntil('.last-request').fadeToggle();
+        tr.find('.history-expand').toggle();
+        tr.find('.history-collapse').toggle();
       });
     }
   }]);
@@ -21152,8 +21167,8 @@ exports.default = _jquery2.default;
 require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
 require.alias("jquery/dist/jquery.js", "jquery");
 require.alias("process/browser.js", "process");
-require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("prismjs/prism.js", "prismjs");
+require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("xterm/lib/xterm.js", "xterm");process = require('process');require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');
