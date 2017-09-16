@@ -3,14 +3,17 @@ defmodule ExDebugToolbar.BreakpointChannel do
 
   use ExDebugToolbar.Web, :channel
   alias ExDebugToolbar.Breakpoint
+  alias ExDebugToolbar.Data.Breakpoints
 
-  def join("breakpoint:" <> id, _payload, socket) do
-    case ExDebugToolbar.get_breakpoint(id) do
-      {:ok, _} ->
-        {:ok, iex} = Breakpoint.start_iex(id, self())
-        {:ok, assign(socket, :iex, iex)}
-      {:error, reason} ->
-        {:error, %{reason: reason}}
+  def join("breakpoint:" <> _id, payload, socket) do
+    with request_id <- payload["request_id"],
+         breakpoint_id <- payload["breakpoint_id"],
+         {:ok, _} <- ExDebugToolbar.get_breakpoint(request_id, breakpoint_id),
+         {:ok, iex} <- Breakpoint.start_iex(request_id, breakpoint_id, self())
+    do
+      {:ok, assign(socket, :iex, iex)}
+    else
+      {:error, reason} -> {:error, %{reason: reason}}
     end
   end
 

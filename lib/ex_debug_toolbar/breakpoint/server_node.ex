@@ -21,8 +21,8 @@ defmodule ExDebugToolbar.Breakpoint.ServerNode do
     :"#{@server}@#{hostname}"
   end
 
-  def get_breakpoint(breakpoint_id) do
-    case :rpc.call(get_name(), ExDebugToolbar, :get_breakpoint, [breakpoint_id]) do
+  def get_breakpoint(request_id, breakpoint_id) do
+    case :rpc.call(get_name(), ExDebugToolbar, :get_breakpoint, [request_id, breakpoint_id]) do
       {:ok, breakpoint} -> breakpoint
       _ -> :error
     end

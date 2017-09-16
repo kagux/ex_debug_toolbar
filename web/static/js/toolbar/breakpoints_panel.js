@@ -9,7 +9,8 @@ class BreakpointsPanel {
     this.toolbar = toolbar;
   }
 
-  render() {
+  render(request_id) {
+    this.request_id = request_id
     this.appendModalToBody();
     this.renderModal();
     this.renderCodeSnippets();
@@ -50,7 +51,7 @@ class BreakpointsPanel {
   }
 
   showModal({target: target}) {
-    this.breakpoint_id = $(target).closest('tr').attr('id');
+    this.breakpoint_id = $(target).closest('tr').data('breakpoint-id');
     $('#breakpoints-modal').modal();
   }
 
@@ -95,8 +96,8 @@ class BreakpointsPanel {
   }
 
   joinBreakpointChannel(socket) {
-    const topic = "breakpoint:" + this.breakpoint_id;
-    const channel = socket.channel(topic, {});
+    const topic = "breakpoint:" + this.request_id + this.breakpoint_id;
+    const channel = socket.channel(topic, {request_id: this.request_id, breakpoint_id: this.breakpoint_id});
     channel.join();
     channel.on('output', ({output}) => this.term.write(output));
 

@@ -4,6 +4,9 @@ defmodule Mix.Tasks.Breakpoint.Client do
   use Mix.Task
 
    def run(args) do
-     args |> hd |> ExDebugToolbar.Breakpoint.ClientNode.run
+     {options, _, _} = OptionParser.parse(args, switches: [request_id: :string, breakpoint_id: :string])
+     request_id = Keyword.fetch!(options, :request_id)
+     breakpoint_id = Keyword.fetch!(options, :breakpoint_id)
+     ExDebugToolbar.Breakpoint.ClientNode.run(request_id, breakpoint_id)
    end
 end

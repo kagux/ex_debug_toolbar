@@ -4,10 +4,10 @@ defmodule ExDebugToolbar.Breakpoint.ClientNode do
   alias ExDebugToolbar.Breakpoint.ServerNode
   alias ExDebugToolbar.Breakpoint
 
-  def run(breakpoint_id) do
+  def run(request_id, breakpoint_id) do
     set_cookie()
     true = ServerNode.get_name() |> Node.connect
-    %Breakpoint{binding: binding, env: env} = ServerNode.get_breakpoint(breakpoint_id)
+    %Breakpoint{binding: binding, env: env} = ServerNode.get_breakpoint(request_id, breakpoint_id)
     if old_iex_version?() do
       apply(IEx, :pry, [binding, env, 5000])
     else

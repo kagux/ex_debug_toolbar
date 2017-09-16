@@ -1,6 +1,5 @@
 defmodule ExDebugToolbar.ToolbarChannelTest do
-  use ExDebugToolbar.CollectorCase, async: true
-  use ExDebugToolbar.ChannelCase
+  use ExDebugToolbar.ChannelCase, async: true
   alias ExDebugToolbar.ToolbarChannel
 
   setup :start_request

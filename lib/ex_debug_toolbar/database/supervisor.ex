@@ -11,7 +11,6 @@ defmodule ExDebugToolbar.Database.Supervisor do
     children = [
       worker(ExDebugToolbar.Database, []),
       worker(ExDebugToolbar.Database.RequestRepo, []),
-      worker(ExDebugToolbar.Database.BreakpointRepo, []),
     ]
 
     supervise(children, strategy: :one_for_one)

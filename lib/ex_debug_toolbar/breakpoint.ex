@@ -14,7 +14,7 @@ defmodule ExDebugToolbar.Breakpoint do
     :inserted_at
   ]
 
-  defdelegate start_iex(breakpoint_id, output_pid), to: Server, as: :start_link
+  defdelegate start_iex(request_id, breakpoint_id, output_pid), to: Server, as: :start_link
   defdelegate send_input_to_iex(pid, input), to: Server, as: :send_input
   defdelegate stop_iex(pid), to: Server, as: :stop
   defdelegate code_snippet(env), to: Pry

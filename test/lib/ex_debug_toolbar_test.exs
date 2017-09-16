@@ -28,6 +28,8 @@ defmodule ExDebugToolbarTest do
   end
 
   describe "pry/0" do
+    setup :start_request
+
     test "adds new breakpoint" do
       bound_var = :bound_var
       # line 1
@@ -35,23 +37,23 @@ defmodule ExDebugToolbarTest do
       ExDebugToolbar.pry
       # line 3
       # line 4
-      
-      breakpoints = ExDebugToolbar.get_breakpoints(self())
+
+      {:ok, request} = get_request()
+      breakpoints = request.breakpoints.collection
+
       assert breakpoints |> length == 1
       breakpoint = breakpoints |> hd
       assert breakpoint.pid == self()
       assert breakpoint.file =~ "test/lib/ex_debug_toolbar_test.exs"
-      assert breakpoint.line == 35
+      assert breakpoint.line == 37
       assert breakpoint.binding[:bound_var] == :bound_var
       assert breakpoint.code_snippet == [
-        {"      # line 1\n", 33},
-        {"      # line 2\n", 34},
-        {"      ExDebugToolbar.pry\n", 35},
-        {"      # line 3\n", 36},
-        {"      # line 4\n", 37}
+        {"      # line 1\n", 35},
+        {"      # line 2\n", 36},
+        {"      ExDebugToolbar.pry\n", 37},
+        {"      # line 3\n", 38},
+        {"      # line 4\n", 39}
       ]
-
-      ExDebugToolbar.Database.BreakpointRepo.purge()
     end
   end
 end
