@@ -134,32 +134,32 @@ defmodule ExDebugToolbar.ToolbarViewTest do
 
     test "groups similar consequent requests by status" do
       other_request = %{@request | conn: %{@conn | status: 404}}
-      history = [@request, @request, other_request, other_request]
-      collapsed_history = [[@request, @request], [other_request, other_request]] |> to_uuid
+      history = [@request, other_request, other_request, @request]
+      collapsed_history = [[@request], [other_request, other_request], [@request]] |> to_uuid
 
       assert history |> ToolbarView.collapse_history |> to_uuid == collapsed_history
     end
 
     test "groups similar consequent requests by method" do
       other_request = %{@request | conn: %{@conn | method: "post"}}
-      history = [@request, @request, other_request, other_request]
-      collapsed_history = [[@request, @request], [other_request, other_request]] |> to_uuid
+      history = [@request, other_request, other_request, @request]
+      collapsed_history = [[@request], [other_request, other_request], [@request]] |> to_uuid
 
       assert history |> ToolbarView.collapse_history |> to_uuid == collapsed_history
     end
 
     test "groups similar consequent requests by controller" do
       other_request = %{@request | conn: %{@conn | private: %{phoenix_controller: "sessions", phoenix_action: "index"}}}
-      history = [@request, @request, other_request, other_request]
-      collapsed_history = [[@request, @request], [other_request, other_request]] |> to_uuid
+      history = [@request, other_request, other_request, @request]
+      collapsed_history = [[@request], [other_request, other_request], [@request]] |> to_uuid
 
       assert history |> ToolbarView.collapse_history |> to_uuid == collapsed_history
     end
 
     test "groups similar consequent requests by action" do
       other_request = %{@request | conn: %{@conn | private: %{phoenix_controller: "users", phoenix_action: "create"}}}
-      history = [@request, @request, other_request, other_request]
-      collapsed_history = [[@request, @request], [other_request, other_request]] |> to_uuid
+      history = [@request, other_request, other_request, @request]
+      collapsed_history = [[@request], [other_request, other_request], [@request]] |> to_uuid
 
       assert history |> ToolbarView.collapse_history |> to_uuid == collapsed_history
     end
