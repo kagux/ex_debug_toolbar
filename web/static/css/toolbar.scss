@@ -156,14 +156,32 @@
       font-weight: bold;
       color: black;
       font-size: 0.85em;
+      text-decoration: underline;
     }
   }
   .historic-request {
     .historic-flag {
       display: block;
     }
+
+    .navbar {
+      background-color: #ececdb;
+    }
   }
   .history-point {
     cursor: pointer;
+
+    &.active {
+      cursor: default;
+    }
+
+    &.prev-request {
+      display: none;
+    }
+
+    .history-collapse {
+      display: none;
+    }
   }
+
 }
