@@ -43,7 +43,7 @@ class BreakpointsPanel {
   renderBindingPopover() {
     $('[data-toggle="binding"]').popover({
       container: 'body',
-      content: () => $('#'+this.breakpoint_id + ' .binding-popover').html(),
+      content: () => $('*[data-breakpoint-id="' + this.breakpoint_id +'"] .binding-popover').html(),
         html: true,
       trigger: 'hover',
       title: 'Binding'

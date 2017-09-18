@@ -21144,7 +21144,7 @@ var BreakpointsPanel = function () {
       (0, _jquery2.default)('[data-toggle="binding"]').popover({
         container: 'body',
         content: function content() {
-          return (0, _jquery2.default)('#' + _this.breakpoint_id + ' .binding-popover').html();
+          return (0, _jquery2.default)('*[data-breakpoint-id="' + _this.breakpoint_id + '"] .binding-popover').html();
         },
         html: true,
         trigger: 'hover',
@@ -21329,8 +21329,8 @@ exports.default = _jquery2.default;
 require.alias("jquery/dist/jquery.js", "jquery");
 require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
 require.alias("process/browser.js", "process");
-require.alias("prismjs/prism.js", "prismjs");
 require.alias("phoenix/priv/static/phoenix.js", "phoenix");
+require.alias("prismjs/prism.js", "prismjs");
 require.alias("xterm/lib/xterm.js", "xterm");process = require('process');require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');
