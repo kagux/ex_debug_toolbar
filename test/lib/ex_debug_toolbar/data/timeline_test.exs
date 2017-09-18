@@ -22,7 +22,7 @@ defmodule ExDebugToolbar.Data.TimelineTest do
       timeline = %Timeline{}
       |> Timeline.start_event("A")
       |> Timeline.finish_event("A", duration: 1000)
-      
+
       assert %{duration: 1000} = timeline.events |> hd
       assert timeline.duration == 1000
     end
@@ -31,7 +31,7 @@ defmodule ExDebugToolbar.Data.TimelineTest do
       timeline = %Timeline{}
       |> Timeline.start_event("A", timestamp: 1000)
       |> Timeline.finish_event("A", timestamp: 1050)
-      
+
       assert %{duration: 50} = timeline.events |> hd
       assert timeline.duration == 50
     end
