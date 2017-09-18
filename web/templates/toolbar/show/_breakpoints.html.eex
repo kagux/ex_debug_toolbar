@@ -1,6 +1,6 @@
 <span class="toolbar-item" data-toggle="panel" data-title="Breakpoints">
   <i class="glyphicon glyphicon-list" aria-hidden="true"></i>
-  <%= Enum.count(@breakpoints.collection) %>
+  <%= Enum.count(@breakpoints.entries) %>
 </span>
 <div id="breakpoint" class="panel panel-default navbar-fixed-bottom">
   <div class="panel-heading">
@@ -17,9 +17,9 @@
             <th> Line </th>
           </thead>
           <tbody>
-            <%= for breakpoint <- @breakpoints.collection do %>
-              <tr 
-               data-breakpoint-id="<%= breakpoint.id %>" 
+            <%= for breakpoint <- @breakpoints.entries do %>
+              <tr
+               data-breakpoint-id="<%= breakpoint.id %>"
                class="breakpoint pointer">
                 <td><%= breakpoint.inserted_at %></td>
                 <td><%= breakpoint.file %></td>

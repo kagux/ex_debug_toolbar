@@ -9,7 +9,7 @@ defmodule ExDebugToolbar.BreakpointChannelTest do
   test "joining and interacting with breakpoint" do
     ExDebugToolbar.pry
     {:ok, request} = get_request()
-    breakpoint = request.breakpoints.collection |> hd
+    breakpoint = request.breakpoints.entries |> hd
     topic = "breakpoint:" <> request.uuid <> breakpoint.id
 
     # initial output
