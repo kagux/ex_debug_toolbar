@@ -4,8 +4,16 @@ defmodule ExDebugToolbar.Plug.CodeInjectorTest do
   import Plug.Conn
   alias ExDebugToolbar.Plug.CodeInjector
 
-  @default_conn_opts [status: 200, content_type: "text/html", body: "", path: "/"]
-  @js "<script>window.requestId='request_123';</script>\n<script src='/__ex_debug_toolbar__/js/toolbar.js'></script>\n"
+  @default_conn_opts [status: 200, content_type: "text/html", body: "", path: "/", ex_debug_toolbar_ignore?: false]
+  @js """
+  <script>
+    window.ExDebugToolbar = {
+      requestId: 'request_123',
+      debug: false
+    };
+  </script>
+  <script src='/__ex_debug_toolbar__/js/toolbar.js'></script>
+  """
   @css "<link rel='stylesheet' type='text/css' href='/__ex_debug_toolbar__/css/toolbar.css'>\n"
 
   test "it adds js and css to html" do
@@ -54,9 +62,9 @@ defmodule ExDebugToolbar.Plug.CodeInjectorTest do
     assert conn.resp_body == "<html><body>#{@js}</body></html>"
   end
 
-  test "it does nothing if request path is /phoenix/live_reload/frame" do
+  test "it does nothing if request is ignored" do
     html = "<html><body></body></html>"
-    conn = conn_with_plug(body: html, path: "/phoenix/live_reload/frame")
+    conn = conn_with_plug(body: html, ex_debug_toolbar_ignore?: true)
 
     assert conn.resp_body == html
   end
@@ -65,6 +73,7 @@ defmodule ExDebugToolbar.Plug.CodeInjectorTest do
     opts = Keyword.merge(@default_conn_opts, opts)
     conn(:get, opts[:path])
     |> put_private(:request_id, "request_123")
+    |> put_private(:ex_debug_toolbar_ignore?, opts[:ex_debug_toolbar_ignore?])
     |> CodeInjector.call(%{})
     |> put_resp_content_type(opts[:content_type])
     |> send_resp(opts[:status], opts[:body])

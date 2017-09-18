@@ -1,5 +1,6 @@
 import {Socket} from 'phoenix';
 import $ from './toolbar/jquery';
+import Logger from './toolbar/logger';
 import BreakpointsPanel from './toolbar/breakpoints_panel';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-elixir';
@@ -10,7 +11,7 @@ import 'prismjs/plugins/line-highlight/prism-line-highlight';
 
 class App {
   constructor(opts) {
-    this.opts = opts;
+    this.logger = new Logger(opts.debug)
     this.originalRequestId = opts.requestId;
     this.resetActivePanel();
     this.socket = this.initSocket();
@@ -23,6 +24,7 @@ class App {
     if (requestId === undefined) {
       requestId = this.originalRequestId;
     }
+    this.logger.debug('Rendering request', requestId)
     this.joinToolbarChannel(this.socket, requestId);
     this.breakpointsPanel = new BreakpointsPanel(this.socket, this.toolbar);
   }
@@ -34,12 +36,13 @@ class App {
   }
 
   joinToolbarChannel(socket, requestId) {
+    this.logger.debug('Joining channel', requestId)
     const channel = socket.channel(`toolbar:request:${requestId}`)
     channel
     .join()
     .receive("ok", this.onChannelResponse.bind(this))
     .receive("error", resp => {
-      console.debug("ExDebugToolbar: unable to join websocket channel", resp)
+      this.logger.debug('Unable to join channel', resp)
     });
 
     channel.on("request:ready", this.onChannelResponse.bind(this));
@@ -47,17 +50,18 @@ class App {
 
   onChannelResponse(response){
     if (response.html) {
-      console.debug('ExDebugToolbar: rendering toolbar');
+      this.logger.debug('Received response from channel')
       this.renderToolbar(response);
     } else {
-      console.debug('ExDebugToolbar: waiting for data to be processed');
+      this.logger.debug('Waiting for request to be processed')
     }
   }
 
   renderToolbar({html: html, request: request}){
-    //console.log("Request: ", request);
+    this.logger.debug('Request data', request)
     const content = $('<div>').html(html);
     if (this.originalRequestId != request.uuid) {
+      this.logger.debug('Historic request');
       content.addClass("historic-request");
     }
     this.toolbar.html(content);
@@ -146,4 +150,4 @@ class App {
   }
 
 }
-(new App({requestId: window.requestId})).render();
+(new App(window.ExDebugToolbar)).render();
