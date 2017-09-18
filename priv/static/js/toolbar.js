@@ -20907,6 +20907,10 @@ var _breakpoints_panel = require('./toolbar/breakpoints_panel');
 
 var _breakpoints_panel2 = _interopRequireDefault(_breakpoints_panel);
 
+var _history_panel = require('./toolbar/history_panel');
+
+var _history_panel2 = _interopRequireDefault(_history_panel);
+
 var _prismjs = require('prismjs');
 
 var _prismjs2 = _interopRequireDefault(_prismjs);
@@ -20934,18 +20938,15 @@ var App = function () {
     this.resetActivePanel();
     this.socket = this.initSocket();
     this.toolbar = (0, _jquery2.default)("<div>", { id: "ex-debug-toolbar" });
+    this.breakpointsPanel = new _breakpoints_panel2.default(this.socket, this.toolbar);
+    this.historyPanel = new _history_panel2.default(this.toolbar, this.originalRequestId, this.render.bind(this));
     (0, _jquery2.default)("body").append(this.toolbar);
-    this.setupHistoryListeners(this.toolbar);
   }
 
   _createClass(App, [{
     key: 'render',
     value: function render(requestId) {
-      if (requestId === undefined) {
-        requestId = this.originalRequestId;
-      }
       this.joinToolbarChannel(this.socket, requestId);
-      this.breakpointsPanel = new _breakpoints_panel2.default(this.socket, this.toolbar);
     }
   }, {
     key: 'initSocket',
@@ -20980,7 +20981,6 @@ var App = function () {
       var html = _ref.html,
           request = _ref.request;
 
-      //console.log("Request: ", request);
       var content = (0, _jquery2.default)('<div>').html(html);
       if (this.originalRequestId != request.uuid) {
         content.addClass("historic-request");
@@ -20989,6 +20989,7 @@ var App = function () {
       this.renderPanels(this.toolbar);
       this.renderPopovers(this.toolbar);
       this.breakpointsPanel.render(request.uuid);
+      this.historyPanel.render(request.uuid);
       this.highlightCode(this.toolbar);
     }
   }, {
@@ -21062,25 +21063,12 @@ var App = function () {
     value: function renderPopovers(toolbar) {
       (0, _jquery2.default)(toolbar).find('[data-toggle="popover"]').popover();
     }
-  }, {
-    key: 'setupHistoryListeners',
-    value: function setupHistoryListeners() {
-      var self = this;
-      this.toolbar.on("click", ".history-point", function (event) {
-        event.preventDefault();
-        self.render((0, _jquery2.default)(this).data('uuid'));
-      });
-      this.toolbar.on("click", ".back-to-current-request", function (event) {
-        event.preventDefault();
-        self.render();
-      });
-    }
   }]);
 
   return App;
 }();
 
-new App({ requestId: window.requestId }).render();
+new App({ requestId: window.requestId }).render(window.requestId);
 });
 
 require.register("web/static/js/toolbar/breakpoints_panel.js", function(exports, require, module) {
@@ -21242,6 +21230,66 @@ var BreakpointsPanel = function () {
 exports.default = BreakpointsPanel;
 });
 
+require.register("web/static/js/toolbar/history_panel.js", function(exports, require, module) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _jquery = require('./jquery');
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var HistoryPanel = function () {
+  function HistoryPanel(toolbar, requestId, callback) {
+    _classCallCheck(this, HistoryPanel);
+
+    this.toolbar = toolbar;
+    this.addEventListeners(callback, requestId);
+  }
+
+  _createClass(HistoryPanel, [{
+    key: 'render',
+    value: function render(requestId) {
+      this.toolbar.find('.history-point').removeClass('active');
+      this.toolbar.find('.history-point[data-uuid="' + requestId + '"]').toggleClass('active');
+    }
+  }, {
+    key: 'addEventListeners',
+    value: function addEventListeners(callback, requestId) {
+      this.toolbar.on("click", ".history-point:not(.active)", function (event) {
+        console.log('history click');
+        event.preventDefault();
+        callback((0, _jquery2.default)(this).data('uuid'));
+      });
+      this.toolbar.on("click", ".back-to-current-request", function (event) {
+        event.preventDefault();
+        callback(requestId);
+      });
+      this.toolbar.on("click", ".history-expand, .history-collapse", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var tr = (0, _jquery2.default)(this).closest('tr');
+        tr.nextUntil('.last-request').fadeToggle();
+        tr.find('.history-expand').toggle();
+        tr.find('.history-collapse').toggle();
+      });
+    }
+  }]);
+
+  return HistoryPanel;
+}();
+
+exports.default = HistoryPanel;
+});
+
 require.register("web/static/js/toolbar/jquery.js", function(exports, require, module) {
 'use strict';
 
@@ -21278,8 +21326,8 @@ window.$ = _$;
 exports.default = _jquery2.default;
 });
 
-require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
 require.alias("jquery/dist/jquery.js", "jquery");
+require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
 require.alias("process/browser.js", "process");
 require.alias("prismjs/prism.js", "prismjs");
 require.alias("phoenix/priv/static/phoenix.js", "phoenix");

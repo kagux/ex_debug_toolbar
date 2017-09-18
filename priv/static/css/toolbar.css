@@ -6706,11 +6706,20 @@
     #ex-debug-toolbar .historic-flag .back-to-current-request {
       font-weight: bold;
       color: black;
-      font-size: 0.85em; }
+      font-size: 0.85em;
+      text-decoration: underline; }
   #ex-debug-toolbar .historic-request .historic-flag {
     display: block; }
+  #ex-debug-toolbar .historic-request .navbar {
+    background-color: #ececdb; }
   #ex-debug-toolbar .history-point {
     cursor: pointer; }
+    #ex-debug-toolbar .history-point.active {
+      cursor: default; }
+    #ex-debug-toolbar .history-point.prev-request {
+      display: none; }
+    #ex-debug-toolbar .history-point .history-collapse {
+      display: none; }
 
 
 /*# sourceMappingURL=toolbar.css.map*/
