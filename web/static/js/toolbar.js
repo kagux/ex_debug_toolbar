@@ -2,6 +2,7 @@ import {Socket} from 'phoenix';
 import $ from './toolbar/jquery';
 import Logger from './toolbar/logger';
 import BreakpointsPanel from './toolbar/breakpoints_panel';
+import HistoryPanel from './toolbar/history_panel';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-elixir';
 import 'prismjs/components/prism-sql';
@@ -16,17 +17,14 @@ class App {
     this.resetActivePanel();
     this.socket = this.initSocket();
     this.toolbar = $("<div>", {id: "ex-debug-toolbar"});
+    this.breakpointsPanel = new BreakpointsPanel(this.socket, this.toolbar);
+    this.historyPanel = new HistoryPanel(this.toolbar, this.originalRequestId, this.render.bind(this));
     $("body").append(this.toolbar);
-    this.setupHistoryListeners(this.toolbar);
   }
 
   render(requestId) {
-    if (requestId === undefined) {
-      requestId = this.originalRequestId;
-    }
     this.logger.debug('Rendering request', requestId)
     this.joinToolbarChannel(this.socket, requestId);
-    this.breakpointsPanel = new BreakpointsPanel(this.socket, this.toolbar);
   }
 
   initSocket() {
@@ -68,6 +66,7 @@ class App {
     this.renderPanels(this.toolbar);
     this.renderPopovers(this.toolbar);
     this.breakpointsPanel.render();
+    this.historyPanel.render(request.uuid);
     this.highlightCode(this.toolbar);
   }
 
@@ -136,18 +135,6 @@ class App {
   renderPopovers(toolbar) {
     $(toolbar).find('[data-toggle="popover"]').popover();
   }
-
-  setupHistoryListeners() {
-    var self = this;
-    this.toolbar.on("click", ".history-point", function(event) { 
-      event.preventDefault();
-      self.render($(this).data('uuid'));
-    })
-    this.toolbar.on("click", ".back-to-current-request", function(event) {
-      event.preventDefault();
-      self.render();
-    })
-  }
-
 }
-(new App(window.ExDebugToolbar)).render();
+const opts = window.ExDebugToolbar;
+(new App(opts)).render(opts.requestId);
