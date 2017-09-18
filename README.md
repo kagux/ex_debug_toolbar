@@ -43,8 +43,8 @@ Note, unlike `IEx.pry`, this does not interfere with execution flow of phoenix s
 
 Usage is similar to `IEx`.
 Drop `require ExDebugToolbar; ExDebugToolbar.pry` in a file you'd like to debug
-and breakpoint will appear in this panel. Breakpoints are not limited to current request, but are capped at 
-configurable number (100 by default).
+and breakpoint will appear in this panel. Breakpoints are capped at configurable number per 
+request (10 by default).
 ![Breakpoints](screenshots/breakpoints.png)
 
 A click on any breakpoint will take you to familiar `iex` session with context as it was at execution time.
@@ -115,13 +115,12 @@ To change configuration, update `:ex_debug_toolbar` config key in your `config/d
 
 ### Available options:
 
-
 | Option             | Values  | Default                                                                                      | Description                                                                                                         |
 |--------------------|---------|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
 | enable             | boolean | false                                                                                        | Enable/disable toolbar. When disabled, toolbar code is not injected in page and toolbar functions are mostly no-op. |
 | iex_shell          | string  | "/bin/sh"                                                                                    | Shell executable to be used for breakpoint session                                                                  |
 | iex_shell_cmd      | string  | """ stty echo; clear; iex --sname %{node_name} -S mix breakpoint.client %{breakpoint_id} """ | Shell command to launch breakpoint iex session                                                                      |
-| breakpoints_limit  | integer | 100                                                                                          | Maximum number of available breakpoints. After reaching this cap, new breakpoints will push out oldest ones.        |
+| breakpoints_limit  | integer | 10                                                                                           | Maximum number of breakpoints per request. After reaching this cap, new breakpoints will be ignored                 |
 | remove_glob_params | boolean | true                                                                                         | `Plug.Router` adds `glob` params to `conn.params` and `conn.path_params` on `forward`. This option removes them     |
 | ignore_paths       | list    | [~r{^/images/}, ~r{^/css/}, ~r{^/js/}, ~r{^/phoenix/live_reload/}]                           | A list of paths that should not be recorded by toolbar. Each item can be either string for exact match or a Regex.  |
 
