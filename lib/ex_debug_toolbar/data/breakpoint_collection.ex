@@ -4,10 +4,10 @@ alias ExDebugToolbar.Breakpoint
 defmodule ExDebugToolbar.Data.BreakpointCollection do
   @moduledoc false
 
-  defstruct [count: 0, entries: []]
+  defstruct [count: 0, entries: %{}]
 
   def find(breakpoints, id) do
-    case Enum.find(breakpoints.entries, &(&1.id == id)) do
+    case Map.get(breakpoints.entries, id) do
       nil -> {:error, :not_found}
       breakpoint -> {:ok, breakpoint}
     end
@@ -23,7 +23,7 @@ defimpl Collection, for: BreakpointCollection do
   def add(breakpoints, %Breakpoint{} = breakpoint) do
     %{
       breakpoints |
-      entries: [breakpoint | breakpoints.entries],
+      entries: Map.put(breakpoints.entries, breakpoint.id, breakpoint),
       count: breakpoints.count + 1
     }
   end

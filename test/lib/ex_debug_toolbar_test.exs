@@ -39,7 +39,7 @@ defmodule ExDebugToolbarTest do
       # line 4
 
       {:ok, request} = get_request()
-      breakpoints = request.breakpoints.entries
+      breakpoints = request.breakpoints.entries |> Map.values
 
       assert breakpoints |> length == 1
       breakpoint = breakpoints |> hd
