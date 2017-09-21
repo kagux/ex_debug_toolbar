@@ -152,9 +152,6 @@ defmodule ExDebugToolbar.ToolbarView do
     |> Kernel.+(1)
   end
 
-  def breakpoint_color_class(%Breakpoint{pid: pid}, %Request{pid: pid}), do: "bg-success"
-  def breakpoint_color_class(_, _), do: ""
-
   def collapse_history(requests) do
     {group, acc} = requests
      |> Enum.map(&conn_with_defaults/1)
