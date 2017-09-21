@@ -2,9 +2,8 @@ defmodule ExDebugToolbar do
   @moduledoc ExDebugToolbar.Docs.load!("README.md")
 
   alias ExDebugToolbar.Database.RequestRepo
-  alias ExDebugToolbar.Data.{BreakpointCollection, Collection}
-  alias ExDebugToolbar.Data.BreakpointCollection.Breakpoint
-  alias ExDebugToolbar.Request
+  alias ExDebugToolbar.Data.{Collection, BreakpointCollection}
+  alias ExDebugToolbar.{Breakpoint, Request}
   use ExDebugToolbar.Decorator.Noop
 
   @type uuid :: String.t
@@ -165,7 +164,7 @@ defmodule ExDebugToolbar do
   @spec pry() :: nil
   @decorate noop_when_toolbar_disabled(nil)
   defmacro pry do
-    code_snippet = ExDebugToolbar.Breakpoint.code_snippet(__CALLER__)
+    code_snippet = Breakpoint.code_snippet(__CALLER__)
     quote do
       ExDebugToolbar.add_breakpoint(%Breakpoint{
         id: System.unique_integer |> to_string,

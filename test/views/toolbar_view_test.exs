@@ -2,9 +2,9 @@ defmodule ExDebugToolbar.ToolbarViewTest do
   use ExUnit.Case, async: true
   alias ExDebugToolbar.Request
   alias ExDebugToolbar.Data.{LogEntry, Timeline}
-  alias ExDebugToolbar.Data.BreakpointCollection.Breakpoint
   alias Phoenix.View
   alias ExDebugToolbar.ToolbarView
+  alias ExDebugToolbar.Breakpoint
   alias Plug.Conn
 
   describe "rendering" do

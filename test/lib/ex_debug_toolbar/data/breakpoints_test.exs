@@ -1,7 +1,7 @@
 defmodule ExDebugToolbar.Data.BreakpointsTest do
   use ExUnit.Case, async: true
   alias ExDebugToolbar.Data.{BreakpointCollection, Collection}
-  alias ExDebugToolbar.Data.BreakpointCollection.Breakpoint
+  alias ExDebugToolbar.Breakpoint
 
   describe "collection protocol" do
     test "adding breakpoints" do
