@@ -21114,14 +21114,14 @@ var BreakpointsPanel = function () {
   }, {
     key: 'appendModalToBody',
     value: function appendModalToBody() {
-      (0, _jquery2.default)('#breakpoints-modal').detach().appendTo(this.toolbar);
+      (0, _jquery2.default)('#breakpoints-modal', this.toolbar).detach().appendTo(this.toolbar);
     }
   }, {
     key: 'renderModal',
     value: function renderModal() {
-      (0, _jquery2.default)('#breakpoints-modal').on('shown.bs.modal', this.renderTerm.bind(this)).on('hidden.bs.modal', this.destroyTerm.bind(this));
-      (0, _jquery2.default)('.breakpoint').click(this.showModal.bind(this));
-      (0, _jquery2.default)('[data-toggle="fullscreen"]').click(this.toggleFullscreen.bind(this));
+      (0, _jquery2.default)('#breakpoints-modal', this.toolbar).on('shown.bs.modal', this.renderTerm.bind(this)).on('hidden.bs.modal', this.destroyTerm.bind(this));
+      (0, _jquery2.default)('.breakpoint', this.toolbar).click(this.showModal.bind(this));
+      (0, _jquery2.default)('[data-toggle="fullscreen"]', this.toolbar).click(this.toggleFullscreen.bind(this));
       this.renderBindingPopover();
       (0, _jquery2.default)(window).resize(this.resizeTerm.bind(this));
     }
@@ -21141,10 +21141,10 @@ var BreakpointsPanel = function () {
     value: function renderBindingPopover() {
       var _this = this;
 
-      (0, _jquery2.default)('[data-toggle="binding"]').popover({
+      (0, _jquery2.default)('[data-toggle="binding"]', this.toolbar).popover({
         container: 'body',
         content: function content() {
-          return (0, _jquery2.default)('*[data-breakpoint-id="' + _this.breakpoint_id + '"] .binding-popover').html();
+          return (0, _jquery2.default)('*[data-breakpoint-id="' + _this.breakpoint_id + '"] .binding-popover', _this.toolbar).html();
         },
         html: true,
         trigger: 'hover',
@@ -21157,13 +21157,13 @@ var BreakpointsPanel = function () {
       var target = _ref.target;
 
       this.breakpoint_id = (0, _jquery2.default)(target).closest('tr').data('breakpoint-id');
-      (0, _jquery2.default)('#breakpoints-modal').modal();
+      (0, _jquery2.default)('#breakpoints-modal', this.toolbar).modal();
     }
   }, {
     key: 'toggleFullscreen',
     value: function toggleFullscreen() {
       this.term.toggleFullscreen();
-      (0, _jquery2.default)('#breakpoints-modal').toggleClass('fullscreen');
+      (0, _jquery2.default)('#breakpoints-modal', this.toolbar).toggleClass('fullscreen');
       this.term.focus();
       this.resizeTerm();
     }
@@ -21174,8 +21174,8 @@ var BreakpointsPanel = function () {
         return;
       }
 
-      var termEl = (0, _jquery2.default)('#breakpoints-modal .terminal.xterm.fullscreen');
-      var parentEl = (0, _jquery2.default)('#terminal-container');
+      var termEl = (0, _jquery2.default)('#breakpoints-modal .terminal.xterm.fullscreen', this.toolbar);
+      var parentEl = (0, _jquery2.default)('#terminal-container', this.toolbar);
       if (termEl[0]) {
         parentEl.height(termEl.height());
         parentEl.width(termEl.width());
@@ -21190,7 +21190,7 @@ var BreakpointsPanel = function () {
     value: function destroyTerm() {
       this.channel.leave();
       this.term.destroy();
-      (0, _jquery2.default)('#breakpoints-modal').removeClass('fullscreen');
+      (0, _jquery2.default)('#breakpoints-modal', this.toolbar).removeClass('fullscreen');
     }
   }, {
     key: 'renderTerm',
@@ -21329,8 +21329,8 @@ exports.default = _jquery2.default;
 require.alias("jquery/dist/jquery.js", "jquery");
 require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
 require.alias("process/browser.js", "process");
-require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("prismjs/prism.js", "prismjs");
+require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("xterm/lib/xterm.js", "xterm");process = require('process');require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');
