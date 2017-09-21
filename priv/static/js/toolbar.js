@@ -21212,8 +21212,8 @@ var BreakpointsPanel = function () {
     value: function joinBreakpointChannel(socket) {
       var _this3 = this;
 
-      var topic = "breakpoint:" + this.request_id + this.breakpoint_id;
-      var channel = socket.channel(topic, { request_id: this.request_id, breakpoint_id: this.breakpoint_id });
+      var topic = "breakpoint:" + this.breakpoint_id;
+      var channel = socket.channel(topic, { request_id: this.request_id });
       channel.join();
       channel.on('output', function (_ref2) {
         var output = _ref2.output;
@@ -21326,8 +21326,8 @@ window.$ = _$;
 exports.default = _jquery2.default;
 });
 
-require.alias("jquery/dist/jquery.js", "jquery");
 require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
+require.alias("jquery/dist/jquery.js", "jquery");
 require.alias("process/browser.js", "process");
 require.alias("prismjs/prism.js", "prismjs");
 require.alias("phoenix/priv/static/phoenix.js", "phoenix");

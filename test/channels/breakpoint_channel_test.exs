@@ -10,10 +10,10 @@ defmodule ExDebugToolbar.BreakpointChannelTest do
     ExDebugToolbar.pry
     {:ok, request} = get_request()
     breakpoint = request.breakpoints.entries |> Map.values |> hd
-    topic = "breakpoint:" <> request.uuid <> breakpoint.id
+    topic = "breakpoint:" <> breakpoint.id
 
     # initial output
-    {:ok, _, socket} = socket() |> subscribe_and_join(BreakpointChannel, topic, %{"request_id" => request.uuid, "breakpoint_id" => breakpoint.id})
+    {:ok, _, socket} = socket() |> subscribe_and_join(BreakpointChannel, topic, %{"request_id" => request.uuid})
 
     # echo input
     push socket, "input", %{"input" => "€"}
