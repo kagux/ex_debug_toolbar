@@ -9,7 +9,7 @@ defmodule ExDebugToolbar.Data.BreakpointsTest do
         |> Collection.add(%Breakpoint{})
 
       assert collection.count == 1
-      assert collection.entries |> Map.keys |> length == 1
+      assert collection.entries |> Enum.count == 1
     end
 
     test "it ignores breakpoints above the threshold" do
@@ -20,7 +20,7 @@ defmodule ExDebugToolbar.Data.BreakpointsTest do
       )
 
       assert collection.count == 3
-      assert collection.entries |> Map.keys |> length == 3
+      assert collection.entries |> Enum.count == 3
     end
   end
 end
