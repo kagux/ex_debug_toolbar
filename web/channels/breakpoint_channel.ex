@@ -3,7 +3,6 @@ defmodule ExDebugToolbar.BreakpointChannel do
 
   use ExDebugToolbar.Web, :channel
   alias ExDebugToolbar.Breakpoint
-  alias ExDebugToolbar.Data.Breakpoints
 
   def join("breakpoint:" <> _id, payload, socket) do
     with request_id <- payload["request_id"],

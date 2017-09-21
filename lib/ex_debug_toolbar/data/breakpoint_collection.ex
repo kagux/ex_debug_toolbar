@@ -1,7 +1,7 @@
 alias ExDebugToolbar.Data.Collection
 alias ExDebugToolbar.Breakpoint
 
-defmodule ExDebugToolbar.Data.Breakpoints do
+defmodule ExDebugToolbar.Data.BreakpointCollection do
   @moduledoc false
 
   defstruct [count: 0, entries: []]
@@ -14,9 +14,9 @@ defmodule ExDebugToolbar.Data.Breakpoints do
   end
 end
 
-alias ExDebugToolbar.Data.Breakpoints
+alias ExDebugToolbar.Data.BreakpointCollection
 
-defimpl Collection, for: Breakpoints do
+defimpl Collection, for: BreakpointCollection do
   @breakpoints_limit Application.get_env(:ex_debug_toolbar, :breakpoints_limit, 10)
 
   def add(%{count: @breakpoints_limit} = breakpoints, %Breakpoint{}), do: breakpoints

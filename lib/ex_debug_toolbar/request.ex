@@ -1,7 +1,7 @@
 defmodule ExDebugToolbar.Request do
   @moduledoc false
 
-  alias ExDebugToolbar.Data.{Breakpoints, Timeline}
+  alias ExDebugToolbar.Data.{BreakpointCollection, Timeline}
 
   defstruct [
     pid: nil,
@@ -10,7 +10,7 @@ defmodule ExDebugToolbar.Request do
     conn: %Plug.Conn{},
     ecto: [],
     logs: [],
-    breakpoints: %Breakpoints{},
+    breakpoints: %BreakpointCollection{},
     timeline: %Timeline{},
     stopped?: false
   ]

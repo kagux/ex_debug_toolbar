@@ -1,11 +1,11 @@
 defmodule ExDebugToolbar.Data.BreakpointsTest do
   use ExUnit.Case, async: true
-  alias ExDebugToolbar.Data.{Breakpoints, Collection}
+  alias ExDebugToolbar.Data.{BreakpointCollection, Collection}
   alias ExDebugToolbar.Breakpoint
 
   describe "collection protocol" do
     test "adding breakpoints" do
-      collection = %Breakpoints{}
+      collection = %BreakpointCollection{}
         |> Collection.add(%Breakpoint{})
 
       assert collection.count == 1
@@ -15,7 +15,7 @@ defmodule ExDebugToolbar.Data.BreakpointsTest do
     test "it ignores breakpoints above the threshold" do
       collection = Enum.reduce(
         1..20,
-        %Breakpoints{},
+        %BreakpointCollection{},
         fn(_, acc) -> Collection.add(acc, %Breakpoint{}) end
       )
 

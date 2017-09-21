@@ -2,7 +2,7 @@ defmodule ExDebugToolbar do
   @moduledoc ExDebugToolbar.Docs.load!("README.md")
 
   alias ExDebugToolbar.Database.RequestRepo
-  alias ExDebugToolbar.Data.{Collection, Breakpoints}
+  alias ExDebugToolbar.Data.{Collection, BreakpointCollection}
   alias ExDebugToolbar.{Breakpoint, Request}
   use ExDebugToolbar.Decorator.Noop
 
@@ -64,7 +64,7 @@ defmodule ExDebugToolbar do
   @decorate noop_when_toolbar_disabled()
   def get_breakpoint(request_id \\ self(), breakpoint_id) do
     case ExDebugToolbar.get_request(request_id) do
-      {:ok, request} -> Breakpoints.find(request.breakpoints, breakpoint_id)
+      {:ok, request} -> BreakpointCollection.find(request.breakpoints, breakpoint_id)
       {:error, reason} -> {:error, reason}
     end
   end
