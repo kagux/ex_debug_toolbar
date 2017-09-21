@@ -1,10 +1,21 @@
 alias ExDebugToolbar.Data.Collection
-alias ExDebugToolbar.Breakpoint
 
 defmodule ExDebugToolbar.Data.BreakpointCollection do
   @moduledoc false
-
   defstruct [count: 0, entries: %{}]
+
+  defmodule Breakpoint do
+    defstruct [
+      :id,
+      :pid,
+      :file,
+      :line,
+      :env,
+      :binding,
+      :code_snippet,
+      :inserted_at
+    ]
+  end
 
   def find(breakpoints, id) do
     case Map.get(breakpoints.entries, id) do
@@ -15,6 +26,7 @@ defmodule ExDebugToolbar.Data.BreakpointCollection do
 end
 
 alias ExDebugToolbar.Data.BreakpointCollection
+alias ExDebugToolbar.Data.BreakpointCollection.Breakpoint
 
 defimpl Collection, for: BreakpointCollection do
   @breakpoints_limit Application.get_env(:ex_debug_toolbar, :breakpoints_limit, 10)

@@ -2,8 +2,8 @@ defmodule ExDebugToolbar.ToolbarView do
   @moduledoc false
 
   use ExDebugToolbar.Web, :view
-  alias ExDebugToolbar.Data.Timeline
-  alias ExDebugToolbar.{Breakpoint, Request}
+  alias ExDebugToolbar.Data.{Timeline, BreakpointCollection.Breakpoint}
+  alias ExDebugToolbar.Request
   alias Plug.Conn
 
   @millisecond System.convert_time_unit(1, :millisecond, :native)

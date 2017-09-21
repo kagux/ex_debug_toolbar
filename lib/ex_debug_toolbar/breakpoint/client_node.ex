@@ -2,7 +2,7 @@ defmodule ExDebugToolbar.Breakpoint.ClientNode do
   @moduledoc false
 
   alias ExDebugToolbar.Breakpoint.ServerNode
-  alias ExDebugToolbar.Breakpoint
+  alias ExDebugToolbar.Data.BreakpointCollection.Breakpoint
 
   def run(request_id, breakpoint_id) do
     set_cookie()
