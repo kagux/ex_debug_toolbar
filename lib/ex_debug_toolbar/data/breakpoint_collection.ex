@@ -7,9 +7,9 @@ defmodule ExDebugToolbar.Data.BreakpointCollection do
   defstruct [count: 0, entries: %{}]
 
   def find(breakpoints, id) do
-    case Map.get(breakpoints.entries, id) do
-      nil -> {:error, :not_found}
-      breakpoint -> {:ok, breakpoint}
+    case Map.fetch(breakpoints.entries, id) do
+      :error -> {:error, :not_found}
+      {:ok, breakpoint} -> {:ok, breakpoint}
     end
   end
 end
