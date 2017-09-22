@@ -40,7 +40,7 @@ defmodule ExDebugToolbarTest do
       assert breakpoints |> length == 1
       breakpoint = breakpoints |> hd
       assert breakpoint.pid == self()
-      assert breakpoint.file =~ "test/lib/ex_debug_toolbar_test.exs"
+      assert breakpoint.file == "test/lib/ex_debug_toolbar_test.exs"
       assert breakpoint.line == 35
       assert breakpoint.binding[:bound_var] == :bound_var
       assert breakpoint.code_snippet == [
