@@ -2,13 +2,16 @@ defmodule ExDebugToolbar.Application do
   @moduledoc false
 
   use Application
+  alias ExDebugToolbar.Logger
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
   def start(_type, _args) do
     if enabled?() and phoenix_server?() do
+      Logger.debug("Starting")
       do_start()
     else
+      Logger.debug("DISABLED")
       {:ok, self()}
     end
   end

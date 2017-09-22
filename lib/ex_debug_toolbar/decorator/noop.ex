@@ -1,19 +1,34 @@
 defmodule ExDebugToolbar.Decorator.Noop do
   @moduledoc false
 
-  use Decorator.Define, [noop_when_toolbar_disabled: 1, noop_when_toolbar_disabled: 0]
+  use Decorator.Define, [
+    noop_when_toolbar_disabled: 1,
+    noop_when_toolbar_disabled: 0,
+    noop_when_debug_mode_disabled: 1,
+    noop_when_debug_mode_disabled: 0
+  ]
 
-  @default_noop_result {:error, :toolbar_disabled}
+  @toolbar_noop_result {:error, :toolbar_disabled}
+  @debug_noop_result {:error, :debug_mode_disabled}
 
   @doc """
-  decorates a function such that it has empty body when compiled
-  with toolbar disbled and at the same time it will be no-op without
-  recompiling toolbar for when developer toogles without recompilign dependencies
+  Decorator that turns function into a no-op when toolbar is disabled.
   """
-  def noop_when_toolbar_disabled(noop_result \\ @default_noop_result, body, _context) do
+  def noop_when_toolbar_disabled(noop_result \\ @toolbar_noop_result, body, _context) do
+    toggle_function(:enable, noop_result, body)
+  end
+
+  @doc """
+  Decorator that turns function into a no-op when debug mode is disabled.
+  """
+  def noop_when_debug_mode_disabled(noop_result \\ @debug_noop_result, body, _context) do
+    toggle_function(:debug, noop_result, body)
+  end
+
+  defp toggle_function(flag, noop_result, body) do
     quote do
-      enabled = Application.get_env(:ex_debug_toolbar, :enable, false)
-      if enabled do
+      execute? = Application.get_env(:ex_debug_toolbar, unquote(flag), false)
+      if execute? do
         unquote(body)
       else
         unquote(noop_result)
