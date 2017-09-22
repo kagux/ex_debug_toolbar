@@ -4,7 +4,7 @@ defmodule ExDebugToolbar.CollectorCase do
 
   using do
     quote do
-      @request_id System.unique_integer |> to_string
+      @request_id Base.hex_encode32(:crypto.strong_rand_bytes(20), case: :lower)
       import ExDebugToolbar.Test.Support.RequestHelpers
       import ExDebugToolbar.Test.Support.Data.TimelineHelpers
 
