@@ -96,8 +96,7 @@ class BreakpointsPanel {
   }
 
   joinBreakpointChannel(socket) {
-    const topic = "breakpoint:" + this.breakpoint_id;
-    const channel = socket.channel(topic, {request_id: this.request_id});
+    const channel = socket.channel("breakpoint:" + this.breakpoint_id);
     channel.join();
     channel.on('output', ({output}) => this.term.write(output));
 

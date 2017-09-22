@@ -4,12 +4,12 @@ defmodule ExDebugToolbar.Breakpoint.IEx.Shell do
   @default_cmd """
     stty echo
     clear
-    iex --sname %{node_name} -S mix breakpoint.client --request-id %{request_id} --breakpoint-id %{breakpoint_id}
+    iex --sname %{node_name} -S mix breakpoint.client --breakpoint-id %{breakpoint_id}
   """
 
-  def start(request_id, breakpoint_id) do
+  def start(breakpoint_id) do
     with {:ok, pid, _os_pid} <- start_shell_process(),
-         :ok <- start_iex_process(pid, request_id, breakpoint_id),
+         :ok <- start_iex_process(pid, breakpoint_id),
       do: {:ok, pid}
     else error -> error
   end
@@ -22,12 +22,11 @@ defmodule ExDebugToolbar.Breakpoint.IEx.Shell do
     :exec.run('$SHELL', [:stdin, :stdout, :stderr, :pty])
   end
 
-  defp start_iex_process(pid, request_id, breakpoint_id) do
+  defp start_iex_process(pid, breakpoint_id) do
     :ex_debug_toolbar
     |> Application.get_env(:iex_shell_cmd, @default_cmd)
     |> String.replace("%{node_name}", node_name())
-    |> String.replace("%{request_id}", request_id)
-    |> String.replace("%{breakpoint_id}", breakpoint_id)
+    |> String.replace("%{breakpoint_id}", to_string(breakpoint_id))
     |> (&:exec.send(pid, &1)).()
   end
 
