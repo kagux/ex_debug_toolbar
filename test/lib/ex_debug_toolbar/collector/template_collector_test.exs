@@ -1,6 +1,6 @@
 defmodule ExDebugToolbar.Collector.TemplateTest do
   use ExDebugToolbar.CollectorCase, async: true
-  alias ExDebugToolbar.Template.{EExEngine, ExsEngine}
+  alias ExDebugToolbar.Template.{EExEngine, ExsEngine, SlimEngine}
   alias ExDebugToolbar.Data.Timeline.Event
 
   setup :start_request
@@ -13,6 +13,11 @@ defmodule ExDebugToolbar.Collector.TemplateTest do
   test "it compiles exs template" do
     compiled_template = compile_template(ExsEngine, "exs_template.html.exs")
     assert compiled_template == {"<div> Hello world! </div>", []}
+  end
+
+  test "it compiles slim template" do
+    compiled_template = compile_template(SlimEngine, "slim_template.html.slim")
+    assert compiled_template == {{:safe, ["" | "<div>Hello world!</div>"]}, []}
   end
 
   test "it tracks render time" do

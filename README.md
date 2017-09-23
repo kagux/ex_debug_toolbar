@@ -79,6 +79,7 @@ A click on any breakpoint will take you to familiar `iex` session with context a
   ```
 
   3. Enable toolbar in config `config/dev.exs` and setup collectors. Replace `:my_app` and `MyApp` with your application name
+     _Note_: Slim templates support requires [phoenix_slime](https://github.com/slime-lang/phoenix_slime) package
 
   ```elixir
     # ExDebugToolbar config
@@ -93,7 +94,10 @@ A click on any breakpoint will take you to familiar `iex` session with context a
 
     config :phoenix, :template_engines,
       eex: ExDebugToolbar.Template.EExEngine,
-      exs: ExDebugToolbar.Template.ExsEngine
+      exs: ExDebugToolbar.Template.ExsEngine,
+      #slim: ExDebugToolbar.Template.SlimEngine,
+      #slime: ExDebugToolbar.Template.SlimEngine
+
   ```
 
   4. To display parallel Ecto preloads you have to use `master` branch
