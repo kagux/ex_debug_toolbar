@@ -154,7 +154,6 @@ defmodule ExDebugToolbar.ToolbarView do
 
   def collapse_history(requests) do
     {group, acc} = requests
-     |> Enum.map(&conn_with_defaults/1)
      |> Enum.reduce({[], []}, fn
       request, {[],[]} ->
         {[request], []}
@@ -186,9 +185,6 @@ defmodule ExDebugToolbar.ToolbarView do
     private.phoenix_controller |> to_string |> String.trim_leading("Elixir.")
   end
 
-  defp conn_with_defaults(%Request{} = request) do
-    Map.update!(request, :conn, &conn_with_defaults/1)
-  end
   defp conn_with_defaults(%Conn{} = conn) do
     ~w(assigns private)a
     |> Enum.reduce(conn, fn key, conn ->

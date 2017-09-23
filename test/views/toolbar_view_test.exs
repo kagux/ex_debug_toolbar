@@ -128,7 +128,7 @@ defmodule ExDebugToolbar.ToolbarViewTest do
   end
 
   describe "#collapse_history/1" do
-    @conn %Conn{status: 200, method: "get", private: %{phoenix_controller: "users", phoenix_action: "index"}}
+    @conn %Conn{status: 200, method: "get", request_path: "/path"}
     @request %Request{uuid: 1, conn: @conn}
 
     test "groups similar consequent requests by status" do
