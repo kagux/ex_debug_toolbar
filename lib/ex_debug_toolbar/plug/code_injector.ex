@@ -4,6 +4,7 @@ defmodule ExDebugToolbar.Plug.CodeInjector do
   import Plug.Conn
   alias Plug.Conn
   alias ExDebugToolbar.Router.Helpers, as: RouterHelpers
+  alias ExDebugToolbar.Logger
 
   @behaviour Plug
 
@@ -15,8 +16,10 @@ defmodule ExDebugToolbar.Plug.CodeInjector do
 
   defp inject_debug_toolbar_code(conn) do
     if inject?(conn) do
+      Logger.debug("Injecting toolbar html into #{conn.request_path}")
       conn |> inject_css |> inject_js
     else
+      Logger.debug("Skipping toolbar html injection into #{conn.request_path}")
       conn
     end
   end
@@ -40,13 +43,19 @@ defmodule ExDebugToolbar.Plug.CodeInjector do
   end
 
   defp js_code(path, conn) do
+    debug = Application.get_env(:ex_debug_toolbar, :debug, false)
     """
-    <script>window.requestId='#{conn.private.request_id}';</script>
+    <script>
+      window.ExDebugToolbar = {
+        requestId: '#{conn.private.request_id}',
+        debug: #{if debug, do: "true", else: "false"}
+      };
+    </script>
     <script src='#{path}'></script>
     """
   end
 
-  defp inject?(%Conn{request_path: "/phoenix/live_reload/frame"}), do: false
+  defp inject?(%Conn{private: %{ex_debug_toolbar_ignore?: true}}), do: false
   defp inject?(%Conn{status: status}) when status >= 300 and status < 400, do: false
   defp inject?(%Conn{} = conn), do: html_content_type?(conn)
 

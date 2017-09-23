@@ -41,7 +41,10 @@ defmodule ExDebugToolbar.Web do
 
   def channel do
     quote do
-      use Phoenix.Channel
+      @debug Application.get_env(:ex_debug_toolbar, :debug, false)
+      @log_level if @debug, do: :debug, else: false
+
+      use Phoenix.Channel, log_join: @log_level, log_handle_in: @log_level
       import ExDebugToolbar.Gettext
     end
   end

@@ -123,6 +123,7 @@ To change configuration, update `:ex_debug_toolbar` config key in your `config/d
 | breakpoints_limit  | integer | 10                                                                                           | Maximum number of breakpoints per request. After reaching this cap, new breakpoints will be ignored                 |
 | remove_glob_params | boolean | true                                                                                         | `Plug.Router` adds `glob` params to `conn.params` and `conn.path_params` on `forward`. This option removes them     |
 | ignore_paths       | list    | [~r{^/images/}, ~r{^/css/}, ~r{^/js/}, ~r{^/phoenix/live_reload/}]                           | A list of paths that should not be recorded by toolbar. Each item can be either string for exact match or a Regex.  |
+| debug              | boolean | false                                                                                        | Toggles debug logs. Requires recompilation for some logs                                                            |
 
 
 # Contributors
@@ -145,16 +146,12 @@ Special thanks goes to [Juan Peri](https://github.com/epilgrim)!
 - [ ] Toolbar API
   - [ ] Decorator for functions to time them
   - [ ] Add metadata to events and use groupable names (template.render, controller.render etc)
-- [ ] Documentation
-  - [ ] Add function specs
-  - [ ] Document top level API, hide internal modules from docs
 - [ ] Support multiple breakpoint servers on one host
 - [ ] Tests
   - [ ] breakpoints
     - [ ] client test
     - [ ] server test
     - [ ] terminal test
-- [ ] Hide debug logs/output behind `debug: true` config
 - [ ] Simple installer mix task
 - [ ] Upgrade to Phoenix 1.3
 - [ ] Elm/React instead of jquery?

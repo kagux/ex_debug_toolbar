@@ -166,8 +166,9 @@ defmodule ExDebugToolbar do
   defmacro pry do
     code_snippet = Breakpoint.code_snippet(__CALLER__)
     quote do
+      file = __ENV__.file |> String.trim_leading(File.cwd!) |> Path.relative
       ExDebugToolbar.add_breakpoint(%Breakpoint{
-        file: __ENV__.file,
+        file: file,
         line: __ENV__.line,
         env: __ENV__,
         binding: binding(),

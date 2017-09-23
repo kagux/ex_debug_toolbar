@@ -24,6 +24,7 @@ defmodule ExDebugToolbar.Phoenix do
       require Phoenix.Endpoint
       alias Phoenix.Endpoint
       alias ExDebugToolbar.Plug.Router
+      alias ExDebugToolbar.Logger
 
       defoverridable [call: 2]
 
@@ -39,14 +40,17 @@ defmodule ExDebugToolbar.Phoenix do
           # request to Toolbar's internal routes, it's been already
           # processed and we leave it untouched
           %{private: %{phoenix_endpoint: ExDebugToolbar.Endpoint}} = conn ->
+            Logger.debug("Request to #{conn.request_path} was processed by internal endpoint")
             conn
           # app request that should be ignored according to configuration,
           # we pass it to app endpoint, but don't register in toolbar
           %{private: %{ex_debug_toolbar_ignore?: true}} = conn ->
+            Logger.debug("Request to #{conn.request_path} will be ignored")
             super(conn, opts)
           # otherwise it's an app request we want to register in toolbar and 
           # processed by app's endpoint
           conn ->
+            Logger.debug("Request to #{conn.request_path} will be tracked")
             Endpoint.instrument(__MODULE__, :ex_debug_toolbar, %{conn: conn}, fn ->
               super(conn, opts)
             end)
