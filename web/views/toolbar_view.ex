@@ -138,10 +138,6 @@ defmodule ExDebugToolbar.ToolbarView do
     queries |> Enum.filter(fn {_, _, type} -> type == :parallel end)
   end
 
-  def count_current_request_breakpoints(%Request{pid: pid}, breakpoints) do
-    breakpoints |> Enum.filter(&(&1.pid == pid)) |> Enum.count
-  end
-
   def breakpoint_code_snippet_start_line(%Breakpoint{code_snippet: code_snippet}) do
     code_snippet |> hd |> Tuple.to_list |> List.last
   end
@@ -155,9 +151,6 @@ defmodule ExDebugToolbar.ToolbarView do
     |> Enum.find_index(fn {_, n} -> n == line end)
     |> Kernel.+(1)
   end
-
-  def breakpoint_color_class(%Breakpoint{pid: pid}, %Request{pid: pid}), do: "bg-success"
-  def breakpoint_color_class(_, _), do: ""
 
   def collapse_history(requests) do
     {group, acc} = requests
@@ -174,6 +167,10 @@ defmodule ExDebugToolbar.ToolbarView do
     end)
 
     [group | acc] |> Enum.reverse |> Enum.map(&Enum.reverse/1)
+  end
+
+  def breakpoint_uuid(%Request{uuid: request_id}, %Breakpoint{id: id}) do
+    %Breakpoint.UUID{request_id: request_id, breakpoint_id: id}
   end
 
   defp similar_request?(%{conn: conn}, %{conn: prev_conn}) do

@@ -65,7 +65,7 @@ class App {
     this.toolbar.html(content);
     this.renderPanels(this.toolbar);
     this.renderPopovers(this.toolbar);
-    this.breakpointsPanel.render();
+    this.breakpointsPanel.render(request.uuid);
     this.historyPanel.render(request.uuid);
     this.highlightCode(this.toolbar);
   }

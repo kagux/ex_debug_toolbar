@@ -1,8 +1,8 @@
 defmodule ExDebugToolbar do
   @moduledoc ExDebugToolbar.Docs.load!("README.md")
 
-  alias ExDebugToolbar.Database.{BreakpointRepo, RequestRepo}
-  alias ExDebugToolbar.Data.Collection
+  alias ExDebugToolbar.Database.RequestRepo
+  alias ExDebugToolbar.Data.{Collection, BreakpointCollection}
   alias ExDebugToolbar.{Breakpoint, Request}
   use ExDebugToolbar.Decorator.Noop
 
@@ -10,7 +10,7 @@ defmodule ExDebugToolbar do
   @type id :: uuid | pid()
   @type ok :: :ok
   @type options :: Keyword.t()
-  @type breakpoint_id :: Integer.t()
+  @type breakpoint_uuid :: Breakpoint.UUID.t()
 
   @doc """
   Creates a new request record with to provided `uuid` and current process pid.
@@ -55,6 +55,18 @@ defmodule ExDebugToolbar do
   @decorate noop_when_toolbar_disabled()
   def get_request(id \\ self()) do
     RequestRepo.get(id)
+  end
+
+  @doc """
+  Returns the breakpoint
+  """
+  @spec get_breakpoint(breakpoint_uuid) :: Breakpoint.t()
+  @decorate noop_when_toolbar_disabled()
+  def get_breakpoint(breakpoint_uuid) do
+    case ExDebugToolbar.get_request(breakpoint_uuid.request_id) do
+      {:ok, request} -> BreakpointCollection.find(request.breakpoints, breakpoint_uuid.breakpoint_id)
+      {:error, reason} -> {:error, reason}
+    end
   end
 
   @doc """
@@ -129,6 +141,15 @@ defmodule ExDebugToolbar do
   end
 
   @doc """
+  Adds a breakpoint
+  """
+  @spec add_breakpoint(id, Breakpoint.t()) :: ok
+  @decorate noop_when_toolbar_disabled()
+  def add_breakpoint(id \\ self(), breakpoint) do
+    add_data(id, :breakpoints, breakpoint)
+  end
+
+  @doc """
   Adds data to request with id `id`
   """
   @spec add_data(id, atom(), any()) :: ok
@@ -146,9 +167,7 @@ defmodule ExDebugToolbar do
     code_snippet = Breakpoint.code_snippet(__CALLER__)
     quote do
       file = __ENV__.file |> String.trim_leading(File.cwd!) |> Path.relative
-      BreakpointRepo.insert(%Breakpoint{
-        id: System.unique_integer |> to_string,
-        pid: self(),
+      ExDebugToolbar.add_breakpoint(%Breakpoint{
         file: file,
         line: __ENV__.line,
         env: __ENV__,
@@ -157,34 +176,6 @@ defmodule ExDebugToolbar do
         inserted_at: NaiveDateTime.utc_now()
       })
     end
-  end
-
-
-  @doc """
-  Returns all available breakpoints
-  """
-  @spec get_all_breakpoints() :: [Breakpoint.t()]
-  @decorate noop_when_toolbar_disabled([])
-  def get_all_breakpoints do
-    BreakpointRepo.all
-  end
-
-  @doc """
-  Returns breakpoint by its `id`
-  """
-  @spec get_breakpoint(breakpoint_id()) :: Breakpoint.t()
-  @decorate noop_when_toolbar_disabled()
-  def get_breakpoint(id) do
-    BreakpointRepo.get(id)
-  end
-
-  @doc """
-  Deletes breakpoint by `id`
-  """
-  @spec delete_breakpoint(breakpoint_id()) :: ok
-  @decorate noop_when_toolbar_disabled()
-  def delete_breakpoint(id) do
-    BreakpointRepo.delete(id)
   end
 
   defp do_add_data(id, key, data) do

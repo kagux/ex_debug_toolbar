@@ -2,24 +2,26 @@ defmodule ExDebugToolbar.BreakpointChannelTest do
   use ExDebugToolbar.ChannelCase, async: true
 
   alias ExDebugToolbar.BreakpointChannel
+  alias ExDebugToolbar.ToolbarView
   require ExDebugToolbar
+
+  setup :start_request
 
   test "joining and interacting with breakpoint" do
     ExDebugToolbar.pry
-    breakpoint = ExDebugToolbar.get_all_breakpoints() |> hd
-    topic = "breakpoint:" <> breakpoint.id
+    {:ok, request} = get_request()
+    breakpoint = request.breakpoints.entries |> Map.values |> hd
+    topic = "breakpoint:#{ToolbarView.breakpoint_uuid(request, breakpoint)}"
 
     # initial output
     {:ok, _, socket} = socket() |> subscribe_and_join(BreakpointChannel, topic, %{})
 
     # echo input
     push socket, "input", %{"input" => "€"}
-
-    ExDebugToolbar.delete_breakpoint breakpoint.id
   end
 
   test "it returns error on join if breakpoint doesn't exist" do
     topic = "breakpoint:invalid_id"
-    assert {:error, %{reason: :not_found}} = socket() |> subscribe_and_join(BreakpointChannel, topic, %{})
+    assert {:error, %{reason: _}} = socket() |> subscribe_and_join(BreakpointChannel, topic, %{})
   end
 end

@@ -9,22 +9,23 @@ class BreakpointsPanel {
     this.toolbar = toolbar;
   }
 
-  render() {
+  render(request_id) {
+    this.request_id = request_id
     this.appendModalToBody();
     this.renderModal();
     this.renderCodeSnippets();
   }
 
   appendModalToBody() {
-    $('#breakpoints-modal').detach().appendTo(this.toolbar);
+    $('#breakpoints-modal', this.toolbar).detach().appendTo(this.toolbar);
   }
 
   renderModal() {
-    $('#breakpoints-modal')
+    $('#breakpoints-modal', this.toolbar)
     .on('shown.bs.modal', this.renderTerm.bind(this))
     .on('hidden.bs.modal', this.destroyTerm.bind(this))
-    $('.breakpoint').click(this.showModal.bind(this));
-    $('[data-toggle="fullscreen"]').click(this.toggleFullscreen.bind(this));
+    $('.breakpoint', this.toolbar).click(this.showModal.bind(this));
+    $('[data-toggle="fullscreen"]', this.toolbar).click(this.toggleFullscreen.bind(this));
     this.renderBindingPopover();
     $(window).resize(this.resizeTerm.bind(this));
   }
@@ -40,9 +41,9 @@ class BreakpointsPanel {
   }
 
   renderBindingPopover() {
-    $('[data-toggle="binding"]').popover({
+    $('[data-toggle="binding"]', this.toolbar).popover({
       container: 'body',
-      content: () => $('#'+this.breakpoint_id + ' .binding-popover').html(),
+      content: () => $('*[data-breakpoint-id="' + this.breakpoint_id +'"] .binding-popover', this.toolbar).html(),
         html: true,
       trigger: 'hover',
       title: 'Binding'
@@ -50,13 +51,13 @@ class BreakpointsPanel {
   }
 
   showModal({target: target}) {
-    this.breakpoint_id = $(target).closest('tr').attr('id');
-    $('#breakpoints-modal').modal();
+    this.breakpoint_id = $(target).closest('tr').data('breakpoint-id');
+    $('#breakpoints-modal', this.toolbar).modal();
   }
 
   toggleFullscreen() {
     this.term.toggleFullscreen();
-    $('#breakpoints-modal').toggleClass('fullscreen');
+    $('#breakpoints-modal', this.toolbar).toggleClass('fullscreen');
     this.term.focus();
     this.resizeTerm();
   }
@@ -66,8 +67,8 @@ class BreakpointsPanel {
       return;
     }
 
-    const termEl = $('#breakpoints-modal .terminal.xterm.fullscreen');
-    const parentEl = $('#terminal-container');
+    const termEl = $('#breakpoints-modal .terminal.xterm.fullscreen', this.toolbar);
+    const parentEl = $('#terminal-container', this.toolbar);
     if (termEl[0]) {
       parentEl.height(termEl.height());
       parentEl.width(termEl.width());
@@ -81,7 +82,7 @@ class BreakpointsPanel {
   destroyTerm() {
     this.channel.leave();
     this.term.destroy();
-    $('#breakpoints-modal').removeClass('fullscreen');
+    $('#breakpoints-modal', this.toolbar).removeClass('fullscreen');
   }
 
   renderTerm() {
@@ -95,8 +96,7 @@ class BreakpointsPanel {
   }
 
   joinBreakpointChannel(socket) {
-    const topic = "breakpoint:" + this.breakpoint_id;
-    const channel = socket.channel(topic, {});
+    const channel = socket.channel("breakpoint:" + this.breakpoint_id);
     channel.join();
     channel.on('output', ({output}) => this.term.write(output));
 

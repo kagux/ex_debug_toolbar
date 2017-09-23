@@ -1,6 +1,6 @@
 <span class="toolbar-item" data-toggle="panel" data-title="Breakpoints">
   <i class="glyphicon glyphicon-list" aria-hidden="true"></i>
-  <%= count_current_request_breakpoints(@request, @breakpoints) %> / <%= Enum.count(@breakpoints) %>
+  <%= Enum.count(@breakpoints.entries) %>
 </span>
 <div id="breakpoint" class="panel panel-default navbar-fixed-bottom">
   <div class="panel-heading">
@@ -10,15 +10,17 @@
     <div class="row">
       <div class="col-lg-6">
         <table class="table table-hover table-condensed">
-          <caption>Available breakpoints. The ones set in currect request's process are <span class="bg-success">green</span></caption>
+          <caption>Available breakpoints.</caption>
           <thead>
             <th> Timestamp </th>
             <th> File </th>
             <th> Line </th>
           </thead>
           <tbody>
-            <%= for breakpoint <- @breakpoints do %>
-              <tr id="<%= breakpoint.id %>" class="breakpoint pointer <%= breakpoint_color_class(breakpoint, @request) %>">
+            <%= for {_id, breakpoint} <- @breakpoints.entries do %>
+              <tr
+               data-breakpoint-id="<%= to_string(breakpoint_uuid(@request, breakpoint)) %>"
+               class="breakpoint pointer">
                 <td><%= breakpoint.inserted_at %></td>
                 <td><%= breakpoint.file %></td>
                 <td>

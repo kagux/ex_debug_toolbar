@@ -4,7 +4,7 @@ defmodule ExDebugToolbar.Breakpoint.IEx.Shell do
   @default_cmd """
     stty echo
     clear
-    iex --sname %{node_name} -S mix breakpoint.client %{breakpoint_id}
+    iex --sname %{node_name} -S mix breakpoint.client --breakpoint-id %{breakpoint_id}
   """
 
   def start(breakpoint_id) do
@@ -26,7 +26,7 @@ defmodule ExDebugToolbar.Breakpoint.IEx.Shell do
     :ex_debug_toolbar
     |> Application.get_env(:iex_shell_cmd, @default_cmd)
     |> String.replace("%{node_name}", node_name())
-    |> String.replace("%{breakpoint_id}", breakpoint_id)
+    |> String.replace("%{breakpoint_id}", to_string(breakpoint_id))
     |> (&:exec.send(pid, &1)).()
   end
 

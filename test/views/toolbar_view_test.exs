@@ -91,7 +91,6 @@ defmodule ExDebugToolbar.ToolbarViewTest do
     test "it renders toolbar with breakpoints" do
       breakpoint = %Breakpoint{
         id: 1,
-        pid: self(),
         line: 5,
         file: "test.ex",
         code_snippet: [{"a = [1, 2]", 5}],
