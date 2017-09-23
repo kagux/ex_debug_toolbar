@@ -17,9 +17,9 @@
             <th> Line </th>
           </thead>
           <tbody>
-            <%= for {id, breakpoint} <- @breakpoints.entries do %>
+            <%= for {_id, breakpoint} <- @breakpoints.entries do %>
               <tr
-               data-breakpoint-id="<%= to_string(id) %>"
+               data-breakpoint-id="<%= to_string(breakpoint_uuid(@request, breakpoint)) %>"
                class="breakpoint pointer">
                 <td><%= breakpoint.inserted_at %></td>
                 <td><%= breakpoint.file %></td>

@@ -10,7 +10,7 @@ defmodule ExDebugToolbar do
   @type id :: uuid | pid()
   @type ok :: :ok
   @type options :: Keyword.t()
-  @type breakpoint_id :: Breakpoint.UUID.t()
+  @type breakpoint_uuid :: Breakpoint.UUID.t()
 
   @doc """
   Creates a new request record with to provided `uuid` and current process pid.
@@ -60,11 +60,11 @@ defmodule ExDebugToolbar do
   @doc """
   Returns the breakpoint
   """
-  @spec get_breakpoint(breakpoint_id) :: Breakpoint.t()
+  @spec get_breakpoint(breakpoint_uuid) :: Breakpoint.t()
   @decorate noop_when_toolbar_disabled()
-  def get_breakpoint(breakpoint_id) do
-    case ExDebugToolbar.get_request(breakpoint_id.request_id) do
-      {:ok, request} -> BreakpointCollection.find(request.breakpoints, breakpoint_id)
+  def get_breakpoint(breakpoint_uuid) do
+    case ExDebugToolbar.get_request(breakpoint_uuid.request_id) do
+      {:ok, request} -> BreakpointCollection.find(request.breakpoints, breakpoint_uuid.breakpoint_id)
       {:error, reason} -> {:error, reason}
     end
   end
@@ -166,9 +166,7 @@ defmodule ExDebugToolbar do
   defmacro pry do
     code_snippet = Breakpoint.code_snippet(__CALLER__)
     quote do
-      {:ok, %{uuid: request_id}} = ExDebugToolbar.get_request()
       ExDebugToolbar.add_breakpoint(%Breakpoint{
-        request_id: request_id,
         file: __ENV__.file,
         line: __ENV__.line,
         env: __ENV__,

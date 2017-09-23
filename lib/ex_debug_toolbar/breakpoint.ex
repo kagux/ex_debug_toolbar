@@ -5,7 +5,6 @@ defmodule ExDebugToolbar.Breakpoint do
 
   defstruct [
     :id,
-    :request_id,
     :file,
     :line,
     :env,

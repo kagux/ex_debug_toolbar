@@ -2,6 +2,7 @@ defmodule ExDebugToolbar.BreakpointChannelTest do
   use ExDebugToolbar.ChannelCase, async: true
 
   alias ExDebugToolbar.BreakpointChannel
+  alias ExDebugToolbar.ToolbarView
   require ExDebugToolbar
 
   setup :start_request
@@ -10,10 +11,10 @@ defmodule ExDebugToolbar.BreakpointChannelTest do
     ExDebugToolbar.pry
     {:ok, request} = get_request()
     breakpoint = request.breakpoints.entries |> Map.values |> hd
-    topic = "breakpoint:#{breakpoint.id}"
+    topic = "breakpoint:#{ToolbarView.breakpoint_uuid(request, breakpoint)}"
 
     # initial output
-    {:ok, _, socket} = socket() |> subscribe_and_join(BreakpointChannel, topic, %{"request_id" => request.uuid})
+    {:ok, _, socket} = socket() |> subscribe_and_join(BreakpointChannel, topic, %{})
 
     # echo input
     push socket, "input", %{"input" => "€"}

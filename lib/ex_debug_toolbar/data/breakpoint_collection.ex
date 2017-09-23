@@ -15,21 +15,19 @@ defmodule ExDebugToolbar.Data.BreakpointCollection do
 end
 
 alias ExDebugToolbar.Data.BreakpointCollection
-alias ExDebugToolbar.Breakpoint.UUID
 
 defimpl Collection, for: BreakpointCollection do
   @breakpoints_limit Application.get_env(:ex_debug_toolbar, :breakpoints_limit, 10)
 
   def add(%{count: @breakpoints_limit} = breakpoints, %Breakpoint{}), do: breakpoints
-  def add(breakpoints, %Breakpoint{id: %UUID{}} = breakpoint) do
+  def add(%{count: count} = breakpoints, %Breakpoint{id: nil} = breakpoint) do
+    add(breakpoints, %{breakpoint | id: count})
+  end
+  def add(breakpoints, %Breakpoint{} = breakpoint) do
     %{
       breakpoints |
       entries: Map.put(breakpoints.entries, breakpoint.id, breakpoint),
       count: breakpoints.count + 1
     }
-  end
-  def add(%{count: count} = breakpoints, %Breakpoint{} = breakpoint) do
-    uuid = %UUID{request_id: breakpoint.request_id, breakpoint_id: count}
-    add(breakpoints, %{breakpoint | id: uuid})
   end
 end

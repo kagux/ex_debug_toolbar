@@ -169,6 +169,10 @@ defmodule ExDebugToolbar.ToolbarView do
     [group | acc] |> Enum.reverse |> Enum.map(&Enum.reverse/1)
   end
 
+  def breakpoint_uuid(%Request{uuid: request_id}, %Breakpoint{id: id}) do
+    %Breakpoint.UUID{request_id: request_id, breakpoint_id: id}
+  end
+
   defp similar_request?(%{conn: conn}, %{conn: prev_conn}) do
     conn.status == prev_conn.status and
     conn.method == prev_conn.method and
