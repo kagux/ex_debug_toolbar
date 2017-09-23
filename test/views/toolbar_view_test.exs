@@ -129,10 +129,10 @@ defmodule ExDebugToolbar.ToolbarViewTest do
 
   describe "#collapse_history/1" do
     @conn %Conn{status: 200, method: "get", private: %{phoenix_controller: "users", phoenix_action: "index"}}
-    @request %Request{conn: @conn}
+    @request %Request{uuid: 1, conn: @conn}
 
     test "groups similar consequent requests by status" do
-      other_request = %{@request | conn: %{@conn | status: 404}}
+      other_request = %{@request | uuid: 2, conn: %{@conn | status: 404}}
       history = [@request, other_request, other_request, @request]
       collapsed_history = [[@request], [other_request, other_request], [@request]] |> to_uuid
 
@@ -140,7 +140,7 @@ defmodule ExDebugToolbar.ToolbarViewTest do
     end
 
     test "groups similar consequent requests by method" do
-      other_request = %{@request | conn: %{@conn | method: "post"}}
+      other_request = %{@request | uuid: 2, conn: %{@conn | method: "post"}}
       history = [@request, other_request, other_request, @request]
       collapsed_history = [[@request], [other_request, other_request], [@request]] |> to_uuid
 
@@ -148,7 +148,7 @@ defmodule ExDebugToolbar.ToolbarViewTest do
     end
 
     test "groups similar consequent requests by controller" do
-      other_request = %{@request | conn: %{@conn | private: %{phoenix_controller: "sessions", phoenix_action: "index"}}}
+      other_request = %{@request | uuid: 2, conn: %{@conn | private: %{phoenix_controller: "sessions", phoenix_action: "index"}}}
       history = [@request, other_request, other_request, @request]
       collapsed_history = [[@request], [other_request, other_request], [@request]] |> to_uuid
 
@@ -156,7 +156,7 @@ defmodule ExDebugToolbar.ToolbarViewTest do
     end
 
     test "groups similar consequent requests by action" do
-      other_request = %{@request | conn: %{@conn | private: %{phoenix_controller: "users", phoenix_action: "create"}}}
+      other_request = %{@request | uuid: 2, conn: %{@conn | private: %{phoenix_controller: "users", phoenix_action: "create"}}}
       history = [@request, other_request, other_request, @request]
       collapsed_history = [[@request], [other_request, other_request], [@request]] |> to_uuid
 
@@ -164,9 +164,18 @@ defmodule ExDebugToolbar.ToolbarViewTest do
     end
 
     test "groups requests without controller and action" do
-      other_request = %{@request | conn: %{@conn | private: %{}}}
+      other_request = %{@request | uuid: 2, conn: %{@conn | private: %{}}}
       history = [@request, other_request, other_request, @request]
       collapsed_history = [[@request], [other_request, other_request], [@request]] |> to_uuid
+
+      assert history |> ToolbarView.collapse_history |> to_uuid == collapsed_history
+    end
+
+    test "it does not group requests without controller and action that have different request path" do
+      other_request_a = %{@request | uuid: 2, conn: %{@conn | request_path: "/a", private: %{}}}
+      other_request_b = %{@request | uuid: 3, conn: %{@conn | request_path: "/b", private: %{}}}
+      history = [other_request_a, other_request_b]
+      collapsed_history = [[other_request_a], [other_request_b]] |> to_uuid
 
       assert history |> ToolbarView.collapse_history |> to_uuid == collapsed_history
     end

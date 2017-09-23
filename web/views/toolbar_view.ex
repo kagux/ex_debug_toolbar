@@ -176,8 +176,17 @@ defmodule ExDebugToolbar.ToolbarView do
   defp similar_request?(%{conn: conn}, %{conn: prev_conn}) do
     conn.status == prev_conn.status and
     conn.method == prev_conn.method and
-    controller_action(conn) == controller_action(prev_conn)
+    (
+      has_controller?(conn) and
+      controller_action(conn) == controller_action(prev_conn) or
+      not has_controller?(conn) and
+      not has_controller?(prev_conn) and
+      conn.request_path == prev_conn.request_path
+    )
   end
+
+  defp has_controller?(%{private: %{phoenix_controller: "none"}}), do: false
+  defp has_controller?(_), do: true
 
   def history_row_collapse_class(0), do: "last-request"
   def history_row_collapse_class(_), do: "prev-request"
