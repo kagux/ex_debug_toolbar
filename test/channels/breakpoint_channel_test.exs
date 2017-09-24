@@ -18,6 +18,8 @@ defmodule ExDebugToolbar.BreakpointChannelTest do
 
     # echo input
     push socket, "input", %{"input" => "€"}
+    # can't figure out how to assert echo, as it's different every time
+    # but it still goes through the stack to ensure it works
   end
 
   test "it returns error on join if breakpoint doesn't exist" do
