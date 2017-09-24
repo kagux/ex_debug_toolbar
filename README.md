@@ -133,6 +133,12 @@ To change configuration, update `:ex_debug_toolbar` config key in your `config/d
 
 # Troubleshooting
 
+### Poison encode issues
+
+If you see `poison` encode related errors in your logs:
+* update to latest `poison` package version
+* enable debug mode and open an issue with detailed logs
+
 ### Debug mode
 
 When enabled, toolbar prints debug logs.

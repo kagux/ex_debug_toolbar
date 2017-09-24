@@ -3,7 +3,7 @@ defmodule ExDebugToolbar.Breakpoints.UUIDTest do
   alias ExDebugToolbar.Breakpoint.UUID
 
   test "serializing and unserializing uuid returns the same value" do
-    uuid = %UUID{request_id: "asdaf", breakpoint_id: 5}
+    uuid = %UUID{request_id: "asdaf", breakpoint_id: "5"}
     {:ok, unserialized} = UUID.from_string(to_string(uuid))
     assert uuid == unserialized
   end
