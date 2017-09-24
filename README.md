@@ -79,6 +79,7 @@ A click on any breakpoint will take you to familiar `iex` session with context a
   ```
 
   3. Enable toolbar in config `config/dev.exs` and setup collectors. Replace `:my_app` and `MyApp` with your application name
+
      _Note_: Slim templates support requires [phoenix_slime](https://github.com/slime-lang/phoenix_slime) package
 
   ```elixir
