@@ -39,7 +39,7 @@ defmodule ExDebugToolbar.ToolbarChannel do
 
   defp build_payload(request) do
     Logger.debug fn ->
-      dump = inspect(request, pretty: true, safe: true, limit: 10_000)
+      dump = inspect(request, pretty: true, safe: true, limit: :infinity)
       "Building paylod for request #{dump}"
     end
     {time, payload} = :timer.tc(fn -> do_build_payload(request) end)
