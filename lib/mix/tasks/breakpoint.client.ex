@@ -2,11 +2,11 @@ defmodule Mix.Tasks.Breakpoint.Client do
   @moduledoc false
 
   use Mix.Task
-  alias ExDebugToolbar.Breakpoint.UUID
+  alias ExDebugToolbar.Breakpoint
 
    def run(args) do
-     {options, _, _} = OptionParser.parse(args, switches: [breakpoint_id: :string])
-     {:ok, breakpoint_id} = options |> Keyword.fetch!(:breakpoint_id) |> UUID.from_string
-     ExDebugToolbar.Breakpoint.ClientNode.run(breakpoint_id)
+     {options, _, _} = OptionParser.parse(args, switches: [breakpoint: :string])
+     breakpoint = options |> Keyword.fetch!(:breakpoint) |> Breakpoint.unserialize
+     ExDebugToolbar.Breakpoint.ClientNode.run(breakpoint)
    end
 end

@@ -4,12 +4,15 @@ defmodule ExDebugToolbar.Breakpoint.IEx.Shell do
   @default_cmd """
     stty echo
     clear
-    iex --sname %{node_name} -S mix breakpoint.client --breakpoint-id %{breakpoint_id}
+    iex -S mix breakpoint.client --breakpoint $BREAKPOINT
   """
 
-  def start(breakpoint_id) do
-    with {:ok, pid, _os_pid} <- start_shell_process(),
-         :ok <- start_iex_process(pid, breakpoint_id),
+  alias ExDebugToolbar.Breakpoint
+
+  def start(breakpoint) do
+    with breakpoint_env <- breakpoint_env(breakpoint),
+         {:ok, pid, _os_pid} <- start_shell_process(breakpoint_env),
+         :ok <- start_iex_process(pid),
       do: {:ok, pid}
     else error -> error
   end
@@ -18,23 +21,23 @@ defmodule ExDebugToolbar.Breakpoint.IEx.Shell do
 
   def send_input(pid, input), do: :exec.send(pid, input)
 
-  defp start_shell_process do
-    :exec.run('$SHELL', [:stdin, :stdout, :stderr, :pty])
+  defp breakpoint_env(breakpoint) do
+    breakpoint |> Breakpoint.serialize |> to_charlist
+  end
+  
+  defp start_shell_process(breakpoint_env) do
+    :exec.run('$SHELL', [
+      :stdin,
+      :stdout,
+      :stderr,
+      :pty,
+      {:env, [{'BREAKPOINT', breakpoint_env}]}
+    ])
   end
 
-  defp start_iex_process(pid, breakpoint_id) do
+  defp start_iex_process(pid) do
     :ex_debug_toolbar
     |> Application.get_env(:iex_shell_cmd, @default_cmd)
-    |> String.replace("%{node_name}", node_name())
-    |> String.replace("%{breakpoint_id}", to_string(breakpoint_id))
     |> (&:exec.send(pid, &1)).()
-  end
-
-  defp node_name() do
-    self()
-    |> inspect
-    |> String.trim("#PID<")
-    |> String.trim(">")
-    |> String.replace(".", "-")
   end
 end
