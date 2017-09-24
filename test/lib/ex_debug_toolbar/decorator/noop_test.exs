@@ -18,6 +18,11 @@ defmodule ExDebugToolbar.Decorator.NoopTest do
     def debug_mode_disabled_with_result, do: :ok
   end
 
+  setup_all do
+    on_exit fn ->
+      Application.put_env(:ex_debug_toolbar, :enable, true)
+    end
+  end
 
   describe "noop_when_toolbar_disabled/1" do
     test "does not modify function when toolbar is enalbed" do
