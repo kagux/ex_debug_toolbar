@@ -130,6 +130,36 @@ To change configuration, update `:ex_debug_toolbar` config key in your `config/d
 | debug              | boolean | false                                                                                        | Toggles debug logs. Requires recompilation for some logs                                                            |
 
 
+# Troubleshooting
+
+### Debug mode
+
+When enabled, toolbar prints debug logs.
+This information is very helpful for issues with encoding, missing requests, etc.
+
+Turn on debug mode
+
+```elixir
+    config :ex_debug_toolbar,
+      enable: true,
+      debug: true
+```
+
+Turn off `Logger` log truncation and put it into `debug` level
+
+```elixir
+    config :logger,
+      level: :debug,
+      truncate: :infinity
+```
+
+Recompile toolbar to see channel logs
+
+```
+    mix deps.compile ex_debug_toolbar --force
+```
+
+
 # Contributors
 Special thanks goes to [Juan Peri](https://github.com/epilgrim)!
 
