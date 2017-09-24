@@ -21,7 +21,7 @@ defimpl Collection, for: BreakpointCollection do
 
   def add(%{count: @breakpoints_limit} = breakpoints, %Breakpoint{}), do: breakpoints
   def add(%{count: count} = breakpoints, %Breakpoint{id: nil} = breakpoint) do
-    add(breakpoints, %{breakpoint | id: count})
+    add(breakpoints, %{breakpoint | id: to_string(count)})
   end
   def add(breakpoints, %Breakpoint{} = breakpoint) do
     %{

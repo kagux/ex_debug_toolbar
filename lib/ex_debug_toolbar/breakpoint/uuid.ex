@@ -4,7 +4,7 @@ defmodule ExDebugToolbar.Breakpoint.UUID do
   def from_string(uuid) do
     case String.split(uuid, "-") do
       [request_id, breakpoint_id] ->
-        {:ok, %__MODULE__{request_id: request_id, breakpoint_id: String.to_integer(breakpoint_id)}}
+        {:ok, %__MODULE__{request_id: request_id, breakpoint_id: breakpoint_id}}
       _ -> {:error, "cannot parse uuid #{uuid}"}
     end
   end
