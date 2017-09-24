@@ -11,7 +11,7 @@ defmodule ExDebugToolbarTest do
     end
 
     test "it adds new data to defined collection" do
-      ExDebugToolbar.add_data(@request_id, :conn, {:request, %Plug.Conn{request_path: "/path"}})
+      ExDebugToolbar.add_data(@request_id, :conn, %Plug.Conn{request_path: "/path"})
       {:ok, request} = get_request()
       assert request.conn.request_path == "/path"
     end

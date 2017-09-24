@@ -154,7 +154,6 @@ defmodule ExDebugToolbar.ToolbarView do
 
   def collapse_history(requests) do
     {group, acc} = requests
-     |> Enum.map(&conn_with_defaults/1)
      |> Enum.reduce({[], []}, fn
       request, {[],[]} ->
         {[request], []}
@@ -176,7 +175,7 @@ defmodule ExDebugToolbar.ToolbarView do
   defp similar_request?(%{conn: conn}, %{conn: prev_conn}) do
     conn.status == prev_conn.status and
     conn.method == prev_conn.method and
-    controller_action(conn) == controller_action(prev_conn)
+    conn.request_path == prev_conn.request_path
   end
 
   def history_row_collapse_class(0), do: "last-request"
@@ -186,9 +185,6 @@ defmodule ExDebugToolbar.ToolbarView do
     private.phoenix_controller |> to_string |> String.trim_leading("Elixir.")
   end
 
-  defp conn_with_defaults(%Request{} = request) do
-    Map.update!(request, :conn, &conn_with_defaults/1)
-  end
   defp conn_with_defaults(%Conn{} = conn) do
     ~w(assigns private)a
     |> Enum.reduce(conn, fn key, conn ->
