@@ -22,7 +22,7 @@ defmodule ExDebugToolbar.Breakpoint.IEx.Shell do
   def send_input(pid, input), do: :exec.send(pid, input)
 
   defp breakpoint_env(breakpoint) do
-    breakpoint |> Breakpoint.serialize |> to_charlist
+    breakpoint |> Breakpoint.serialize! |> to_charlist
   end
   
   defp start_shell_process(breakpoint_env) do

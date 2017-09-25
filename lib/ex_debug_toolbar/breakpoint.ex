@@ -18,15 +18,20 @@ defmodule ExDebugToolbar.Breakpoint do
   defdelegate stop_iex(pid), to: Server, as: :stop
   defdelegate code_snippet(env), to: Pry
 
-  def serialize(%__MODULE__{} = breakpoint) do
+  def serialize!(%__MODULE__{} = breakpoint) do
     breakpoint
     |> :erlang.term_to_binary
     |> Base.encode64
   end
 
-  def unserialize(string) do
-    string
+  def unserialize!(string) do
+    breakpoint = string
     |> Base.decode64!
     |> :erlang.binary_to_term
+
+    case breakpoint do
+      __MODULE__ -> breakpoint
+      _ -> raise ArgumentError, "Expected string to be base64 encoded %Breakpoint{}"
+    end
   end
 end
