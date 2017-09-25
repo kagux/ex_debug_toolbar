@@ -6,7 +6,7 @@ defmodule Mix.Tasks.Breakpoint.Client do
 
    def run(args) do
      {options, _, _} = OptionParser.parse(args, switches: [breakpoint: :string])
-     breakpoint = options |> Keyword.fetch!(:breakpoint) |> Breakpoint.unserialize!
+     breakpoint = options |> Keyword.fetch!(:breakpoint_file) |> File.read! |> Breakpoint.unserialize!
      ExDebugToolbar.Breakpoint.ClientNode.run(breakpoint)
    end
 end
