@@ -25,6 +25,12 @@ It shows overall time spent rendering current controller as reported by Phoenix 
 In addition, it provides aggregated stats for each template.
 ![Timings](screenshots/timings.png)
 
+### History
+A list of previous request.
+![History](screenshots/history.png)
+Clicking on historical request loads it into toolbar so you can inspect it closer.
+![History Loaded](screenshots/history_loaded.png)
+
 ### Connection details
 Surfaces information from `conn` struct of current request.
 ![Connection Details](screenshots/conn_details.png)
@@ -124,7 +130,7 @@ To change configuration, update `:ex_debug_toolbar` config key in your `config/d
 |--------------------|---------|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
 | enable             | boolean | false                                                                                        | Enable/disable toolbar. When disabled, toolbar code is not injected in page and toolbar functions are mostly no-op. |
 | iex_shell          | string  | "/bin/sh"                                                                                    | Shell executable to be used for breakpoint session                                                                  |
-| iex_shell_cmd      | string  | "stty echo; clear; iex -S mix breakpoint.client --breakpoint $BREAKPOINT"                    | Shell command to launch breakpoint iex session. `$BREAKPOINT` variable is set automatically in each shell           |
+| iex_shell_cmd      | string  | "stty echo; clear; iex -S mix breakpoint.client --breakpoint-file %{breakpoint_file}"        | Shell command to launch breakpoint iex session. `%{breakpoint_file}` is a placeholder for tmp file with data        |
 | breakpoints_limit  | integer | 10                                                                                           | Maximum number of breakpoints per request. After reaching this cap, new breakpoints will be ignored                 |
 | remove_glob_params | boolean | true                                                                                         | `Plug.Router` adds `glob` params to `conn.params` and `conn.path_params` on `forward`. This option removes them     |
 | ignore_paths       | list    | [~r{^/images/}, ~r{^/css/}, ~r{^/js/}, ~r{^/phoenix/live_reload/}]                           | A list of paths that should not be recorded by toolbar. Each item can be either string for exact match or a Regex.  |
@@ -187,11 +193,9 @@ Special thanks goes to [Juan Peri](https://github.com/epilgrim)!
 - [ ] Toolbar API
   - [ ] Decorator for functions to time them
   - [ ] Add metadata to events and use groupable names (template.render, controller.render etc)
-- [ ] Support multiple breakpoint servers on one host
 - [ ] Tests
   - [ ] breakpoints
     - [ ] client test
-    - [ ] server test
     - [ ] terminal test
 - [ ] Simple installer mix task
 - [ ] Upgrade to Phoenix 1.3
