@@ -21,7 +21,6 @@ defmodule ExDebugToolbar.Application do
     # Define workers and child supervisors to be supervised
     children = [
       # Start the endpoint when the application starts
-      worker(ExDebugToolbar.Breakpoint.ServerNode, []),
       supervisor(ExDebugToolbar.Endpoint, []),
       supervisor(ExDebugToolbar.Database.Supervisor, []),
       worker(:exec, [[env: [{'SHELL', get_shell()}, {'MIX_ENV', to_charlist(Mix.env)}]]]),

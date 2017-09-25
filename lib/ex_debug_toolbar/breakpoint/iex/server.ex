@@ -16,8 +16,8 @@ defmodule ExDebugToolbar.Breakpoint.IEx.Server do
     GenServer.cast(iex, {:input, input})
   end
 
-  def init({breakpoint_id, output_pid}) do
-    {:ok, iex} = Shell.start(breakpoint_id)
+  def init({breakpoint, output_pid}) do
+    {:ok, iex} = Shell.start(breakpoint)
     {:ok, %{output_pid: output_pid, iex: iex}}
   end
 
