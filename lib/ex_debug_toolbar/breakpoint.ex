@@ -30,8 +30,8 @@ defmodule ExDebugToolbar.Breakpoint do
     |> :erlang.binary_to_term
 
     case breakpoint do
-      __MODULE__ -> breakpoint
-      _ -> raise ArgumentError, "Expected string to be base64 encoded %Breakpoint{}"
+      %__MODULE__{} -> breakpoint
+      term -> raise ArgumentError, "Expected string to be base64 encoded %Breakpoint{}, but got #{inspect(term)}"
     end
   end
 end
