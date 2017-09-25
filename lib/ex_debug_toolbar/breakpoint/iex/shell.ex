@@ -4,15 +4,16 @@ defmodule ExDebugToolbar.Breakpoint.IEx.Shell do
   @default_cmd """
     stty echo
     clear
-    iex -S mix breakpoint.client --breakpoint $BREAKPOINT
+    iex -S mix breakpoint.client --breakpoint-file %{breakpoint_file}
   """
 
   alias ExDebugToolbar.Breakpoint
 
   def start(breakpoint) do
-    with breakpoint_env <- breakpoint_env(breakpoint),
-         {:ok, pid, _os_pid} <- start_shell_process(breakpoint_env),
-         :ok <- start_iex_process(pid),
+    with {:ok, _} <- Temp.track,
+         breakpoint_file <- breakpoint_file(breakpoint),
+         {:ok, pid, _os_pid} <- start_shell_process(),
+         :ok <- start_iex_process(pid, breakpoint_file),
       do: {:ok, pid}
     else error -> error
   end
@@ -21,23 +22,19 @@ defmodule ExDebugToolbar.Breakpoint.IEx.Shell do
 
   def send_input(pid, input), do: :exec.send(pid, input)
 
-  defp breakpoint_env(breakpoint) do
-    breakpoint |> Breakpoint.serialize! |> to_charlist
+  defp breakpoint_file(breakpoint) do
+    serialized_breakpoint = breakpoint |> Breakpoint.serialize!
+    Temp.open! "breakpoint", &IO.write(&1, serialized_breakpoint)
   end
   
-  defp start_shell_process(breakpoint_env) do
-    :exec.run('$SHELL', [
-      :stdin,
-      :stdout,
-      :stderr,
-      :pty,
-      {:env, [{'BREAKPOINT', breakpoint_env}]}
-    ])
+  defp start_shell_process do
+    :exec.run('$SHELL', [:stdin, :stdout, :stderr, :pty])
   end
 
-  defp start_iex_process(pid) do
+  defp start_iex_process(pid, breakpoint_file) do
     :ex_debug_toolbar
     |> Application.get_env(:iex_shell_cmd, @default_cmd)
+    |> String.replace("%{breakpoint_file}", breakpoint_file)
     |> (&:exec.send(pid, &1)).()
   end
 end
