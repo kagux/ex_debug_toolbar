@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.Logger do
+  @moduledoc false
+
   use ExDebugToolbar.Decorator.Noop
   require Logger
 

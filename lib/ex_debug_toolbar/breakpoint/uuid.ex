@@ -1,4 +1,6 @@
 defmodule ExDebugToolbar.Breakpoint.UUID do
+  @moduledoc false
+
   defstruct [:request_id, :breakpoint_id]
 
   def from_string(uuid) do

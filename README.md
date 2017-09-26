@@ -10,6 +10,15 @@ Contributions to code, feedback and suggestions will be much appreciated!
 
 ![Screencapture](screenshots/toolbar.gif)
 
+# Recent changes
+  ### Version 0.4.0
+   * _(new)_ requests history panel
+   * _(new)_ support Slim templates (`phoenix_slim` package)
+   * _(new)_ `debug` config key to enable to verbose logs
+   * _(new)_ `ignore_paths` config key to skip tracking certain requests by paths
+   * _(improved)_ breakpoints no longer use distribution code
+
+
 # Features
 Toolbar is built with development environment in mind. It's up to you to enable or disable it in configuration.
 Calls to toolbar functions such as `Toolbar.pry` are no-op when it is disabled.
@@ -62,7 +71,7 @@ A click on any breakpoint will take you to familiar `iex` session with context a
 
    ```elixir
    def deps do
-     [{:ex_debug_toolbar, "~> 0.3.0"}]
+     [{:ex_debug_toolbar, "~> 0.4.0"}]
    end
    ```
 
