@@ -1,11 +1,7 @@
-sudo: required
-language: generic
-
-services:
-  - docker
-
-before_install:
-  - docker build -f docker/test/Dockerfile -t ex_debug_toolbar .
-
-script:
-  - docker run ex_debug_toolbar mix test
+langauge: elixir
+elixir:
+  - 1.5.1
+  - 1.4.5
+otp_release:
+  - 20.0
+  - 19.3.6
