@@ -1,5 +1,5 @@
-[![Travis](https://img.shields.io/travis/kagux/ex_debug_toolbar.svg)]()
-[![Hex.pm](https://img.shields.io/hexpm/v/ex_debug_toolbar.svg)]()
+[![Travis](https://img.shields.io/travis/kagux/ex_debug_toolbar.svg)](https://travis-ci.org/kagux/ex_debug_toolbar)
+[![Hex.pm](https://img.shields.io/hexpm/v/ex_debug_toolbar.svg)](https://hex.pm/packages/ex_debug_toolbar)
 
 A toolbar for Phoenix projects to display all sorts of information
 about current and previous requests: logs, timelines, database queries etc.
