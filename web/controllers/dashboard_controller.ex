@@ -3,7 +3,9 @@ defmodule ExDebugToolbar.DashboardController do
 
   use ExDebugToolbar.Web, :controller
 
+  plug :put_layout, {ExDebugToolbar.DashboardLayoutView, :app}
+
   def show(conn, _) do
-    conn |> put_layout(false) |> render("show.html")
+    conn |> render("show.html")
   end
 end
