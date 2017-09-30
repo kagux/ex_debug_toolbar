@@ -2,13 +2,16 @@ exports.config = {
   // See http://brunch.io/#documentation for docs.
   files: {
     javascripts: {
-      joinTo: {
-        "js/toolbar.js": /^(web\/static\/js\/toolbar)|^node_modules/,
+      // build output file based on required dependencies in entrypoint
+      entryPoints: {
+        "web/static/js/dashboard.js": "js/dashboard.js",
+        "web/static/js/toolbar.js": "js/toolbar.js",
       }
     },
     stylesheets: {
       joinTo: {
         "css/toolbar.css": /^(web\/static\/css\/toolbar)|^node_modules/,
+        "css/dashboard.css": /^(web\/static\/css\/dashboard)|^node_modules/,
       },
       order: {
         after: /prism/
@@ -66,7 +69,8 @@ exports.config = {
 
   modules: {
     autoRequire: {
-      "js/toolbar.js": ["web/static/js/toolbar"]
+      "js/toolbar.js": ["web/static/js/toolbar"],
+      "js/dashboard.js": ["web/static/js/dashboard"]
     }
   },
 
