@@ -12,6 +12,11 @@ defmodule ExDebugToolbar.CollectorCase do
         ExDebugToolbar.start_request(@request_id)
         on_exit fn -> delete_request(@request_id) end
       end
+
+      def insert_request(context \\ %{}) do
+        start_request(context)
+        stop_request(@request_id)
+      end
     end
   end
 end

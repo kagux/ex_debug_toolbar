@@ -24,6 +24,7 @@ defmodule ExDebugToolbar.ConnCase do
 
       # The default endpoint for testing
       @endpoint ExDebugToolbar.Endpoint
+      use ExDebugToolbar.CollectorCase
     end
   end
 
