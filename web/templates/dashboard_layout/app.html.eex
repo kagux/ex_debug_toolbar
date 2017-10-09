@@ -106,10 +106,12 @@
       <footer class="main-footer">
         <!-- To the right -->
         <div class="pull-right hidden-xs">
-          <strong><%= version() %></strong>
+          <strong>
+            <%= link version(), to: "https://hexdocs.pm/ex_debug_toolbar/ExDebugToolbar.html#content", target: :new %>
+          </strong>
         </div>
         <!-- Default to the left -->
-        Found an issue? <a href="https://github.com/kagux/ex_debug_toolbar" target="_blank"> Submit it! </a>
+        Found an issue? <a href="https://github.com/kagux/ex_debug_toolbar/issues" target="_blank"> Submit it! </a>
       </footer>
     </div>
     <!-- ./wrapper -->
