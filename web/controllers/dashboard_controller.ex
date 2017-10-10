@@ -6,6 +6,8 @@ defmodule ExDebugToolbar.DashboardController do
   plug :put_layout, {ExDebugToolbar.DashboardLayoutView, :app}
 
   def show(conn, _) do
-    conn |> render("show.html")
+    conn
+    |> assign(:requests, ExDebugToolbar.get_all_requests())
+    |> render("show.html")
   end
 end

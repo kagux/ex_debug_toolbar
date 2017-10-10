@@ -96,7 +96,9 @@
 
         <!-- Main content -->
         <section class="content container-fluid">
-          <%= render @view_module, @view_template, assigns %>
+          <div class="row">
+            <%= render @view_module, @view_template, assigns %>
+          </div>
         </section>
         <!-- /.content -->
       </div>
