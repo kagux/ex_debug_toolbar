@@ -42,15 +42,18 @@
 <div class="col-xs-12">
   <div class="box box-primary">
     <div class="box-header with-border">
-      <h3 class="box-title">Area Chart</h3>
+      <h3 class="box-title">Request times</h3>
 
       <div class="box-tools pull-right">
         <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i> </button>
       </div>
     </div>
     <div class="box-body">
-      <div class="chart">
-        <canvas id="areaChart" style="height: 249px; width: 548px;" width="1096" height="498"></canvas>
+      <div class="chart" id="requests-chart">
+        <canvas data-points='<%= requests_chart_data(@requests) %>'
+                data-max=<%= requests_chart_max_y(@requests) %>
+           >
+        </canvas>
       </div>
     </div>
   </div>

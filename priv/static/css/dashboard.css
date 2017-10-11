@@ -13245,5 +13245,8 @@ table.text-center th {
   border-bottom-right-radius: 2px;
   border-bottom-left-radius: 0; }
 
+#requests-chart {
+  max-height: 300px; }
+
 
 /*# sourceMappingURL=dashboard.css.map*/

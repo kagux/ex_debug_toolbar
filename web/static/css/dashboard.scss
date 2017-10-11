@@ -4,3 +4,7 @@
 @import 'dashboard/fonts';
 @import 'admin-lte/dist/css/AdminLTE';
 @import 'admin-lte/dist/css/skins/skin-yellow';
+
+#requests-chart {
+  max-height: 300px;
+}

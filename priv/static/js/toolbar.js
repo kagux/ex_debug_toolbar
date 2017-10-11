@@ -21212,13 +21212,16 @@ var Logger = function () {
 exports.default = Logger;
 });
 
-require.alias("admin-lte/dist/js/adminlte.min.js", "admin-lte");
+require.alias("chart.js/src/chart.js", "chart.js");
 require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
+require.alias("admin-lte/dist/js/adminlte.min.js", "admin-lte");
 require.alias("jquery/dist/jquery.js", "jquery");
 require.alias("process/browser.js", "process");
-require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("prismjs/prism.js", "prismjs");
-require.alias("xterm/lib/xterm.js", "xterm");process = require('process');require.register("___globals___", function(exports, require, module) {
+require.alias("phoenix/priv/static/phoenix.js", "phoenix");
+require.alias("moment/moment.js", "moment");
+require.alias("xterm/lib/xterm.js", "xterm");
+require.alias("chartjs-color-string/color-string.js", "chartjs-color-string");process = require('process');require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');
 
