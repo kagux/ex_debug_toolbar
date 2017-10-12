@@ -2,7 +2,7 @@ defmodule ExDebugToolbar.ToolbarChannel do
   @moduledoc false
 
   use ExDebugToolbar.Web, :channel
-  alias ExDebugToolbar.{ToolbarView, Endpoint, Logger}
+  alias ExDebugToolbar.{ToolbarView, Endpoint, Logger, Request}
   alias ExDebugToolbar.View.Helpers.TimeHelpers
   alias Phoenix.View
 
@@ -58,6 +58,7 @@ defmodule ExDebugToolbar.ToolbarChannel do
 
   defp history() do
     ExDebugToolbar.get_all_requests()
-    |> Enum.sort(&(NaiveDateTime.compare(&2.created_at, &1.created_at) == :lt))
+    |> Request.sort_by_date
+    |> Request.group_similar
   end
 end

@@ -20,7 +20,7 @@
       <header class="main-header">
 
         <!-- Logo -->
-        <a href="<%= dashboard_path(@conn, :show) %>" class="logo">
+        <a href="<%= dashboard_path(@conn, :index) %>" class="logo">
           <!-- mini logo for sidebar mini 50x50 pixels -->
           <span class="logo-mini"><b>E</b>D<b>T</b></span>
           <!-- logo for regular state and mobile devices -->
@@ -73,7 +73,14 @@
           <!-- Sidebar Menu -->
           <ul class="sidebar-menu" data-widget="tree">
             <li class="header"> Dashboard </li>
-            <li><a href="#"><i class="fa fa-bar-chart"></i> <span>Requests</span></a></li>
+            <li>
+              <a href="#">
+                <i class="fa fa-bar-chart"></i> <span>History</span>
+                <span class="pull-right-container">
+                  <small id="requests-count" class="label pull-right bg-blue"><%= requests_count() %> </small>
+                </span>
+              </a>
+            </li>
           </ul>
           <!-- /.sidebar-menu -->
         </section>

@@ -21,6 +21,11 @@ defmodule ExDebugToolbar.Endpoint do
     plug Phoenix.CodeReloader
   end
 
+  if ExDebugToolbar.Application.debug_mode? do
+    plug Plug.Logger
+    plug Plug.RequestId
+  end
+
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],

@@ -13248,5 +13248,11 @@ table.text-center th {
 #requests-chart {
   max-height: 300px; }
 
+.invisible-row {
+  display: none; }
+
+.rows-collapse {
+  display: none; }
+
 
 /*# sourceMappingURL=dashboard.css.map*/

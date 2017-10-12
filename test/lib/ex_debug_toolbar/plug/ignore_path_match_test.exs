@@ -1,11 +1,14 @@
 defmodule ExDebugToolbar.Plug.IgnorePathMatchTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   use Plug.Test
 
   alias ExDebugToolbar.Plug.IgnorePathMatch
 
   setup do
     Application.delete_env(:ex_debug_toolbar, :ignore_paths)
+    on_exit fn ->
+      Application.delete_env(:ex_debug_toolbar, :ignore_paths)
+    end
   end
 
   test "it sets ex_debug_toolbar_ignore? to true if path matches exactly" do

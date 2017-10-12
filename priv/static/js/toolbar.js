@@ -20731,6 +20731,129 @@ module.exports = Terminal;
 //# sourceMappingURL=xterm.js.map
   })();
 });
+require.register("web/static/js/lib/collapsable_table.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _jquery = require("./jquery");
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var CollapsableTable = function () {
+  function CollapsableTable(table) {
+    _classCallCheck(this, CollapsableTable);
+
+    this.table = table;
+  }
+
+  _createClass(CollapsableTable, [{
+    key: "render",
+    value: function render() {
+      this.addEventListeners();
+    }
+  }, {
+    key: "addEventListeners",
+    value: function addEventListeners() {
+      this.table.on("click", ".rows-expand, .rows-collapse", function (event) {
+        console.log("click");
+        event.preventDefault();
+        event.stopPropagation();
+        var tr = (0, _jquery2.default)(this).closest('tr');
+        tr.nextUntil('.visible-row').fadeToggle();
+        tr.find('.rows-expand').toggle();
+        tr.find('.rows-collapse').toggle();
+      });
+    }
+  }]);
+
+  return CollapsableTable;
+}();
+
+exports.default = CollapsableTable;
+});
+
+require.register("web/static/js/lib/jquery.js", function(exports, require, module) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _jquery = require('jquery');
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// 2. stash global jQuery if present
+var _jQuery = window.jQuery; // Bootstrap expects a global jQuery object, which leads to a clash
+// between user's app and toolbar's jQuery.
+
+
+// 1. import jQuery from toolbar's package
+
+var _$ = window.$;
+
+// 3. make toolbar's jQuery global
+window.jQuery = _jquery2.default;
+window.$ = _jquery2.default;
+
+// 4. import bootstrap that adds plugins to global jQuery
+require('bootstrap-sass');
+
+// 5. make stashed jQuery global again
+window.jQuery = _jQuery;
+window.$ = _$;
+
+exports.default = _jquery2.default;
+});
+
+require.register("web/static/js/lib/logger.js", function(exports, require, module) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Logger = function () {
+  function Logger(enabled) {
+    _classCallCheck(this, Logger);
+
+    this.enabled = enabled;
+  }
+
+  _createClass(Logger, [{
+    key: 'debug',
+    value: function debug() {
+      var _console;
+
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      this.enabled && (_console = console).log.apply(_console, ['[ExDebugToolbar]'].concat(args));
+    }
+  }]);
+
+  return Logger;
+}();
+
+exports.default = Logger;
+});
+
 require.register("web/static/js/toolbar.js", function(exports, require, module) {
 'use strict';
 
@@ -20738,11 +20861,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _phoenix = require('phoenix');
 
-var _jquery = require('./toolbar/jquery');
+var _jquery = require('./lib/jquery');
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _logger = require('./toolbar/logger');
+var _logger = require('./lib/logger');
 
 var _logger2 = _interopRequireDefault(_logger);
 
@@ -20930,7 +21053,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _jquery = require('./jquery');
+var _jquery = require('../lib/jquery');
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -21088,9 +21211,13 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _jquery = require('./jquery');
+var _jquery = require('../lib/jquery');
 
 var _jquery2 = _interopRequireDefault(_jquery);
+
+var _collapsable_table = require('../lib/collapsable_table');
+
+var _collapsable_table2 = _interopRequireDefault(_collapsable_table);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -21109,26 +21236,19 @@ var HistoryPanel = function () {
     value: function render(requestId) {
       this.toolbar.find('.history-point').removeClass('active');
       this.toolbar.find('.history-point[data-uuid="' + requestId + '"]').toggleClass('active');
+      var table = new _collapsable_table2.default(this.toolbar.find('#history-table'));
+      table.render();
     }
   }, {
     key: 'addEventListeners',
     value: function addEventListeners(callback, requestId) {
       this.toolbar.on("click", ".history-point:not(.active)", function (event) {
-        console.log('history click');
         event.preventDefault();
         callback((0, _jquery2.default)(this).data('uuid'));
       });
       this.toolbar.on("click", ".back-to-current-request", function (event) {
         event.preventDefault();
         callback(requestId);
-      });
-      this.toolbar.on("click", ".history-expand, .history-collapse", function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-        var tr = (0, _jquery2.default)(this).closest('tr');
-        tr.nextUntil('.last-request').fadeToggle();
-        tr.find('.history-expand').toggle();
-        tr.find('.history-collapse').toggle();
       });
     }
   }]);
@@ -21139,89 +21259,13 @@ var HistoryPanel = function () {
 exports.default = HistoryPanel;
 });
 
-require.register("web/static/js/toolbar/jquery.js", function(exports, require, module) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _jquery = require('jquery');
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// 2. stash global jQuery if present
-var _jQuery = window.jQuery; // Bootstrap expects a global jQuery object, which leads to a clash
-// between user's app and toolbar's jQuery.
-
-
-// 1. import jQuery from toolbar's package
-
-var _$ = window.$;
-
-// 3. make toolbar's jQuery global
-window.jQuery = _jquery2.default;
-window.$ = _jquery2.default;
-
-// 4. import bootstrap that adds plugins to global jQuery
-require('bootstrap-sass');
-
-// 5. make stashed jQuery global again
-window.jQuery = _jQuery;
-window.$ = _$;
-
-exports.default = _jquery2.default;
-});
-
-require.register("web/static/js/toolbar/logger.js", function(exports, require, module) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Logger = function () {
-  function Logger(enabled) {
-    _classCallCheck(this, Logger);
-
-    this.enabled = enabled;
-  }
-
-  _createClass(Logger, [{
-    key: 'debug',
-    value: function debug() {
-      var _console;
-
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      this.enabled && (_console = console).log.apply(_console, ['[ExDebugToolbar]'].concat(args));
-    }
-  }]);
-
-  return Logger;
-}();
-
-exports.default = Logger;
-});
-
-require.alias("chart.js/src/chart.js", "chart.js");
+require.alias("jquery/dist/jquery.js", "jquery");
 require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
 require.alias("admin-lte/dist/js/adminlte.min.js", "admin-lte");
-require.alias("jquery/dist/jquery.js", "jquery");
 require.alias("process/browser.js", "process");
 require.alias("prismjs/prism.js", "prismjs");
 require.alias("phoenix/priv/static/phoenix.js", "phoenix");
-require.alias("moment/moment.js", "moment");
-require.alias("xterm/lib/xterm.js", "xterm");
-require.alias("chartjs-color-string/color-string.js", "chartjs-color-string");process = require('process');require.register("___globals___", function(exports, require, module) {
+require.alias("xterm/lib/xterm.js", "xterm");process = require('process');require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');
 

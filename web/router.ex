@@ -13,6 +13,6 @@ defmodule ExDebugToolbar.Router do
 
   scope "/", ExDebugToolbar do
     pipe_through :browser
-    get "/", DashboardController, :show
+    get "/", DashboardController, :index
   end
 end

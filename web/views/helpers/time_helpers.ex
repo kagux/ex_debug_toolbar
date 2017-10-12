@@ -8,6 +8,10 @@ defmodule ExDebugToolbar.View.Helpers.TimeHelpers do
     |> microseconds_to_string
   end
 
+  def datetime_to_string(%NaiveDateTime{} = datetime) do
+    datetime |> Map.put(:microsecond, {0, 0}) |> NaiveDateTime.to_string
+  end
+
   defp microseconds_to_string(time) when time >= 1000, do: round(time / 1000) |> format_time("ms")
   defp microseconds_to_string(time), do: format_time(time, "µs")
 

@@ -177,13 +177,12 @@
       cursor: default;
     }
 
-    &.prev-request {
+    &.invisible-row {
       display: none;
     }
 
-    .history-collapse {
+    .rows-collapse {
       display: none;
     }
   }
-
 }

@@ -30,6 +30,8 @@ defmodule ExDebugToolbar.Web do
       import ExDebugToolbar.ErrorHelpers
       import ExDebugToolbar.Gettext
       import ExDebugToolbar.View.Helpers.TimeHelpers
+      import ExDebugToolbar.View.Helpers.ConnHelpers
+      import ExDebugToolbar.View.Helpers.HistoryHelpers
     end
   end
 

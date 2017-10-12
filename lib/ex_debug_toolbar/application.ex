@@ -47,6 +47,10 @@ defmodule ExDebugToolbar.Application do
     Application.put_env(:ex_debug_toolbar, ExDebugToolbar.Endpoint, config, persistent: true)
   end
 
+  def debug_mode? do
+    Application.get_env(:ex_debug_toolbar, :debug, false)
+  end
+
   defp get_shell do
     default = (System.get_env("SHELL") || "/bin/bash")
     Application.get_env(:ex_debug_toolbar, :iex_shell, default) |> String.to_charlist
