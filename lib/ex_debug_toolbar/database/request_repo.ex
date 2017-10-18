@@ -5,7 +5,7 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   alias ExDebugToolbar.Request
 
   def insert(%Request{} = request) do
-    :mnesia.dirty_write({Request, request.pid, request.uuid, request}) |> result
+    GenServer.call(__MODULE__, {:insert, request})
   end
 
   def update(id, changes, opts \\ []) do
@@ -18,7 +18,7 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   end
 
   def all do
-    :mnesia.dirty_select(Request, [{{Request, :"_", :"_", :"$1"},[],[:"$1"]}])
+    :ets.select(Request, [{{Request, :"_", :"_", :"$1"},[],[:"$1"]}])
   end
 
   def purge do
@@ -27,6 +27,10 @@ defmodule ExDebugToolbar.Database.RequestRepo do
 
   def delete(id) do
     GenServer.call(__MODULE__, {:delete, id})
+  end
+
+  def count do
+    :ets.select_count(Request, [{{Request, :"_", :"_", :"_"},[],[true]}])
   end
 
   def get(pid) when is_pid(pid) do
@@ -51,28 +55,56 @@ defmodule ExDebugToolbar.Database.RequestRepo do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
-  def handle_cast({:update, id, changes}, _state) do
+  def init(_) do
+    limit = Application.get_env(:ex_debug_toolbar, :max_requests, 30)
+    {:ok, %{limit: limit, count: 0, pids: []}}
+  end
 
+  def handle_cast({:update, id, changes}, state) do
     do_update(id, changes)
-    {:noreply, nil}
+    {:noreply, state}
   end
 
-  def handle_call({:update, id, changes}, _from, _state) do
-    {:reply, do_update(id, changes), nil}
+  def handle_call({:update, id, changes}, _from, state) do
+    {:reply, do_update(id, changes), state}
   end
 
-  def handle_call({:delete, id}, _from, _state) do
-    reply = case get(id) do
-      {:ok, request} -> :mnesia.dirty_delete({Request, request.pid})
-      _ -> :error
+  def handle_call({:delete, id}, _from, state) do
+    case get(id) do
+      {:ok, request} ->
+        result = do_delete(request.pid)
+        pids = List.delete(state.pids, request.pid)
+        {:reply, result, %{state | count: state.count - 1, pids: pids}}
+      _ ->
+        {:reply, :error, state}
     end
 
-    {:reply, reply, nil}
+  end
+
+  def handle_call({:insert, request}, _from, state) do
+    result = do_insert(request)
+    case state do
+      %{count: limit, limit: limit, pids: pids} ->
+        [last | tail] = Enum.reverse(pids)
+        pids = Enum.reverse(tail)
+        :ok = do_delete(last)
+        {:reply, result, %{state | pids: [request.pid | pids]}}
+      %{count: count, pids: pids} ->
+        {:reply, result, %{state | pids: [request.pid | pids], count: count + 1}}
+    end
+  end
+
+  def do_delete(pid) do
+    :mnesia.dirty_delete({Request, pid})
+  end
+
+  def do_insert(request) do
+    :mnesia.dirty_write({Request, request.pid, request.uuid, request}) |> result
   end
 
   defp do_update(id, changes) do
     case get(id) do
-      {:ok, request} -> request |> apply_changes(changes) |> insert
+      {:ok, request} -> request |> apply_changes(changes) |> do_insert
       _ -> :error
     end
   end

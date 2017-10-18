@@ -13,9 +13,24 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
     {:ok, %{request: request}}
   end
 
-  test "insert/1 creates new request record", context do
-    assert :ok = RequestRepo.insert(context.request)
-    assert :mnesia.table_info(Request, :size) == 1
+  describe "insert/1" do
+    test "creates new request record", context do
+      assert :ok = RequestRepo.insert(context.request)
+      assert :mnesia.table_info(Request, :size) == 1
+    end
+
+    test "respecs configured max number of requests" do
+      # max_requests is set to 10 in config
+      for n <- 1..12 do
+        pid = spawn fn -> :ok end
+        :ok = RequestRepo.insert %Request{pid: pid, uuid: n}
+      end
+      assert :mnesia.table_info(Request, :size) == 10
+      assert {:error, :not_found} = RequestRepo.get(1)
+      assert {:error, :not_found} = RequestRepo.get(2)
+      assert {:ok, _} = RequestRepo.get(3)
+      assert {:ok, _} = RequestRepo.get(12)
+    end
   end
 
   describe "get/1" do
@@ -136,6 +151,18 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
       assert RequestRepo.all == context.requests |> Enum.reverse |> tl
     end
 
+    test "correctly updates requests limit after deleting" do
+      # max_requests is set to 10 in config
+      assert :ok = RequestRepo.delete(2)
+      for n <- 3..11 do
+        pid = spawn fn -> :ok end
+        :ok = RequestRepo.insert %Request{pid: pid, uuid: n}
+      end
+      requests = RequestRepo.all() |> Enum.sort_by(&(&1.uuid))
+      assert requests |> length == 10
+      assert requests |> hd |> Map.get(:uuid) == 1
+    end
+
     test "it returns error if request doesn't exist" do
       assert :error = RequestRepo.delete("no_such_request")
       assert RequestRepo.all |> length == 2
@@ -146,5 +173,15 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
     :ok = RequestRepo.insert(%Request{uuid: 1})
     :ok = RequestRepo.purge()
     assert RequestRepo.all == []
+  end
+
+  test "count/0 returns current number of requests" do
+    pid_1 = spawn fn -> :ok end
+    pid_2 = spawn fn -> :ok end
+    assert RequestRepo.count == 0
+    :ok = RequestRepo.insert(%Request{pid: pid_1})
+    assert RequestRepo.count == 1
+    :ok = RequestRepo.insert(%Request{pid: pid_2})
+    assert RequestRepo.count == 2
   end
 end
