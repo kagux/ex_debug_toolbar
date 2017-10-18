@@ -9,6 +9,6 @@ defmodule ExDebugToolbar.DashboardLayoutView do
   end
 
   def requests_count do
-    ExDebugToolbar.get_all_requests() |> Enum.count
+    ExDebugToolbar.get_requests_count()
   end
 end

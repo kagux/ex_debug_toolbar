@@ -61,7 +61,8 @@ defmodule ExDebugToolbar.Mixfile do
       {:erlexec, "~> 1.7", runtime: false},
       {:decorator, "~> 1.2"},
       {:temp, "~> 0.4"},
-      {:ex_doc, ">= 0.0.0", only: :dev}
+      {:ex_doc, ">= 0.0.0", only: :dev},
+      {:benchee, "~> 0.9.0", optional: true, only: :dev}
     ]
   end
 end

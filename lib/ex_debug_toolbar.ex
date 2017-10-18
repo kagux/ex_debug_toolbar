@@ -49,6 +49,13 @@ defmodule ExDebugToolbar do
   end
 
   @doc """
+  Returns total number of tracked requests
+  """
+  @spec get_requests_count :: integer
+  @decorate noop_when_toolbar_disabled(0)
+  defdelegate get_requests_count, to: RequestRepo, as: :count
+
+  @doc """
   Returns request matching provided `id`, which defaults to `self()`
   """
   @spec get_request(id) :: Request.t()
