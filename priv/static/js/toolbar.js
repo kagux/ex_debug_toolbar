@@ -20731,56 +20731,6 @@ module.exports = Terminal;
 //# sourceMappingURL=xterm.js.map
   })();
 });
-require.register("web/static/js/lib/collapsable_table.js", function(exports, require, module) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _jquery = require("./jquery");
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var CollapsableTable = function () {
-  function CollapsableTable(table) {
-    _classCallCheck(this, CollapsableTable);
-
-    this.table = table;
-  }
-
-  _createClass(CollapsableTable, [{
-    key: "render",
-    value: function render() {
-      this.addEventListeners();
-    }
-  }, {
-    key: "addEventListeners",
-    value: function addEventListeners() {
-      this.table.on("click", ".rows-expand, .rows-collapse", function (event) {
-        console.log("click");
-        event.preventDefault();
-        event.stopPropagation();
-        var tr = (0, _jquery2.default)(this).closest('tr');
-        tr.nextUntil('.visible-row').fadeToggle();
-        tr.find('.rows-expand').toggle();
-        tr.find('.rows-collapse').toggle();
-      });
-    }
-  }]);
-
-  return CollapsableTable;
-}();
-
-exports.default = CollapsableTable;
-});
-
 require.register("web/static/js/lib/jquery.js", function(exports, require, module) {
 'use strict';
 
@@ -21215,10 +21165,6 @@ var _jquery = require('../lib/jquery');
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _collapsable_table = require('../lib/collapsable_table');
-
-var _collapsable_table2 = _interopRequireDefault(_collapsable_table);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -21236,8 +21182,6 @@ var HistoryPanel = function () {
     value: function render(requestId) {
       this.toolbar.find('.history-point').removeClass('active');
       this.toolbar.find('.history-point[data-uuid="' + requestId + '"]').toggleClass('active');
-      var table = new _collapsable_table2.default(this.toolbar.find('#history-table'));
-      table.render();
     }
   }, {
     key: 'addEventListeners',
@@ -21259,9 +21203,9 @@ var HistoryPanel = function () {
 exports.default = HistoryPanel;
 });
 
-require.alias("jquery/dist/jquery.js", "jquery");
-require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
 require.alias("admin-lte/dist/js/adminlte.min.js", "admin-lte");
+require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
+require.alias("jquery/dist/jquery.js", "jquery");
 require.alias("process/browser.js", "process");
 require.alias("prismjs/prism.js", "prismjs");
 require.alias("phoenix/priv/static/phoenix.js", "phoenix");

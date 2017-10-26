@@ -1,5 +1,4 @@
 import $ from '../lib/jquery';
-import CollapsableTable from '../lib/collapsable_table';
 
 class HistoryPanel {
   constructor(toolbar, requestId, callback) {
@@ -10,8 +9,6 @@ class HistoryPanel {
   render(requestId) {
     this.toolbar.find('.history-point').removeClass('active');
     this.toolbar.find(`.history-point[data-uuid="${requestId}"]`).toggleClass('active');
-    const table = new CollapsableTable(this.toolbar.find('#history-table'));
-    table.render();
   }
 
   addEventListeners(callback, requestId) {

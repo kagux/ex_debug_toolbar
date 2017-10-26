@@ -2,6 +2,6 @@
   <%= if @requests == [] do %>
     <h2 class="headline text-yellow"> No recoreded requests yet :( </h2>
   <% else %>
-    <%= render "index/_requests_table.html", history: @history %>
+    <%= render "index/_requests_table.html", requests: @requests %>
   <% end %>
 </div>

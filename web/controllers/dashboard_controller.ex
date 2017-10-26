@@ -9,7 +9,6 @@ defmodule ExDebugToolbar.DashboardController do
   def index(conn, _) do
     requests = ExDebugToolbar.get_all_requests() |> Request.sort_by_date
     conn
-    |> assign(:history, Request.group_similar(requests))
     |> assign(:requests, requests)
     |> render("index.html")
   end

@@ -77,7 +77,7 @@
               <a href="#">
                 <i class="fa fa-bar-chart"></i> <span>History</span>
                 <span class="pull-right-container">
-                  <small id="requests-count" class="label pull-right bg-blue"><%= requests_count() %> </small>
+                  <small id="requests-count" class="label pull-right bg-blue"><%= ExDebugToolbar.get_requests_count() %> </small>
                 </span>
               </a>
             </li>

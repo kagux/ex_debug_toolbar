@@ -62,7 +62,7 @@ defmodule ExDebugToolbar.Mixfile do
       {:decorator, "~> 1.2"},
       {:temp, "~> 0.4"},
       {:ex_doc, ">= 0.0.0", only: :dev},
-      {:benchee, "~> 0.9.0", optional: true, only: :dev}
+      {:benchee, "~> 0.9", optional: true, only: :dev}
     ]
   end
 end

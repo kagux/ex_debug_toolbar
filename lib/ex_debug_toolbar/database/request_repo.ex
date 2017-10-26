@@ -4,6 +4,15 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   use GenServer
   alias ExDebugToolbar.Request
 
+  defmodule State do
+    defstruct [
+      requests: %{},
+      pids_to_uuids: %{},
+      queue: :queue.new(),
+      count: 0
+    ]
+  end
+
   def insert(%Request{} = request) do
     GenServer.call(__MODULE__, {:insert, request})
   end
@@ -18,11 +27,11 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   end
 
   def all do
-    :ets.select(Request, [{{Request, :"_", :"_", :"$1"},[],[:"$1"]}])
+    GenServer.call(__MODULE__, :all)
   end
 
   def purge do
-    :mnesia.clear_table(Request) |> result
+    GenServer.call(__MODULE__, :purge)
   end
 
   def delete(id) do
@@ -30,25 +39,15 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   end
 
   def count do
-    :ets.select_count(Request, [{{Request, :"_", :"_", :"_"},[],[true]}])
+    GenServer.call(__MODULE__, :count)
   end
 
-  def get(pid) when is_pid(pid) do
-    do_get fn ->
-      :mnesia.dirty_read(Request, pid)
-    end
-  end
-  def get(uuid) do
-    do_get fn ->
-      :mnesia.dirty_index_read(Request, uuid, :uuid)
-    end
+  def get(id) do
+    GenServer.call(__MODULE__, {:get, id})
   end
 
-  defp do_get(func) do
-    case func.() do
-      [{Request, _, _, request}] -> {:ok, request}
-      [] -> {:error, :not_found}
-    end
+  def pop(n) do
+    GenServer.call(__MODULE__, {:pop, n})
   end
 
   def start_link do
@@ -56,57 +55,102 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   end
 
   def init(_) do
-    limit = Application.get_env(:ex_debug_toolbar, :max_requests, 30)
-    {:ok, %{limit: limit, count: 0, pids: []}}
+    {:ok, %State{}}
   end
 
   def handle_cast({:update, id, changes}, state) do
-    do_update(id, changes)
+    {_, state} = do_update(id, changes, state)
     {:noreply, state}
   end
 
   def handle_call({:update, id, changes}, _from, state) do
-    {:reply, do_update(id, changes), state}
+    {reply, state} = do_update(id, changes, state)
+    {:reply, reply, state}
   end
 
   def handle_call({:delete, id}, _from, state) do
-    case get(id) do
+    case do_get(id, state) do
       {:ok, request} ->
-        result = do_delete(request.pid)
-        pids = List.delete(state.pids, request.pid)
-        {:reply, result, %{state | count: state.count - 1, pids: pids}}
-      _ ->
-        {:reply, :error, state}
+        queue = state.queue
+          |> :queue.to_list
+          |> List.delete(request.uuid)
+          |> :queue.from_list
+        state = state |> Map.put(:queue, queue) |> delete_request(request)
+        {:reply, :ok, state}
+      error ->
+        {:reply, error, state}
     end
-
   end
 
   def handle_call({:insert, request}, _from, state) do
-    result = do_insert(request)
-    case state do
-      %{count: limit, limit: limit, pids: pids} ->
-        [last | tail] = Enum.reverse(pids)
-        pids = Enum.reverse(tail)
-        :ok = do_delete(last)
-        {:reply, result, %{state | pids: [request.pid | pids]}}
-      %{count: count, pids: pids} ->
-        {:reply, result, %{state | pids: [request.pid | pids], count: count + 1}}
+    state = state
+      |> Map.update!(:requests, &Map.put(&1, request.uuid, request))
+      |> Map.update!(:pids_to_uuids, &Map.put(&1, request.pid, request.uuid))
+      |> Map.update!(:queue, &:queue.in(request.uuid, &1))
+      |> Map.update!(:count, &(&1 + 1))
+
+    {:reply, :ok, state}
+  end
+
+  def handle_call({:get, id}, _from, state) do
+    {:reply, do_get(id, state), state}
+  end
+
+  def handle_call(:all, _from, %{requests: requests} = state) do
+    {:reply, Map.values(requests), state}
+  end
+
+  def handle_call(:purge, _from, _state) do
+    {:reply, :ok, %State{}}
+  end
+
+  def handle_call(:count, _from, state) do
+    {:reply, state.count, state}
+  end
+
+  def handle_call({:pop, n}, _from, state) do
+    len = min(n, state.count)
+    {state, removed} = 1..len |> Enum.reduce({state, []}, fn _, {state, removed} ->
+      {{:value, uuid}, queue} = :queue.out(state.queue)
+      request = Map.get(state.requests, uuid)
+      state = state |> Map.put(:queue, queue) |> delete_request(request)
+      {state, [request | removed]}
+    end)
+    {:reply, Enum.reverse(removed), state}
+  end
+
+  def do_get(pid, state) when is_pid(pid) do
+    with {:ok, uuid} <- Map.fetch(state.pids_to_uuids, pid),
+         {:ok, request} <- Map.fetch(state.requests, uuid)
+    do
+      {:ok, request}
+    else _ ->
+      {:error, :not_found}
     end
   end
 
-  def do_delete(pid) do
-    :mnesia.dirty_delete({Request, pid})
-  end
-
-  def do_insert(request) do
-    :mnesia.dirty_write({Request, request.pid, request.uuid, request}) |> result
-  end
-
-  defp do_update(id, changes) do
-    case get(id) do
-      {:ok, request} -> request |> apply_changes(changes) |> do_insert
-      _ -> :error
+  def do_get(uuid, state) do
+    case Map.fetch(state.requests, uuid) do
+      :error -> {:error, :not_found}
+      result -> result
     end
+  end
+
+  defp do_update(id, changes, state) do
+    case do_get(id, state) do
+      {:ok, request} ->
+        request = request |> apply_changes(changes)
+        state = Map.update!(state, :requests, &Map.put(&1, request.uuid, request))
+        {:ok, state}
+      _ -> {:error, state}
+    end
+  end
+
+  defp delete_request(state, request) do
+    state
+      |> Map.update!(:requests, &Map.delete(&1, request.uuid))
+      |> Map.update!(:pids_to_uuids, &Map.delete(&1, request.pid))
+      |> Map.update!(:count, &(&1 - 1))
   end
 
   defp apply_changes(request, changes) when is_map(changes) do
@@ -115,8 +159,4 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   defp apply_changes(request, changes) when is_function(changes) do
     changes.(request)
   end
-
-  defp result({:atomic, result}), do: result
-  defp result({:aborted, reason}), do: {:error, reason}
-  defp result(result), do: result
 end

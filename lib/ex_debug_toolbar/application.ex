@@ -22,9 +22,11 @@ defmodule ExDebugToolbar.Application do
     children = [
       # Start the endpoint when the application starts
       supervisor(ExDebugToolbar.Endpoint, []),
-      supervisor(ExDebugToolbar.Database.Supervisor, []),
+      worker(ExDebugToolbar.Database.RequestRepo, []),
       worker(:exec, [[env: [{'SHELL', get_shell()}, {'MIX_ENV', to_charlist(Mix.env)}]]]),
     ]
+    janitor = worker(ExDebugToolbar.Database.Janitor, [])
+    children = if Mix.env == :test, do: children, else: [janitor | children]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options
@@ -62,5 +64,6 @@ defmodule ExDebugToolbar.Application do
 
   defp phoenix_server? do
     Application.get_env(:phoenix, :serve_endpoints, false)
+    true
   end
 end

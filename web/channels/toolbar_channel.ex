@@ -57,8 +57,6 @@ defmodule ExDebugToolbar.ToolbarChannel do
   end
 
   defp history() do
-    ExDebugToolbar.get_all_requests()
-    |> Request.sort_by_date
-    |> Request.group_similar
+    ExDebugToolbar.get_all_requests() |> Request.sort_by_date
   end
 end
