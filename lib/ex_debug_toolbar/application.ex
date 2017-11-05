@@ -1,3 +1,5 @@
+Code.compiler_options(ignore_module_conflict: true)
+
 defmodule ExDebugToolbar.Application do
   @moduledoc false
 
