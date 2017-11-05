@@ -32,3 +32,5 @@ end
 defimpl Poison.Encoder, for: Function do
   defdelegate encode(func, options), to: Encoder, as: :encode_inspect
 end
+
+Code.compiler_options(ignore_module_conflict: false)

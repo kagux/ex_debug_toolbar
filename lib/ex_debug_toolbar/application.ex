@@ -62,3 +62,5 @@ defmodule ExDebugToolbar.Application do
     Application.get_env(:phoenix, :serve_endpoints, false)
   end
 end
+
+Code.compiler_options(ignore_module_conflict: false)
