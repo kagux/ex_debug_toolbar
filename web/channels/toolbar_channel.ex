@@ -2,7 +2,7 @@ defmodule ExDebugToolbar.ToolbarChannel do
   @moduledoc false
 
   use ExDebugToolbar.Web, :channel
-  alias ExDebugToolbar.{ToolbarView, Endpoint, Logger, Request}
+  alias ExDebugToolbar.{ToolbarView, Logger, Request}
   alias ExDebugToolbar.View.Helpers.TimeHelpers
   alias Phoenix.View
 
@@ -25,16 +25,6 @@ defmodule ExDebugToolbar.ToolbarChannel do
     {:ok, request} = ExDebugToolbar.get_request(request_id)
     push socket, event, build_payload(request)
     {:noreply, socket}
-  end
-
-  def broadcast_request(id \\ self()) do
-    case ExDebugToolbar.get_request(id) do
-      {:ok, request} ->
-        topic = "toolbar:request:#{request.uuid}"
-        Logger.debug("Broadcasting that request #{request.uuid} is ready")
-        Endpoint.broadcast(topic, "request:ready", %{id: request.uuid})
-      _ -> :error
-    end
   end
 
   defp build_payload(request) do

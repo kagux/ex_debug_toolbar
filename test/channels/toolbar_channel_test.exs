@@ -22,21 +22,4 @@ defmodule ExDebugToolbar.ToolbarChannelTest do
       assert %{reason: :not_found} = error
     end
   end
-
-  describe "broadcast_request/1" do
-    setup do
-      @endpoint.subscribe("toolbar:request:#{@request_id}")
-    end
-
-    test "it broadcasts request" do
-      ToolbarChannel.broadcast_request()
-      assert_broadcast "request:ready", %{id: @request_id}
-    end
-
-    test "it does nothing when request does not exist" do
-      delete_request(@request_id)
-      ToolbarChannel.broadcast_request()
-      refute_broadcast "request:ready", %{}
-    end
-  end
 end

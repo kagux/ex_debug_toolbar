@@ -6,7 +6,7 @@ defmodule ExDebugToolbar.Collector.InstrumentationCollector do
   end
   def ex_debug_toolbar(:stop, _, _) do
     ExDebugToolbar.stop_request(self())
-    ExDebugToolbar.ToolbarChannel.broadcast_request
+    ExDebugToolbar.Request.Broadcast.request_created()
   end
 
   def phoenix_controller_call(:start, _, _) do
