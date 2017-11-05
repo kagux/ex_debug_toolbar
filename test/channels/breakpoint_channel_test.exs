@@ -9,7 +9,7 @@ defmodule ExDebugToolbar.BreakpointChannelTest do
 
   test "joining and interacting with breakpoint" do
     ExDebugToolbar.pry
-    :timer.sleep 100
+    :timer.sleep 500
     {:ok, request} = get_request()
     breakpoint = request.breakpoints.entries |> Map.values |> hd
     topic = "breakpoint:#{ToolbarView.breakpoint_uuid(request, breakpoint)}"
