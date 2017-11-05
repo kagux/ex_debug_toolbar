@@ -1,6 +1,6 @@
-defmodule ExDebugToolbar.Poison.Encoder do
-  @moduledoc false
+Code.compiler_options(ignore_module_conflict: true)
 
+defmodule ExDebugToolbar.Poison.Encoder do
   def encode_inspect(term, options) do
     term |> inspect |> Poison.Encoder.encode(options)
   end
@@ -14,6 +14,7 @@ defimpl Poison.Encoder, for: Tuple do
   end
 end
 
+# redefine not to raise error
 defimpl Poison.Encoder, for: Ecto.Association.NotLoaded do
   def encode(_assoc, _options) do
     "null"
@@ -31,3 +32,5 @@ end
 defimpl Poison.Encoder, for: Function do
   defdelegate encode(func, options), to: Encoder, as: :encode_inspect
 end
+
+Code.compiler_options(ignore_module_conflict: false)
