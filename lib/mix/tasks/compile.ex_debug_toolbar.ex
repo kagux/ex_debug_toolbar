@@ -1,3 +1,5 @@
+Code.compiler_options(ignore_module_conflict: true)
+
 defmodule Mix.Tasks.Compile.ExDebugToolbar do
   @moduledoc false
 
@@ -8,3 +10,5 @@ defmodule Mix.Tasks.Compile.ExDebugToolbar do
      ExDebugToolbar.Application.update_config()
    end
 end
+
+Code.compiler_options(ignore_module_conflict: false)
