@@ -27,7 +27,7 @@ defmodule ExDebugToolbar.Decorator.Noop do
 
   defp toggle_function(flag, noop_result, body) do
     quote do
-      execute? = Application.get_env(:ex_debug_toolbar, unquote(flag), false)
+      execute? = ExDebugToolbar.Config.get(unquote(flag), false)
       if execute? do
         unquote(body)
       else
