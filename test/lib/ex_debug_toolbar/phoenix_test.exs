@@ -33,10 +33,11 @@ defmodule ExDebugToolbar.PhoenixTest do
   end
 
   test "it creates request and injects toolbar on 404 errors" do
-    conn = make_request "/", error: :no_route
+    {404, _, body} = assert_error_sent 404, fn ->
+      make_request "/", error: :no_route
+    end
     assert {:ok, request} = get_request()
     assert request.stopped?
-    assert {404, _, body} = sent_resp(conn)
     assert contains_toolbar?(body)
   end
 

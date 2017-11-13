@@ -21,7 +21,7 @@ defmodule ExDebugToolbar.Endpoint do
     plug Phoenix.CodeReloader
   end
 
-  if ExDebugToolbar.Application.debug_mode? do
+  if ExDebugToolbar.Config.debug? do
     plug Plug.Logger
     plug Plug.RequestId
   end

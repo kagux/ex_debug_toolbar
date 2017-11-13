@@ -43,7 +43,7 @@ defmodule ExDebugToolbar.Plug.CodeInjector do
   end
 
   defp js_code(path, conn) do
-    debug = Application.get_env(:ex_debug_toolbar, :debug, false)
+    debug = ExDebugToolbar.Config.debug?()
     """
     <script>
       window.ExDebugToolbar = {

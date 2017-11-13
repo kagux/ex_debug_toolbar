@@ -17,7 +17,7 @@ end
 alias ExDebugToolbar.Data.BreakpointCollection
 
 defimpl Collection, for: BreakpointCollection do
-  @breakpoints_limit Application.get_env(:ex_debug_toolbar, :breakpoints_limit, 10)
+  @breakpoints_limit ExDebugToolbar.Config.get_breakpoints_limit()
 
   def add(%{count: @breakpoints_limit} = breakpoints, %Breakpoint{}), do: breakpoints
   def add(%{count: count} = breakpoints, %Breakpoint{id: nil} = breakpoint) do
