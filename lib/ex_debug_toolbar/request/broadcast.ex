@@ -4,9 +4,10 @@ defmodule ExDebugToolbar.Request.Broadcast do
   def request_created(id \\ self()) do
     case ExDebugToolbar.get_request(id) do
       {:ok, %Request{stopped?: true} = request} ->
-        topic = "toolbar:request:#{request.uuid}"
-        Logger.debug("Broadcasting that request #{request.uuid} is ready")
-        Endpoint.broadcast(topic, "request:created", %{id: request.uuid})
+        Logger.debug("Broadcasting that request #{request.uuid} was created")
+        for topic <- ["toolbar:request:#{request.uuid}", "dashboard"] do
+          Endpoint.broadcast(topic, "request:created", %{id: request.uuid})
+        end
       _ -> :error
     end
   end
