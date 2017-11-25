@@ -10,8 +10,14 @@ defmodule ExDebugToolbar.Request.BroadcastTest do
     end
 
     test "it broadcasts stopped request" do
+      stop_request(@request_id)
       Broadcast.request_created()
       assert_broadcast "request:ready", %{id: @request_id}
+    end
+
+    test "it does nothing when request is not stopped" do
+      Broadcast.request_created()
+      refute_broadcast "request:ready", %{}
     end
 
     test "it does nothing when request does not exist" do
