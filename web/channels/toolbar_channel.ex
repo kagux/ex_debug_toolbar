@@ -3,7 +3,6 @@ defmodule ExDebugToolbar.ToolbarChannel do
 
   use ExDebugToolbar.Web, :channel
   alias ExDebugToolbar.{ToolbarView, Logger, Request}
-  alias ExDebugToolbar.View.Helpers.TimeHelpers
   alias Phoenix.View
 
   def join("toolbar:request:" <> request_id = topic, _params, socket) do
@@ -28,25 +27,9 @@ defmodule ExDebugToolbar.ToolbarChannel do
   end
 
   defp build_payload(request) do
-    Logger.debug fn ->
-      dump = inspect(request, pretty: true, safe: true, limit: :infinity)
-      "Building paylod for request #{dump}"
-    end
-    {time, payload} = :timer.tc(fn -> do_build_payload(request) end)
-    Logger.debug fn ->
-      "Toolbar rendered in " <> TimeHelpers.native_time_to_string(time)
-    end
-    payload
-  end
-
-  defp do_build_payload(request) do
-    %{
-      html: View.render_to_string(ToolbarView, "show.html", request: request, history: history()),
-      request: request
-    }
-  end
-
-  defp history() do
-    ExDebugToolbar.get_all_requests() |> Request.sort_by_date
+    PayloadHelpers.build_request_payload(request, fn ->
+      history = ExDebugToolbar.get_all_requests() |> Request.sort_by_date
+      View.render_to_string(ToolbarView, "show.html", request: request, history: history)
+    end)
   end
 end

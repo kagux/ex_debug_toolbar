@@ -48,6 +48,7 @@ defmodule ExDebugToolbar.Web do
 
       use Phoenix.Channel, log_join: @log_level, log_handle_in: @log_level
       import ExDebugToolbar.Gettext
+      alias ExDebugToolbar.Channel.Helpers.PayloadHelpers
     end
   end
 
