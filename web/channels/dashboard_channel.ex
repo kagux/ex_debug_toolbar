@@ -16,8 +16,8 @@ defmodule ExDebugToolbar.DashboardChannel do
     {:noreply, socket}
   end
 
-  def handle_out("request:deleted" = event, %{id: request_id}, socket) do
-    push socket, event, %{id: request_id}
+  def handle_out("request:deleted" = event, %{uuid: request_uuid}, socket) do
+    push socket, event, %{uuid: request_uuid}
     {:noreply, socket}
   end
 

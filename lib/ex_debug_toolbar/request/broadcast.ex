@@ -11,4 +11,8 @@ defmodule ExDebugToolbar.Request.Broadcast do
       _ -> :error
     end
   end
+
+  def request_deleted(%Request{uuid: uuid}) do
+    Endpoint.broadcast("dashboard", "request:deleted", %{uuid: uuid})
+  end
 end

@@ -3,6 +3,7 @@ defmodule ExDebugToolbar.Database.Janitor do
 
   alias ExDebugToolbar.Database.RequestRepo
   alias ExDebugToolbar.Logger
+  alias ExDebugToolbar.Request.Broadcast
 
   use GenServer
 
@@ -12,7 +13,7 @@ defmodule ExDebugToolbar.Database.Janitor do
     extra = max(0, RequestRepo.count() - limit)
     if extra > 0 do
       Logger.debug "Cleaning up #{extra} requests"
-      RequestRepo.pop(extra)
+      extra |> RequestRepo.pop |> Enum.each(&Broadcast.request_deleted/1)
     end
   end
 

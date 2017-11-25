@@ -1,6 +1,7 @@
 defmodule ExDebugToolbar.Request.BroadcastTest do
   use ExDebugToolbar.ChannelCase, async: false # cannot pin why setting this to true blows up
   alias ExDebugToolbar.Request.Broadcast
+  alias ExDebugToolbar.Request
 
   setup :start_request
 
@@ -34,6 +35,18 @@ defmodule ExDebugToolbar.Request.BroadcastTest do
     end
     defp subscribe_to_topic(%{topic: :dashboard}) do
       @endpoint.subscribe("dashboard")
+    end
+  end
+
+  describe "request_deleted/1" do
+    setup do
+      @endpoint.subscribe("dashboard")
+    end
+
+    test "it broadcasts request to dashboard channel topic" do
+      request = %Request{uuid: "uuid"}
+      Broadcast.request_deleted(request)
+      assert_broadcast "request:deleted", %{uuid: "uuid"}
     end
   end
 end

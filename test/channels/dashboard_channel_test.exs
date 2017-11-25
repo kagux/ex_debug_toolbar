@@ -16,10 +16,10 @@ defmodule ExDebugToolbar.DashboardChannelTest do
       assert_push "request:created", %{html: _, request: ^request}
     end
 
-    test "pushes request to the socket on request:deleted event" do
+    test "pushes request uuid to the socket on request:deleted event" do
       {:ok, _, socket} = subscribe_and_join_dashboard()
-      broadcast_from socket, "request:deleted", %{id: @request_id}
-      assert_push "request:deleted", %{id: @request_id}
+      broadcast_from socket, "request:deleted", %{uuid: "uuid"}
+      assert_push "request:deleted", %{uuid: "uuid"}
     end
   end
 
