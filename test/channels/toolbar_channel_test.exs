@@ -22,4 +22,9 @@ defmodule ExDebugToolbar.ToolbarChannelTest do
       assert %{reason: :not_found} = error
     end
   end
+
+  describe "request:created broadcast" do
+
+
+  end
 end

@@ -21,7 +21,7 @@ defmodule ExDebugToolbar.ToolbarChannel do
     end
   end
 
-  def handle_out("request:ready" = event, %{id: request_id}, socket) do
+  def handle_out("request:created" = event, %{id: request_id}, socket) do
     {:ok, request} = ExDebugToolbar.get_request(request_id)
     push socket, event, build_payload(request)
     {:noreply, socket}

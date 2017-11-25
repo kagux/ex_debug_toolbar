@@ -43,7 +43,7 @@ class App {
       this.logger.debug('Unable to join channel', resp)
     });
 
-    channel.on("request:ready", this.onChannelResponse.bind(this));
+    channel.on("request:created", this.onChannelResponse.bind(this));
   }
 
   onChannelResponse(response){

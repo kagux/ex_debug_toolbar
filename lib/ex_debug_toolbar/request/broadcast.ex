@@ -6,7 +6,7 @@ defmodule ExDebugToolbar.Request.Broadcast do
       {:ok, %Request{stopped?: true} = request} ->
         topic = "toolbar:request:#{request.uuid}"
         Logger.debug("Broadcasting that request #{request.uuid} is ready")
-        Endpoint.broadcast(topic, "request:ready", %{id: request.uuid})
+        Endpoint.broadcast(topic, "request:created", %{id: request.uuid})
       _ -> :error
     end
   end
