@@ -34,13 +34,13 @@ defmodule ExDebugToolbar.Request.BroadcastTest do
       @endpoint.subscribe("toolbar:request:#{@request_id}")
     end
     defp subscribe_to_topic(%{topic: :dashboard}) do
-      @endpoint.subscribe("dashboard")
+      @endpoint.subscribe("dashboard:history")
     end
   end
 
   describe "request_deleted/1" do
     setup do
-      @endpoint.subscribe("dashboard")
+      @endpoint.subscribe("dashboard:history")
     end
 
     test "it broadcasts request to dashboard channel topic" do

@@ -24,6 +24,6 @@ defmodule ExDebugToolbar.DashboardChannelTest do
   end
 
   defp subscribe_and_join_dashboard do
-    socket() |> subscribe_and_join(DashboardChannel, "dashboard")
+    socket() |> subscribe_and_join(DashboardChannel, "dashboard:history")
   end
 end

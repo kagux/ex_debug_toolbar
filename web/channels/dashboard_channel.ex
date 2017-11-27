@@ -5,7 +5,7 @@ defmodule ExDebugToolbar.DashboardChannel do
   alias ExDebugToolbar.DashboardView
   alias Phoenix.View
 
-  def join("dashboard" = topic, _payload, socket) do
+  def join("dashboard:history" = topic, _payload, socket) do
     ExDebugToolbar.Endpoint.subscribe(topic)
     {:ok, socket}
   end

@@ -1,4 +1,4 @@
-<tr class="<%= history_row_color(@request.conn) %>">
+<tr class="<%= history_row_color(@request.conn) %>" id="<%= @request.uuid %>">
   <td class="nowrap">
     <span class="label label-<%= conn_status_color_class(@request.conn) %>"><%= @request.conn.status %></span>
   </td>

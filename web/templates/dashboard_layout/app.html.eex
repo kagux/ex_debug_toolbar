@@ -125,6 +125,11 @@
     </div>
     <!-- ./wrapper -->
 
+    <script>
+      window.ExDebugToolbar = {
+        debug: <%= if ExDebugToolbar.Config.debug?(), do: "true", else: "false" %>
+      };
+    </script>
     <script src="<%= static_path(@conn, "/js/dashboard.js") %>"></script>
   </body>
 </html>

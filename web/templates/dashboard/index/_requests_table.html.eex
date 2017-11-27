@@ -1,4 +1,4 @@
-<div class="box">
+<div class="box <%= if @requests == [], do: "hidden" %>" id="requests-history-container">
   <div class="box-body table-responsive no-padding">
     <table id="requests-history" class="table table-hover">
       <thead>

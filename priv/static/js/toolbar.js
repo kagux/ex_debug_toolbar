@@ -21203,12 +21203,12 @@ var HistoryPanel = function () {
 exports.default = HistoryPanel;
 });
 
+require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("admin-lte/dist/js/adminlte.min.js", "admin-lte");
-require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
 require.alias("jquery/dist/jquery.js", "jquery");
+require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
 require.alias("process/browser.js", "process");
 require.alias("prismjs/prism.js", "prismjs");
-require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("xterm/lib/xterm.js", "xterm");process = require('process');require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');
