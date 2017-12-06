@@ -29,7 +29,7 @@ defmodule ExDebugToolbar.Database.JanitorTest do
     end
 
     test "it broadcasts request:deleted event for each popped requests" do
-      @endpoint.subscribe "dashboard"
+      @endpoint.subscribe "dashboard:history"
       Janitor.cleanup_requests()
       assert_broadcast "request:deleted", %{uuid: 1}
       assert_broadcast "request:deleted", %{uuid: 2}
