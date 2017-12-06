@@ -9,7 +9,8 @@ defmodule ExDebugToolbar.Database.RequestRepo do
       requests: %{},
       pids_to_uuids: %{},
       queue: :queue.new(),
-      count: 0
+      count: 0,
+      stopped_count: 0
     ]
   end
 
@@ -26,6 +27,10 @@ defmodule ExDebugToolbar.Database.RequestRepo do
     end
   end
 
+  def stop(id) do
+    GenServer.call(__MODULE__, {:stop, id}, :infinity)
+  end
+
   def all do
     GenServer.call(__MODULE__, :all)
   end
@@ -40,6 +45,10 @@ defmodule ExDebugToolbar.Database.RequestRepo do
 
   def count do
     GenServer.call(__MODULE__, :count)
+  end
+
+  def stopped_count do
+    GenServer.call(__MODULE__, :stopped_count)
   end
 
   def get(id) do
@@ -92,6 +101,22 @@ defmodule ExDebugToolbar.Database.RequestRepo do
     {:reply, :ok, state}
   end
 
+  def handle_call({:stop, id}, _from, state) do
+    {reply, state} =
+      case do_get(id, state) do
+        {:ok, %{stopped?: true}} ->
+          {:ok, state}
+        {:ok, request} ->
+          request = %{request | stopped?: true}
+          state = state
+          |> Map.update!(:requests, &Map.put(&1, request.uuid, request))
+          |> Map.update!(:stopped_count, &(&1 + 1))
+          {:ok, state}
+        _ -> {:error, state}
+      end
+    {:reply, reply, state}
+  end
+
   def handle_call({:get, id}, _from, state) do
     {:reply, do_get(id, state), state}
   end
@@ -106,6 +131,10 @@ defmodule ExDebugToolbar.Database.RequestRepo do
 
   def handle_call(:count, _from, state) do
     {:reply, state.count, state}
+  end
+
+  def handle_call(:stopped_count, _from, state) do
+    {:reply, state.stopped_count, state}
   end
 
   def handle_call({:pop, n}, _from, state) do
@@ -148,9 +177,10 @@ defmodule ExDebugToolbar.Database.RequestRepo do
 
   defp delete_request(state, request) do
     state
-      |> Map.update!(:requests, &Map.delete(&1, request.uuid))
-      |> Map.update!(:pids_to_uuids, &Map.delete(&1, request.pid))
-      |> Map.update!(:count, &(&1 - 1))
+    |> Map.update!(:requests, &Map.delete(&1, request.uuid))
+    |> Map.update!(:pids_to_uuids, &Map.delete(&1, request.pid))
+    |> Map.update!(:count, &(&1 - 1))
+    |> dec_stopped_count(request)
   end
 
   defp apply_changes(request, changes) when is_map(changes) do
@@ -159,4 +189,9 @@ defmodule ExDebugToolbar.Database.RequestRepo do
   defp apply_changes(request, changes) when is_function(changes) do
     changes.(request)
   end
+
+  defp dec_stopped_count(state, %{stopped?: true}) do
+    state |> Map.update!(:stopped_count, &(&1 - 1))
+  end
+  defp dec_stopped_count(state, _), do: state
 end

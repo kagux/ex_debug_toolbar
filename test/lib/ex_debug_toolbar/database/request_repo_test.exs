@@ -32,18 +32,10 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
     end
 
     test "returns request by pid", %{request: request} do
-      self_pid = self()
-      pid = spawn fn ->
+      pid = run_in_new_process fn _ ->
         request = %{request | pid: self()}
         :ok = RequestRepo.insert(request)
-        send self_pid, :done
       end
-      msg = receive do
-        :done -> :ok
-      after
-        200 -> :error
-      end
-      assert msg == :ok
       assert {:ok, request} = RequestRepo.get(pid)
       assert request.uuid == @request_id
     end
@@ -73,17 +65,9 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
     end
 
     test "acceps pid instead of id" do
-      pid = self()
-      spawn fn ->
-        assert :ok = RequestRepo.update(pid, %{logs: [:bar]})
-        send pid, :done
+      run_in_new_process fn test_pid ->
+        assert :ok = RequestRepo.update(test_pid, %{logs: [:bar]})
       end
-      msg = receive do
-        :done -> :ok
-      after
-        200 -> :error
-      end
-      assert msg == :ok
       assert {:ok, updated_request} = get_request(@request_id)
       assert updated_request.logs == [:bar]
     end
@@ -112,35 +96,24 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
     end
 
     test "returns all requests" do
-      pid_1 = spawn fn -> :ok end
-      pid_2 = spawn fn -> :ok end
-      requests = [%Request{pid: pid_1, uuid: 1}, %Request{pid: pid_2, uuid: 2}]
-      for request <- requests do
-        :ok = RequestRepo.insert(request)
-      end
+      requests = insert_requests(2)
       assert requests == RequestRepo.all |> Enum.sort_by(&(&1.uuid))
     end
   end
 
   describe "delete/1" do
     setup do
-      pid_1 = spawn fn -> :ok end
-      pid_2 = spawn fn -> :ok end
-      requests = [%Request{pid: pid_1, uuid: 1}, %Request{pid: pid_2, uuid: 2}]
-      for request <- requests do
-        :ok = RequestRepo.insert(request)
-      end
-      {:ok, %{requests: requests, pids: [pid_1, pid_2]}}
+      [requests: insert_requests(2)]
     end
 
-    test "deletes request by id", context do
+    test "deletes request by id", %{requests: requests}do
       assert :ok = RequestRepo.delete(1)
-      assert RequestRepo.all() == context.requests |> tl
+      assert RequestRepo.all() == requests |> tl
     end
 
-    test "deletes request by pid", context do
-      assert :ok = context.pids |> List.last |> RequestRepo.delete
-      assert RequestRepo.all() == context.requests |> Enum.reverse |> tl
+    test "deletes request by pid", %{requests: requests} do
+      assert :ok = requests |> List.last |> Map.get(:pid) |> RequestRepo.delete
+      assert RequestRepo.all() == requests |> Enum.reverse |> tl
     end
 
     test "it returns error if request doesn't exist" do
@@ -155,31 +128,68 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
     assert RequestRepo.all() == []
   end
 
+  describe "stopped_count/0" do
+    setup do
+      [stopped_request, running_request] = insert_requests(2)
+      RequestRepo.stop(stopped_request.uuid)
+      [stopped_request: stopped_request, running_request: running_request]
+    end
+
+    test "counts only stopped requests" do
+      assert RequestRepo.stopped_count() == 1
+    end
+
+    test "number of requests after deleting stopped request", %{stopped_request: request} do
+      RequestRepo.delete(request.uuid)
+      assert RequestRepo.stopped_count() == 0
+    end
+
+    test "number of requests after deleting running request", %{running_request: request} do
+      RequestRepo.delete(request.uuid)
+      assert RequestRepo.stopped_count() == 1
+    end
+
+    test "number of requests after purging" do
+      RequestRepo.purge()
+      assert RequestRepo.stopped_count() == 0
+    end
+
+    test "number of requests after popping stopped request" do
+      RequestRepo.pop(1)
+      assert RequestRepo.stopped_count() == 0
+    end
+
+    test "number of requests after popping running request" do
+      [request] = insert_requests(1) # adds stopped at the end
+      RequestRepo.stop(request.uuid)
+      RequestRepo.pop(2) # pop one stopped and one running
+      assert RequestRepo.stopped_count() == 1
+    end
+  end
+
   describe "count/0" do
     test "number of requests after inserting" do
-      pid_1 = spawn fn -> :ok end
-      pid_2 = spawn fn -> :ok end
       assert RequestRepo.count == 0
-      :ok = RequestRepo.insert(%Request{pid: pid_1, uuid: 1})
+      insert_requests(1)
       assert RequestRepo.count == 1
-      :ok = RequestRepo.insert(%Request{pid: pid_2, uuid: 2})
+      insert_requests(1)
       assert RequestRepo.count == 2
     end
 
     test "number of requests after deleting" do
-      :ok = RequestRepo.insert(%Request{pid: self(), uuid: 1})
+      insert_requests(1)
       RequestRepo.delete(1)
       assert RequestRepo.count() == 0
     end
 
     test "number of requests after purging" do
-      :ok = RequestRepo.insert(%Request{pid: self(), uuid: 1})
+      insert_requests(1)
       RequestRepo.purge()
       assert RequestRepo.count() == 0
     end
 
     test "number of requests after popping" do
-      :ok = RequestRepo.insert(%Request{pid: self(), uuid: 1})
+      insert_requests(1)
       RequestRepo.pop(1)
       assert RequestRepo.count() == 0
     end
@@ -187,10 +197,7 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
 
   describe "pop/1" do
     setup do
-      for n <- 1..3 do
-        pid = spawn fn -> :ok end
-        :ok = RequestRepo.insert %Request{pid: pid, uuid: n}
-      end
+      insert_requests(3)
       :ok
     end
 
@@ -234,8 +241,57 @@ defmodule ExDebugToolbar.Database.RequestRepoTest do
     end
   end
 
+  describe "stop/1" do
+    test "flags request as stopped", %{request: request} do
+      :ok = RequestRepo.insert(request)
+      {:ok, request} = RequestRepo.get(@request_id)
+      refute request.stopped?
+      :ok = RequestRepo.stop(@request_id)
+      {:ok, request} = RequestRepo.get(@request_id)
+      assert request.stopped?
+    end
+
+    test "accepts pid as id", %{request: request} do
+      :ok = RequestRepo.insert(request)
+      run_in_new_process fn test_pid ->
+        :ok = RequestRepo.stop(test_pid)
+      end
+      {:ok, request} = RequestRepo.get(@request_id)
+      assert request.stopped?
+    end
+  end
+
   defp cleanup_requests do
     :ok = Supervisor.terminate_child(ExDebugToolbar.Supervisor, RequestRepo)
     {:ok, _} = Supervisor.restart_child(ExDebugToolbar.Supervisor, RequestRepo)
+  end
+
+  defp run_in_new_process(fun) do
+    test_pid = self()
+    pid = spawn fn ->
+      fun.(test_pid)
+      send test_pid, :done
+    end
+    :ok = receive do
+      :done -> :ok
+    after
+      200 -> :error
+    end
+    pid
+  end
+
+  defp insert_requests(count) do
+    requests =
+    fn -> :ok end
+    |> List.duplicate(count)
+    |> Stream.map(&spawn/1)
+    |> Stream.zip(1..count)
+    |> Enum.map(fn {pid, uuid} ->
+      %Request{pid: pid, uuid: uuid}
+    end)
+
+    requests |> Enum.each(&RequestRepo.insert/1)
+
+    requests
   end
 end
