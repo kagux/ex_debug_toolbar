@@ -49,7 +49,7 @@ class App {
   }
 
   onRequestCreated(data){
-    this.logger.debug('Adding request', data.uuid, data.request);
+    this.logger.debug('Adding request', data.request.uuid, data.request);
     $(data.html).prependTo('#requests-history > tbody');
     this.requestCountEl.text(++this.requestsCount);
     if (this.requestsCount == 1) {
