@@ -3,14 +3,15 @@ defmodule ExDebugToolbar.Database.JanitorTest do
 
   import ExDebugToolbar.Test.Support.RequestHelpers
   alias ExDebugToolbar.Database.{RequestRepo, Janitor}
-  alias ExDebugToolbar.Request
+  alias ExDebugToolbar.{Request, Config}
 
   describe "cleanup_requests/0" do
     setup do
       RequestRepo.purge()
-      Application.put_env(:ex_debug_toolbar, :max_requests, 2)
+      limit = Config.get_requests_limit()
+      Config.set_requests_limit(2)
       on_exit fn ->
-        Application.put_env(:ex_debug_toolbar, :max_requests, 30)
+        Config.set_requests_limit(limit)
       end
       for n <- 1..4 do
         pid = spawn fn -> :ok end

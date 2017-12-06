@@ -7,7 +7,7 @@ config :ex_debug_toolbar,
   breakpoints_limit: 3,
   remove_glob_params: true,
   debug: false,
-  max_requests: 10
+  requests_limit: 10
 
 config :ex_debug_toolbar, ExDebugToolbar.Fixtures.Endpoint,
   instrumenters: [ExDebugToolbar.Collector.InstrumentationCollector],

@@ -2,14 +2,14 @@ defmodule ExDebugToolbar.Database.Janitor do
   @moduledoc false
 
   alias ExDebugToolbar.Database.RequestRepo
-  alias ExDebugToolbar.Logger
+  alias ExDebugToolbar.{Logger, Config}
   alias ExDebugToolbar.Request.Broadcast
 
   use GenServer
 
   @doc "deletes requests from repository once they reach a limit"
   def cleanup_requests do
-    limit = Application.get_env(:ex_debug_toolbar, :max_requests, 30)
+    limit = Config.get_requests_limit()
     extra = max(0, RequestRepo.count() - limit)
     if extra > 0 do
       Logger.debug "Cleaning up #{extra} requests"

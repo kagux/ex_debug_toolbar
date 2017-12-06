@@ -2,6 +2,7 @@ Code.compiler_options(ignore_module_conflict: true)
 
 defmodule ExDebugToolbar.Config do
   @breakpoints_limit 10
+  @requests_limit 30
 
   def get(key, default) do
     Application.get_env(:ex_debug_toolbar, key, default)
@@ -30,6 +31,14 @@ defmodule ExDebugToolbar.Config do
 
   def get_breakpoints_limit do
     Application.get_env(:ex_debug_toolbar, :breakpoints_limit, @breakpoints_limit)
+  end
+
+  def get_requests_limit do
+    Application.get_env(:ex_debug_toolbar, :requests_limit, @requests_limit)
+  end
+
+  def set_requests_limit(limit) do
+    Application.put_env(:ex_debug_toolbar, :requests_limit, limit)
   end
 
   def update do
