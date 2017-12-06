@@ -16,6 +16,9 @@ defmodule ExDebugToolbar.Database.JanitorTest do
       for n <- 1..4 do
         pid = spawn fn -> :ok end
         :ok = RequestRepo.insert %Request{pid: pid, uuid: n}
+        on_exit fn ->
+          delete_request(n)
+        end
       end
       :ok
     end

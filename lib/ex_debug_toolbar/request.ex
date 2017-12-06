@@ -18,4 +18,8 @@ defmodule ExDebugToolbar.Request do
   def sort_by_date(requests) do
     Enum.sort(requests, &(NaiveDateTime.compare(&2.created_at, &1.created_at) == :lt))
   end
+
+  def filter_stopped(requests) do
+    Enum.filter(requests, &(&1.stopped?))
+  end
 end
