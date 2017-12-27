@@ -19,9 +19,11 @@ if Config.enabled?() and Config.debug?() do
 
   # redefine not to raise error
   defimpl Poison.Encoder, for: Ecto.Association.NotLoaded do
-    def encode(_assoc, _options) do
-      "null"
-    end
+    def encode(_assoc, _options), do: "null"
+  end
+
+  defimpl Poison.Encoder, for: Regex do
+    def encode(regex, _options), do: Regex.source(regex)
   end
 
   defimpl Poison.Encoder, for: Port do
