@@ -1,13 +1,14 @@
 Code.compiler_options(ignore_module_conflict: true)
 
-defmodule ExDebugToolbar.Poison.Encoder do
-  def encode_inspect(term, options) do
-    term |> inspect |> Poison.Encoder.encode(options)
+alias ExDebugToolbar.Config
+
+if Config.enabled?() and Config.debug?() do
+  defmodule ExDebugToolbar.Poison.Encoder do
+    def encode_inspect(term, options) do
+      term |> inspect |> Poison.Encoder.encode(options)
+    end
   end
-end
 
-
-if ExDebugToolbar.Config.enabled?() do
   alias ExDebugToolbar.Poison.Encoder
 
   defimpl Poison.Encoder, for: Tuple do
