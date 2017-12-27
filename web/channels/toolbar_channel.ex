@@ -2,7 +2,7 @@ defmodule ExDebugToolbar.ToolbarChannel do
   @moduledoc false
 
   use ExDebugToolbar.Web, :channel
-  alias ExDebugToolbar.{ToolbarView, Endpoint, Logger}
+  alias ExDebugToolbar.{ToolbarView, Endpoint, Logger, Config}
   alias ExDebugToolbar.View.Helpers.TimeHelpers
   alias Phoenix.View
 
@@ -52,7 +52,8 @@ defmodule ExDebugToolbar.ToolbarChannel do
   defp do_build_payload(request) do
     %{
       html: View.render_to_string(ToolbarView, "show.html", request: request, history: history()),
-      request: request
+      uuid: request.uuid,
+      request: (if Config.debug?(), do: request, else: nil)
     }
   end
 

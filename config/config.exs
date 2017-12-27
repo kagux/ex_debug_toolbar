@@ -6,7 +6,7 @@ config :ex_debug_toolbar,
   iex_shell_cmd: "stty echo\n",
   breakpoints_limit: 3,
   remove_glob_params: true,
-  debug: false
+  debug: true
 
 config :ex_debug_toolbar, ExDebugToolbar.Fixtures.Endpoint,
   instrumenters: [ExDebugToolbar.Collector.InstrumentationCollector],

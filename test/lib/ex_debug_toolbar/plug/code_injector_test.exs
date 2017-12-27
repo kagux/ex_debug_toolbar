@@ -9,7 +9,7 @@ defmodule ExDebugToolbar.Plug.CodeInjectorTest do
   <script>
     window.ExDebugToolbar = {
       requestId: 'request_123',
-      debug: false
+      debug: true
     };
   </script>
   <script src='/__ex_debug_toolbar__/js/toolbar.js'></script>
