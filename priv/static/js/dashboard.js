@@ -14317,6 +14317,7 @@ var App = function () {
     value: function render() {
       this.logger.debug('Rendering dashboard');
       this.joinToolbarChannel(this.socket);
+      (0, _jquery2.default)("#requests-history").on("click", "tr", this.onRequestClick);
     }
   }, {
     key: 'initSocket',
@@ -14351,13 +14352,19 @@ var App = function () {
   }, {
     key: 'onRequestCreated',
     value: function onRequestCreated(data) {
-      this.logger.debug('Adding request', data.uuid, data.request);
+      this.logger.debug('Adding request', data.request.uuid, data.request);
       (0, _jquery2.default)(data.html).prependTo('#requests-history > tbody');
       this.requestCountEl.text(++this.requestsCount);
       if (this.requestsCount == 1) {
         (0, _jquery2.default)('#no-requests-history').hide();
         (0, _jquery2.default)('#requests-history-container').removeClass('hidden');
       }
+    }
+  }, {
+    key: 'onRequestClick',
+    value: function onRequestClick() {
+      var id = (0, _jquery2.default)(this).attr("id");
+      window.location = "/__ex_debug_toolbar__/requests/" + id;
     }
   }]);
 
@@ -14441,10 +14448,10 @@ var Logger = function () {
 exports.default = Logger;
 });
 
-require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("admin-lte/dist/js/adminlte.min.js", "admin-lte");
-require.alias("jquery/dist/jquery.js", "jquery");
+require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
+require.alias("jquery/dist/jquery.js", "jquery");
 require.alias("process/browser.js", "process");
 require.alias("prismjs/prism.js", "prismjs");
 require.alias("xterm/lib/xterm.js", "xterm");process = require('process');require.register("___globals___", function(exports, require, module) {

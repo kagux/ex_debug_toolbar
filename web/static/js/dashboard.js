@@ -18,6 +18,7 @@ class App {
   render() {
     this.logger.debug('Rendering dashboard')
     this.joinToolbarChannel(this.socket);
+    $("#requests-history").on("click", "tr", this.onRequestClick);
   }
 
   initSocket() {
@@ -56,6 +57,11 @@ class App {
       $('#no-requests-history').hide();
       $('#requests-history-container').removeClass('hidden');
     }
+  }
+
+  onRequestClick() {
+    const id = $(this).attr("id");
+    window.location = "/__ex_debug_toolbar__/requests/" + id;
   }
 }
 

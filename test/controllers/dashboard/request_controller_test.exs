@@ -23,4 +23,16 @@ defmodule ExDebugToolbar.Dashboard.RequestControllerTest do
       assert conn.assigns.requests == []
     end
   end
+
+  describe "show/2" do
+    test "it renders", %{conn: conn} do
+      conn = get conn, "/requests/#{@request_id}"
+      assert conn.status == 200
+    end
+
+    test "it renders for missing request", %{conn: conn} do
+      conn = get conn, "/requests/invalid_request_id"
+      assert conn.status == 200
+    end
+  end
 end

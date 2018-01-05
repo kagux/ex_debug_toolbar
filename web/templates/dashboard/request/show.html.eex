@@ -1,0 +1,14 @@
+<div class="col-xs-12">
+  <%= if @request do %>
+    <%= render "show/_request.html", request: @request %>
+  <% else %>
+    <h2 class="headline text-yellow"> Request no longer exists :( </h2>
+    <p>
+      You can adjust number of requests kept in history in your config file. 
+      Here's a link to a <a href="https://github.com/kagux/ex_debug_toolbar#available-options" target="_blank">full list of available options</a>.
+    </p>
+    <p>
+      <%= link "Return back to all requests", to: request_path(@conn, :index) %>
+    </p>
+  <% end %>
+</div>

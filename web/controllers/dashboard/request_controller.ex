@@ -15,4 +15,15 @@ defmodule ExDebugToolbar.Dashboard.RequestController do
     |> assign(:requests, requests)
     |> render("index.html")
   end
+
+  def show(conn, %{"id" => request_id}) do
+    request =
+      case ExDebugToolbar.get_request(request_id) do
+        {:ok, request} -> request
+        _ -> nil
+      end
+    conn
+    |> assign(:request, request)
+    |> render("show.html")
+  end
 end

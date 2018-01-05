@@ -14,5 +14,6 @@ defmodule ExDebugToolbar.Router do
   scope "/", ExDebugToolbar.Dashboard do
     pipe_through :browser
     get "/", RequestController, :index
+    resources "/requests", RequestController, only: [:show]
   end
 end
