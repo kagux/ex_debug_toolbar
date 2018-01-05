@@ -20,7 +20,7 @@
       <header class="main-header">
 
         <!-- Logo -->
-        <a href="<%= dashboard_path(@conn, :index) %>" class="logo">
+        <a href="<%= request_path(@conn, :index) %>" class="logo">
           <!-- mini logo for sidebar mini 50x50 pixels -->
           <span class="logo-mini"><b>E</b>D<b>T</b></span>
           <!-- logo for regular state and mobile devices -->

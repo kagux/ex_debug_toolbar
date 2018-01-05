@@ -1,9 +1,9 @@
-defmodule ExDebugToolbar.DashboardControllerTest do
+defmodule ExDebugToolbar.Dashboard.RequestControllerTest do
   use ExDebugToolbar.ConnCase, async: false
 
   setup :start_request
 
-  describe "show/2" do
+  describe "index/2" do
     test "it renders", %{conn: conn} do
       conn = get conn, "/"
       assert conn.status == 200

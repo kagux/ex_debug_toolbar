@@ -11,8 +11,8 @@ defmodule ExDebugToolbar.Router do
     plug :put_secure_browser_headers
   end
 
-  scope "/", ExDebugToolbar do
+  scope "/", ExDebugToolbar.Dashboard do
     pipe_through :browser
-    get "/", DashboardController, :index
+    get "/", RequestController, :index
   end
 end

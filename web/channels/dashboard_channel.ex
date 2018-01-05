@@ -2,7 +2,7 @@ defmodule ExDebugToolbar.DashboardChannel do
   @moduledoc false
 
   use ExDebugToolbar.Web, :channel
-  alias ExDebugToolbar.DashboardView
+  alias ExDebugToolbar.Dashboard.RequestView
   alias Phoenix.View
 
   def join("dashboard:history" = topic, _payload, socket) do
@@ -23,7 +23,7 @@ defmodule ExDebugToolbar.DashboardChannel do
 
   defp build_payload(request) do
     PayloadHelpers.build_request_payload(request, fn ->
-      View.render_to_string(DashboardView, "index/_request_table_row.html", request: request)
+      View.render_to_string(RequestView, "index/_request_table_row.html", request: request)
     end)
   end
 end

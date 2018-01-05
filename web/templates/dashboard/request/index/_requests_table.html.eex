@@ -10,7 +10,7 @@
         <th> Timestamp </th>
       </thead>
       <tbody>
-        <%= render_many @requests, ExDebugToolbar.DashboardView, "index/_request_table_row.html", as: :request %>
+        <%= render_many @requests, ExDebugToolbar.Dashboard.RequestView, "index/_request_table_row.html", as: :request %>
       </tbody>
     </table>
   </div>

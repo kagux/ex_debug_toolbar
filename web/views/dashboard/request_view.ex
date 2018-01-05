@@ -1,4 +1,4 @@
-defmodule ExDebugToolbar.DashboardView do
+defmodule ExDebugToolbar.Dashboard.RequestView do
   @moduledoc false
 
   use ExDebugToolbar.Web, :view
