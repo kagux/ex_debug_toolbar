@@ -45,7 +45,7 @@
           <ul class="sidebar-menu" data-widget="tree">
             <li class="header"> Dashboard </li>
             <li>
-              <a href="#">
+              <a href="<%= request_path(@conn, :index) %>">
                 <i class="fa fa-bar-chart"></i> <span>History</span>
                 <span class="pull-right-container">
                   <small id="requests-count" class="label pull-right bg-blue"><%= ExDebugToolbar.get_requests_count() %> </small>
