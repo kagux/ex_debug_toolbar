@@ -13254,5 +13254,8 @@ table.text-center th {
 #requests-history tr {
   cursor: pointer; }
 
+.box-body .progress {
+  margin-bottom: 0px; }
+
 
 /*# sourceMappingURL=dashboard.css.map*/

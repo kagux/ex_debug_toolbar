@@ -14318,6 +14318,7 @@ var App = function () {
       this.logger.debug('Rendering dashboard');
       this.joinToolbarChannel(this.socket);
       (0, _jquery2.default)("#requests-history").on("click", "tr", this.onRequestClick);
+      (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
     }
   }, {
     key: 'initSocket',

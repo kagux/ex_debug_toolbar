@@ -19,6 +19,7 @@ class App {
     this.logger.debug('Rendering dashboard')
     this.joinToolbarChannel(this.socket);
     $("#requests-history").on("click", "tr", this.onRequestClick);
+    $('[data-toggle="tooltip"]').tooltip();
   }
 
   initSocket() {
