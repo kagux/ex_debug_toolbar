@@ -13245,14 +13245,14 @@ table.text-center th {
   border-bottom-right-radius: 2px;
   border-bottom-left-radius: 0; }
 
-#requests-chart {
-  max-height: 300px; }
-
 .invisible-row {
   display: none; }
 
 .rows-collapse {
   display: none; }
+
+#requests-history tr {
+  cursor: pointer; }
 
 
 /*# sourceMappingURL=dashboard.css.map*/

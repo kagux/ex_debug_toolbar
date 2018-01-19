@@ -5,14 +5,14 @@
 @import 'admin-lte/dist/css/AdminLTE';
 @import 'admin-lte/dist/css/skins/skin-yellow';
 
-#requests-chart {
-  max-height: 300px;
-}
-
 .invisible-row {
   display: none;
 }
 
 .rows-collapse {
   display: none;
+}
+
+#requests-history tr {
+  cursor: pointer;
 }
