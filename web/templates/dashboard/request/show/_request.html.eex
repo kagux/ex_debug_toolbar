@@ -1,9 +1,30 @@
 <div class="nav-tabs-custom">
   <ul class="nav nav-tabs">
-    <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="false">Overview</a></li>
-    <li><a href="#tab_3" data-toggle="tab" aria-expanded="true">Database</a></li>
-    <li><a href="#tab_3" data-toggle="tab" aria-expanded="true">Logs</a></li>
-    <li><a href="#tab_3" data-toggle="tab" aria-expanded="true">Breakpoints</a></li>
+    <li class="active">
+      <a href="#tab_1" data-toggle="tab" aria-expanded="false">
+        <i class="fa fa-heartbeat" aria-hidden="true"></i>&nbsp;Overview
+      </a>
+    </li>
+    <li>
+      <a href="#tab_3" data-toggle="tab" aria-expanded="true">
+        <i class="fa fa-database" aria-hidden="true"></i>&nbsp;Ecto
+      </a>
+    </li>
+    <li>
+      <a href="#tab_3" data-toggle="tab" aria-expanded="true">
+        <i class="fa fa-file-text-o" aria-hidden="true"></i>&nbsp;Templates
+      </a>
+    </li>
+    <li>
+      <a href="#tab_3" data-toggle="tab" aria-expanded="true">
+        <i class="fa fa-stop-circle" aria-hidden="true"></i>&nbsp;Breakpoints
+      </a>
+    </li>
+    <li>
+      <a href="#tab_3" data-toggle="tab" aria-expanded="true">
+        <i class="fa fa-book" aria-hidden="true"></i>&nbsp;Logs
+      </a>
+    </li>
   </ul>
   <div class="tab-content">
     <div class="tab-pane" id="tab_1">
