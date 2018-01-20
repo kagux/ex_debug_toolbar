@@ -63,21 +63,6 @@ defmodule ExDebugToolbar.ToolbarView do
     |> Enum.join("<br>")
   end
 
-  def controller_times(%Timeline{} = timeline) do
-    event_names = MapSet.new ~w(controller.call controller.render)
-    events = timeline
-    |> Timeline.get_all_events
-    |> Enum.filter(&MapSet.member?(event_names, &1.name))
-    {call, render} = case events do
-      [call, render] -> {call, render}
-      [call] -> {call, %Timeline.Event{}}
-    end
-    [
-      "Controller": call.duration - render.duration,
-      "Templates": render.duration,
-    ]
-  end
-
   def ecto_inline_queries(queries) do
     queries |> Enum.filter(fn {_, _, type} -> type == :inline end)
   end

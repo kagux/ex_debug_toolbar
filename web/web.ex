@@ -32,6 +32,8 @@ defmodule ExDebugToolbar.Web do
       import ExDebugToolbar.View.Helpers.TimeHelpers
       import ExDebugToolbar.View.Helpers.ConnHelpers
       import ExDebugToolbar.View.Helpers.HistoryHelpers
+
+      import ExDebugToolbar.Data.Timeline
     end
   end
 
