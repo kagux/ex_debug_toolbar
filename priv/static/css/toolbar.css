@@ -5510,41 +5510,29 @@
   #ex-debug-toolbar .terminal a.xterm-invalid-link:hover, #ex-debug-toolbar .terminal .navbar-nav.nav > li > span.xterm-invalid-link:hover {
     cursor: text;
     text-decoration: none; }
-  #ex-debug-toolbar .terminal.focus:not(.xterm-cursor-style-underline):not(.xterm-cursor-style-bar) .terminal-cursor {
-    background-color: #fff;
-    color: #000; }
+  #ex-debug-toolbar .terminal .terminal-cursor {
+    position: relative; }
   #ex-debug-toolbar .terminal:not(.focus) .terminal-cursor {
     outline: 1px solid #fff;
-    outline-offset: -1px;
-    background-color: transparent; }
-  #ex-debug-toolbar .terminal:not(.xterm-cursor-style-underline):not(.xterm-cursor-style-bar).focus.xterm-cursor-blink-on .terminal-cursor {
-    background-color: transparent;
-    color: inherit; }
-  #ex-debug-toolbar .terminal.xterm-cursor-style-bar .terminal-cursor,
-  #ex-debug-toolbar .terminal.xterm-cursor-style-underline .terminal-cursor {
-    position: relative; }
-  #ex-debug-toolbar .terminal.xterm-cursor-style-bar .terminal-cursor::before,
-  #ex-debug-toolbar .terminal.xterm-cursor-style-underline .terminal-cursor::before {
-    content: "";
-    display: block;
+    outline-offset: -1px; }
+  #ex-debug-toolbar .terminal.xterm-cursor-style-block.focus:not(.xterm-cursor-blink-on) .terminal-cursor {
+    background-color: #fff;
+    color: #000; }
+  #ex-debug-toolbar .terminal.focus.xterm-cursor-style-bar:not(.xterm-cursor-blink-on) .terminal-cursor::before,
+  #ex-debug-toolbar .terminal.focus.xterm-cursor-style-underline:not(.xterm-cursor-blink-on) .terminal-cursor::before {
+    content: '';
     position: absolute;
     background-color: #fff; }
-  #ex-debug-toolbar .terminal.xterm-cursor-style-bar .terminal-cursor::before {
+  #ex-debug-toolbar .terminal.focus.xterm-cursor-style-bar:not(.xterm-cursor-blink-on) .terminal-cursor::before {
     top: 0;
-    bottom: 0;
     left: 0;
+    bottom: 0;
     width: 1px; }
-  #ex-debug-toolbar .terminal.xterm-cursor-style-underline .terminal-cursor::before {
+  #ex-debug-toolbar .terminal.focus.xterm-cursor-style-underline:not(.xterm-cursor-blink-on) .terminal-cursor::before {
     bottom: 0;
     left: 0;
     right: 0;
     height: 1px; }
-  #ex-debug-toolbar .terminal.xterm-cursor-style-bar.focus.xterm-cursor-blink.xterm-cursor-blink-on .terminal-cursor::before,
-  #ex-debug-toolbar .terminal.xterm-cursor-style-underline.focus.xterm-cursor-blink.xterm-cursor-blink-on .terminal-cursor::before {
-    background-color: transparent; }
-  #ex-debug-toolbar .terminal.xterm-cursor-style-bar.focus.xterm-cursor-blink .terminal-cursor::before,
-  #ex-debug-toolbar .terminal.xterm-cursor-style-underline.focus.xterm-cursor-blink .terminal-cursor::before {
-    background-color: #fff; }
   #ex-debug-toolbar .terminal .composition-view {
     background: #000;
     color: #FFF;
@@ -5594,6 +5582,8 @@
     text-decoration: underline; }
   #ex-debug-toolbar .terminal .xterm-blink {
     text-decoration: blink; }
+  #ex-debug-toolbar .terminal .xterm-blink.xterm-underline {
+    text-decoration: blink underline; }
   #ex-debug-toolbar .terminal .xterm-hidden {
     visibility: hidden; }
   #ex-debug-toolbar .terminal .xterm-color-0 {

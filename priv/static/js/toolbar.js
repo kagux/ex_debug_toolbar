@@ -150,6 +150,126 @@ var __makeRelativeRequire = function(require, mappings, pref) {
   }
 };
 
+require.register("base64-js/index.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "base64-js");
+  (function() {
+    'use strict'
+
+exports.byteLength = byteLength
+exports.toByteArray = toByteArray
+exports.fromByteArray = fromByteArray
+
+var lookup = []
+var revLookup = []
+var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
+
+var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+for (var i = 0, len = code.length; i < len; ++i) {
+  lookup[i] = code[i]
+  revLookup[code.charCodeAt(i)] = i
+}
+
+revLookup['-'.charCodeAt(0)] = 62
+revLookup['_'.charCodeAt(0)] = 63
+
+function placeHoldersCount (b64) {
+  var len = b64.length
+  if (len % 4 > 0) {
+    throw new Error('Invalid string. Length must be a multiple of 4')
+  }
+
+  // the number of equal signs (place holders)
+  // if there are two placeholders, than the two characters before it
+  // represent one byte
+  // if there is only one, then the three characters before it represent 2 bytes
+  // this is just a cheap hack to not do indexOf twice
+  return b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0
+}
+
+function byteLength (b64) {
+  // base64 is 4/3 + up to two characters of the original data
+  return (b64.length * 3 / 4) - placeHoldersCount(b64)
+}
+
+function toByteArray (b64) {
+  var i, l, tmp, placeHolders, arr
+  var len = b64.length
+  placeHolders = placeHoldersCount(b64)
+
+  arr = new Arr((len * 3 / 4) - placeHolders)
+
+  // if there are placeholders, only get up to the last complete 4 chars
+  l = placeHolders > 0 ? len - 4 : len
+
+  var L = 0
+
+  for (i = 0; i < l; i += 4) {
+    tmp = (revLookup[b64.charCodeAt(i)] << 18) | (revLookup[b64.charCodeAt(i + 1)] << 12) | (revLookup[b64.charCodeAt(i + 2)] << 6) | revLookup[b64.charCodeAt(i + 3)]
+    arr[L++] = (tmp >> 16) & 0xFF
+    arr[L++] = (tmp >> 8) & 0xFF
+    arr[L++] = tmp & 0xFF
+  }
+
+  if (placeHolders === 2) {
+    tmp = (revLookup[b64.charCodeAt(i)] << 2) | (revLookup[b64.charCodeAt(i + 1)] >> 4)
+    arr[L++] = tmp & 0xFF
+  } else if (placeHolders === 1) {
+    tmp = (revLookup[b64.charCodeAt(i)] << 10) | (revLookup[b64.charCodeAt(i + 1)] << 4) | (revLookup[b64.charCodeAt(i + 2)] >> 2)
+    arr[L++] = (tmp >> 8) & 0xFF
+    arr[L++] = tmp & 0xFF
+  }
+
+  return arr
+}
+
+function tripletToBase64 (num) {
+  return lookup[num >> 18 & 0x3F] + lookup[num >> 12 & 0x3F] + lookup[num >> 6 & 0x3F] + lookup[num & 0x3F]
+}
+
+function encodeChunk (uint8, start, end) {
+  var tmp
+  var output = []
+  for (var i = start; i < end; i += 3) {
+    tmp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
+    output.push(tripletToBase64(tmp))
+  }
+  return output.join('')
+}
+
+function fromByteArray (uint8) {
+  var tmp
+  var len = uint8.length
+  var extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
+  var output = ''
+  var parts = []
+  var maxChunkLength = 16383 // must be multiple of 3
+
+  // go through the array every three bytes, we'll deal with trailing stuff later
+  for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
+    parts.push(encodeChunk(uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)))
+  }
+
+  // pad the end with zeros, but make sure to not forget the extra bytes
+  if (extraBytes === 1) {
+    tmp = uint8[len - 1]
+    output += lookup[tmp >> 2]
+    output += lookup[(tmp << 4) & 0x3F]
+    output += '=='
+  } else if (extraBytes === 2) {
+    tmp = (uint8[len - 2] << 8) + (uint8[len - 1])
+    output += lookup[tmp >> 10]
+    output += lookup[(tmp >> 4) & 0x3F]
+    output += lookup[(tmp << 2) & 0x3F]
+    output += '='
+  }
+
+  parts.push(output)
+
+  return parts.join('')
+}
+  })();
+});
+
 require.register("bootstrap-sass/assets/javascripts/bootstrap.js", function(exports, require, module) {
   require = __makeRelativeRequire(require, {}, "bootstrap-sass");
   (function() {
@@ -2530,6 +2650,1569 @@ if (typeof jQuery === 'undefined') {
   })
 
 }(jQuery);
+  })();
+});
+
+require.register("buffer/index.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "buffer");
+  var _Buffer = require('buffer'); var Buffer = _Buffer && _Buffer.Buffer;
+(function() {
+    /*!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @license  MIT
+ */
+/* eslint-disable no-proto */
+
+'use strict'
+
+var base64 = require('base64-js')
+var ieee754 = require('ieee754')
+var isArray = require('isarray')
+
+exports.Buffer = Buffer
+exports.SlowBuffer = SlowBuffer
+exports.INSPECT_MAX_BYTES = 50
+Buffer.poolSize = 8192 // not used by this implementation
+
+var rootParent = {}
+
+/**
+ * If `Buffer.TYPED_ARRAY_SUPPORT`:
+ *   === true    Use Uint8Array implementation (fastest)
+ *   === false   Use Object implementation (most compatible, even IE6)
+ *
+ * Browsers that support typed arrays are IE 10+, Firefox 4+, Chrome 7+, Safari 5.1+,
+ * Opera 11.6+, iOS 4.2+.
+ *
+ * Due to various browser bugs, sometimes the Object implementation will be used even
+ * when the browser supports typed arrays.
+ *
+ * Note:
+ *
+ *   - Firefox 4-29 lacks support for adding new properties to `Uint8Array` instances,
+ *     See: https://bugzilla.mozilla.org/show_bug.cgi?id=695438.
+ *
+ *   - Chrome 9-10 is missing the `TypedArray.prototype.subarray` function.
+ *
+ *   - IE10 has a broken `TypedArray.prototype.subarray` function which returns arrays of
+ *     incorrect length in some situations.
+
+ * We detect these buggy browsers and set `Buffer.TYPED_ARRAY_SUPPORT` to `false` so they
+ * get the Object implementation, which is slower but behaves correctly.
+ */
+Buffer.TYPED_ARRAY_SUPPORT = global.TYPED_ARRAY_SUPPORT !== undefined
+  ? global.TYPED_ARRAY_SUPPORT
+  : typedArraySupport()
+
+function typedArraySupport () {
+  try {
+    var arr = new Uint8Array(1)
+    arr.foo = function () { return 42 }
+    return arr.foo() === 42 && // typed array instances can be augmented
+        typeof arr.subarray === 'function' && // chrome 9-10 lack `subarray`
+        arr.subarray(1, 1).byteLength === 0 // ie10 has broken `subarray`
+  } catch (e) {
+    return false
+  }
+}
+
+function kMaxLength () {
+  return Buffer.TYPED_ARRAY_SUPPORT
+    ? 0x7fffffff
+    : 0x3fffffff
+}
+
+/**
+ * The Buffer constructor returns instances of `Uint8Array` that have their
+ * prototype changed to `Buffer.prototype`. Furthermore, `Buffer` is a subclass of
+ * `Uint8Array`, so the returned instances will have all the node `Buffer` methods
+ * and the `Uint8Array` methods. Square bracket notation works as expected -- it
+ * returns a single octet.
+ *
+ * The `Uint8Array` prototype remains unmodified.
+ */
+function Buffer (arg) {
+  if (!(this instanceof Buffer)) {
+    // Avoid going through an ArgumentsAdaptorTrampoline in the common case.
+    if (arguments.length > 1) return new Buffer(arg, arguments[1])
+    return new Buffer(arg)
+  }
+
+  if (!Buffer.TYPED_ARRAY_SUPPORT) {
+    this.length = 0
+    this.parent = undefined
+  }
+
+  // Common case.
+  if (typeof arg === 'number') {
+    return fromNumber(this, arg)
+  }
+
+  // Slightly less common case.
+  if (typeof arg === 'string') {
+    return fromString(this, arg, arguments.length > 1 ? arguments[1] : 'utf8')
+  }
+
+  // Unusual.
+  return fromObject(this, arg)
+}
+
+// TODO: Legacy, not needed anymore. Remove in next major version.
+Buffer._augment = function (arr) {
+  arr.__proto__ = Buffer.prototype
+  return arr
+}
+
+function fromNumber (that, length) {
+  that = allocate(that, length < 0 ? 0 : checked(length) | 0)
+  if (!Buffer.TYPED_ARRAY_SUPPORT) {
+    for (var i = 0; i < length; i++) {
+      that[i] = 0
+    }
+  }
+  return that
+}
+
+function fromString (that, string, encoding) {
+  if (typeof encoding !== 'string' || encoding === '') encoding = 'utf8'
+
+  // Assumption: byteLength() return value is always < kMaxLength.
+  var length = byteLength(string, encoding) | 0
+  that = allocate(that, length)
+
+  that.write(string, encoding)
+  return that
+}
+
+function fromObject (that, object) {
+  if (Buffer.isBuffer(object)) return fromBuffer(that, object)
+
+  if (isArray(object)) return fromArray(that, object)
+
+  if (object == null) {
+    throw new TypeError('must start with number, buffer, array or string')
+  }
+
+  if (typeof ArrayBuffer !== 'undefined') {
+    if (object.buffer instanceof ArrayBuffer) {
+      return fromTypedArray(that, object)
+    }
+    if (object instanceof ArrayBuffer) {
+      return fromArrayBuffer(that, object)
+    }
+  }
+
+  if (object.length) return fromArrayLike(that, object)
+
+  return fromJsonObject(that, object)
+}
+
+function fromBuffer (that, buffer) {
+  var length = checked(buffer.length) | 0
+  that = allocate(that, length)
+  buffer.copy(that, 0, 0, length)
+  return that
+}
+
+function fromArray (that, array) {
+  var length = checked(array.length) | 0
+  that = allocate(that, length)
+  for (var i = 0; i < length; i += 1) {
+    that[i] = array[i] & 255
+  }
+  return that
+}
+
+// Duplicate of fromArray() to keep fromArray() monomorphic.
+function fromTypedArray (that, array) {
+  var length = checked(array.length) | 0
+  that = allocate(that, length)
+  // Truncating the elements is probably not what people expect from typed
+  // arrays with BYTES_PER_ELEMENT > 1 but it's compatible with the behavior
+  // of the old Buffer constructor.
+  for (var i = 0; i < length; i += 1) {
+    that[i] = array[i] & 255
+  }
+  return that
+}
+
+function fromArrayBuffer (that, array) {
+  array.byteLength // this throws if `array` is not a valid ArrayBuffer
+
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    // Return an augmented `Uint8Array` instance, for best performance
+    that = new Uint8Array(array)
+    that.__proto__ = Buffer.prototype
+  } else {
+    // Fallback: Return an object instance of the Buffer class
+    that = fromTypedArray(that, new Uint8Array(array))
+  }
+  return that
+}
+
+function fromArrayLike (that, array) {
+  var length = checked(array.length) | 0
+  that = allocate(that, length)
+  for (var i = 0; i < length; i += 1) {
+    that[i] = array[i] & 255
+  }
+  return that
+}
+
+// Deserialize { type: 'Buffer', data: [1,2,3,...] } into a Buffer object.
+// Returns a zero-length buffer for inputs that don't conform to the spec.
+function fromJsonObject (that, object) {
+  var array
+  var length = 0
+
+  if (object.type === 'Buffer' && isArray(object.data)) {
+    array = object.data
+    length = checked(array.length) | 0
+  }
+  that = allocate(that, length)
+
+  for (var i = 0; i < length; i += 1) {
+    that[i] = array[i] & 255
+  }
+  return that
+}
+
+if (Buffer.TYPED_ARRAY_SUPPORT) {
+  Buffer.prototype.__proto__ = Uint8Array.prototype
+  Buffer.__proto__ = Uint8Array
+} else {
+  // pre-set for values that may exist in the future
+  Buffer.prototype.length = undefined
+  Buffer.prototype.parent = undefined
+}
+
+function allocate (that, length) {
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    // Return an augmented `Uint8Array` instance, for best performance
+    that = new Uint8Array(length)
+    that.__proto__ = Buffer.prototype
+  } else {
+    // Fallback: Return an object instance of the Buffer class
+    that.length = length
+  }
+
+  var fromPool = length !== 0 && length <= Buffer.poolSize >>> 1
+  if (fromPool) that.parent = rootParent
+
+  return that
+}
+
+function checked (length) {
+  // Note: cannot use `length < kMaxLength` here because that fails when
+  // length is NaN (which is otherwise coerced to zero.)
+  if (length >= kMaxLength()) {
+    throw new RangeError('Attempt to allocate Buffer larger than maximum ' +
+                         'size: 0x' + kMaxLength().toString(16) + ' bytes')
+  }
+  return length | 0
+}
+
+function SlowBuffer (subject, encoding) {
+  if (!(this instanceof SlowBuffer)) return new SlowBuffer(subject, encoding)
+
+  var buf = new Buffer(subject, encoding)
+  delete buf.parent
+  return buf
+}
+
+Buffer.isBuffer = function isBuffer (b) {
+  return !!(b != null && b._isBuffer)
+}
+
+Buffer.compare = function compare (a, b) {
+  if (!Buffer.isBuffer(a) || !Buffer.isBuffer(b)) {
+    throw new TypeError('Arguments must be Buffers')
+  }
+
+  if (a === b) return 0
+
+  var x = a.length
+  var y = b.length
+
+  var i = 0
+  var len = Math.min(x, y)
+  while (i < len) {
+    if (a[i] !== b[i]) break
+
+    ++i
+  }
+
+  if (i !== len) {
+    x = a[i]
+    y = b[i]
+  }
+
+  if (x < y) return -1
+  if (y < x) return 1
+  return 0
+}
+
+Buffer.isEncoding = function isEncoding (encoding) {
+  switch (String(encoding).toLowerCase()) {
+    case 'hex':
+    case 'utf8':
+    case 'utf-8':
+    case 'ascii':
+    case 'binary':
+    case 'base64':
+    case 'raw':
+    case 'ucs2':
+    case 'ucs-2':
+    case 'utf16le':
+    case 'utf-16le':
+      return true
+    default:
+      return false
+  }
+}
+
+Buffer.concat = function concat (list, length) {
+  if (!isArray(list)) throw new TypeError('list argument must be an Array of Buffers.')
+
+  if (list.length === 0) {
+    return new Buffer(0)
+  }
+
+  var i
+  if (length === undefined) {
+    length = 0
+    for (i = 0; i < list.length; i++) {
+      length += list[i].length
+    }
+  }
+
+  var buf = new Buffer(length)
+  var pos = 0
+  for (i = 0; i < list.length; i++) {
+    var item = list[i]
+    item.copy(buf, pos)
+    pos += item.length
+  }
+  return buf
+}
+
+function byteLength (string, encoding) {
+  if (typeof string !== 'string') string = '' + string
+
+  var len = string.length
+  if (len === 0) return 0
+
+  // Use a for loop to avoid recursion
+  var loweredCase = false
+  for (;;) {
+    switch (encoding) {
+      case 'ascii':
+      case 'binary':
+      // Deprecated
+      case 'raw':
+      case 'raws':
+        return len
+      case 'utf8':
+      case 'utf-8':
+        return utf8ToBytes(string).length
+      case 'ucs2':
+      case 'ucs-2':
+      case 'utf16le':
+      case 'utf-16le':
+        return len * 2
+      case 'hex':
+        return len >>> 1
+      case 'base64':
+        return base64ToBytes(string).length
+      default:
+        if (loweredCase) return utf8ToBytes(string).length // assume utf8
+        encoding = ('' + encoding).toLowerCase()
+        loweredCase = true
+    }
+  }
+}
+Buffer.byteLength = byteLength
+
+function slowToString (encoding, start, end) {
+  var loweredCase = false
+
+  start = start | 0
+  end = end === undefined || end === Infinity ? this.length : end | 0
+
+  if (!encoding) encoding = 'utf8'
+  if (start < 0) start = 0
+  if (end > this.length) end = this.length
+  if (end <= start) return ''
+
+  while (true) {
+    switch (encoding) {
+      case 'hex':
+        return hexSlice(this, start, end)
+
+      case 'utf8':
+      case 'utf-8':
+        return utf8Slice(this, start, end)
+
+      case 'ascii':
+        return asciiSlice(this, start, end)
+
+      case 'binary':
+        return binarySlice(this, start, end)
+
+      case 'base64':
+        return base64Slice(this, start, end)
+
+      case 'ucs2':
+      case 'ucs-2':
+      case 'utf16le':
+      case 'utf-16le':
+        return utf16leSlice(this, start, end)
+
+      default:
+        if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
+        encoding = (encoding + '').toLowerCase()
+        loweredCase = true
+    }
+  }
+}
+
+// The property is used by `Buffer.isBuffer` and `is-buffer` (in Safari 5-7) to detect
+// Buffer instances.
+Buffer.prototype._isBuffer = true
+
+Buffer.prototype.toString = function toString () {
+  var length = this.length | 0
+  if (length === 0) return ''
+  if (arguments.length === 0) return utf8Slice(this, 0, length)
+  return slowToString.apply(this, arguments)
+}
+
+Buffer.prototype.equals = function equals (b) {
+  if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
+  if (this === b) return true
+  return Buffer.compare(this, b) === 0
+}
+
+Buffer.prototype.inspect = function inspect () {
+  var str = ''
+  var max = exports.INSPECT_MAX_BYTES
+  if (this.length > 0) {
+    str = this.toString('hex', 0, max).match(/.{2}/g).join(' ')
+    if (this.length > max) str += ' ... '
+  }
+  return '<Buffer ' + str + '>'
+}
+
+Buffer.prototype.compare = function compare (b) {
+  if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
+  if (this === b) return 0
+  return Buffer.compare(this, b)
+}
+
+Buffer.prototype.indexOf = function indexOf (val, byteOffset) {
+  if (byteOffset > 0x7fffffff) byteOffset = 0x7fffffff
+  else if (byteOffset < -0x80000000) byteOffset = -0x80000000
+  byteOffset >>= 0
+
+  if (this.length === 0) return -1
+  if (byteOffset >= this.length) return -1
+
+  // Negative offsets start from the end of the buffer
+  if (byteOffset < 0) byteOffset = Math.max(this.length + byteOffset, 0)
+
+  if (typeof val === 'string') {
+    if (val.length === 0) return -1 // special case: looking for empty string always fails
+    return String.prototype.indexOf.call(this, val, byteOffset)
+  }
+  if (Buffer.isBuffer(val)) {
+    return arrayIndexOf(this, val, byteOffset)
+  }
+  if (typeof val === 'number') {
+    if (Buffer.TYPED_ARRAY_SUPPORT && Uint8Array.prototype.indexOf === 'function') {
+      return Uint8Array.prototype.indexOf.call(this, val, byteOffset)
+    }
+    return arrayIndexOf(this, [ val ], byteOffset)
+  }
+
+  function arrayIndexOf (arr, val, byteOffset) {
+    var foundIndex = -1
+    for (var i = 0; byteOffset + i < arr.length; i++) {
+      if (arr[byteOffset + i] === val[foundIndex === -1 ? 0 : i - foundIndex]) {
+        if (foundIndex === -1) foundIndex = i
+        if (i - foundIndex + 1 === val.length) return byteOffset + foundIndex
+      } else {
+        foundIndex = -1
+      }
+    }
+    return -1
+  }
+
+  throw new TypeError('val must be string, number or Buffer')
+}
+
+function hexWrite (buf, string, offset, length) {
+  offset = Number(offset) || 0
+  var remaining = buf.length - offset
+  if (!length) {
+    length = remaining
+  } else {
+    length = Number(length)
+    if (length > remaining) {
+      length = remaining
+    }
+  }
+
+  // must be an even number of digits
+  var strLen = string.length
+  if (strLen % 2 !== 0) throw new Error('Invalid hex string')
+
+  if (length > strLen / 2) {
+    length = strLen / 2
+  }
+  for (var i = 0; i < length; i++) {
+    var parsed = parseInt(string.substr(i * 2, 2), 16)
+    if (isNaN(parsed)) throw new Error('Invalid hex string')
+    buf[offset + i] = parsed
+  }
+  return i
+}
+
+function utf8Write (buf, string, offset, length) {
+  return blitBuffer(utf8ToBytes(string, buf.length - offset), buf, offset, length)
+}
+
+function asciiWrite (buf, string, offset, length) {
+  return blitBuffer(asciiToBytes(string), buf, offset, length)
+}
+
+function binaryWrite (buf, string, offset, length) {
+  return asciiWrite(buf, string, offset, length)
+}
+
+function base64Write (buf, string, offset, length) {
+  return blitBuffer(base64ToBytes(string), buf, offset, length)
+}
+
+function ucs2Write (buf, string, offset, length) {
+  return blitBuffer(utf16leToBytes(string, buf.length - offset), buf, offset, length)
+}
+
+Buffer.prototype.write = function write (string, offset, length, encoding) {
+  // Buffer#write(string)
+  if (offset === undefined) {
+    encoding = 'utf8'
+    length = this.length
+    offset = 0
+  // Buffer#write(string, encoding)
+  } else if (length === undefined && typeof offset === 'string') {
+    encoding = offset
+    length = this.length
+    offset = 0
+  // Buffer#write(string, offset[, length][, encoding])
+  } else if (isFinite(offset)) {
+    offset = offset | 0
+    if (isFinite(length)) {
+      length = length | 0
+      if (encoding === undefined) encoding = 'utf8'
+    } else {
+      encoding = length
+      length = undefined
+    }
+  // legacy write(string, encoding, offset, length) - remove in v0.13
+  } else {
+    var swap = encoding
+    encoding = offset
+    offset = length | 0
+    length = swap
+  }
+
+  var remaining = this.length - offset
+  if (length === undefined || length > remaining) length = remaining
+
+  if ((string.length > 0 && (length < 0 || offset < 0)) || offset > this.length) {
+    throw new RangeError('attempt to write outside buffer bounds')
+  }
+
+  if (!encoding) encoding = 'utf8'
+
+  var loweredCase = false
+  for (;;) {
+    switch (encoding) {
+      case 'hex':
+        return hexWrite(this, string, offset, length)
+
+      case 'utf8':
+      case 'utf-8':
+        return utf8Write(this, string, offset, length)
+
+      case 'ascii':
+        return asciiWrite(this, string, offset, length)
+
+      case 'binary':
+        return binaryWrite(this, string, offset, length)
+
+      case 'base64':
+        // Warning: maxLength not taken into account in base64Write
+        return base64Write(this, string, offset, length)
+
+      case 'ucs2':
+      case 'ucs-2':
+      case 'utf16le':
+      case 'utf-16le':
+        return ucs2Write(this, string, offset, length)
+
+      default:
+        if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
+        encoding = ('' + encoding).toLowerCase()
+        loweredCase = true
+    }
+  }
+}
+
+Buffer.prototype.toJSON = function toJSON () {
+  return {
+    type: 'Buffer',
+    data: Array.prototype.slice.call(this._arr || this, 0)
+  }
+}
+
+function base64Slice (buf, start, end) {
+  if (start === 0 && end === buf.length) {
+    return base64.fromByteArray(buf)
+  } else {
+    return base64.fromByteArray(buf.slice(start, end))
+  }
+}
+
+function utf8Slice (buf, start, end) {
+  end = Math.min(buf.length, end)
+  var res = []
+
+  var i = start
+  while (i < end) {
+    var firstByte = buf[i]
+    var codePoint = null
+    var bytesPerSequence = (firstByte > 0xEF) ? 4
+      : (firstByte > 0xDF) ? 3
+      : (firstByte > 0xBF) ? 2
+      : 1
+
+    if (i + bytesPerSequence <= end) {
+      var secondByte, thirdByte, fourthByte, tempCodePoint
+
+      switch (bytesPerSequence) {
+        case 1:
+          if (firstByte < 0x80) {
+            codePoint = firstByte
+          }
+          break
+        case 2:
+          secondByte = buf[i + 1]
+          if ((secondByte & 0xC0) === 0x80) {
+            tempCodePoint = (firstByte & 0x1F) << 0x6 | (secondByte & 0x3F)
+            if (tempCodePoint > 0x7F) {
+              codePoint = tempCodePoint
+            }
+          }
+          break
+        case 3:
+          secondByte = buf[i + 1]
+          thirdByte = buf[i + 2]
+          if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80) {
+            tempCodePoint = (firstByte & 0xF) << 0xC | (secondByte & 0x3F) << 0x6 | (thirdByte & 0x3F)
+            if (tempCodePoint > 0x7FF && (tempCodePoint < 0xD800 || tempCodePoint > 0xDFFF)) {
+              codePoint = tempCodePoint
+            }
+          }
+          break
+        case 4:
+          secondByte = buf[i + 1]
+          thirdByte = buf[i + 2]
+          fourthByte = buf[i + 3]
+          if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80 && (fourthByte & 0xC0) === 0x80) {
+            tempCodePoint = (firstByte & 0xF) << 0x12 | (secondByte & 0x3F) << 0xC | (thirdByte & 0x3F) << 0x6 | (fourthByte & 0x3F)
+            if (tempCodePoint > 0xFFFF && tempCodePoint < 0x110000) {
+              codePoint = tempCodePoint
+            }
+          }
+      }
+    }
+
+    if (codePoint === null) {
+      // we did not generate a valid codePoint so insert a
+      // replacement char (U+FFFD) and advance only 1 byte
+      codePoint = 0xFFFD
+      bytesPerSequence = 1
+    } else if (codePoint > 0xFFFF) {
+      // encode to utf16 (surrogate pair dance)
+      codePoint -= 0x10000
+      res.push(codePoint >>> 10 & 0x3FF | 0xD800)
+      codePoint = 0xDC00 | codePoint & 0x3FF
+    }
+
+    res.push(codePoint)
+    i += bytesPerSequence
+  }
+
+  return decodeCodePointsArray(res)
+}
+
+// Based on http://stackoverflow.com/a/22747272/680742, the browser with
+// the lowest limit is Chrome, with 0x10000 args.
+// We go 1 magnitude less, for safety
+var MAX_ARGUMENTS_LENGTH = 0x1000
+
+function decodeCodePointsArray (codePoints) {
+  var len = codePoints.length
+  if (len <= MAX_ARGUMENTS_LENGTH) {
+    return String.fromCharCode.apply(String, codePoints) // avoid extra slice()
+  }
+
+  // Decode in chunks to avoid "call stack size exceeded".
+  var res = ''
+  var i = 0
+  while (i < len) {
+    res += String.fromCharCode.apply(
+      String,
+      codePoints.slice(i, i += MAX_ARGUMENTS_LENGTH)
+    )
+  }
+  return res
+}
+
+function asciiSlice (buf, start, end) {
+  var ret = ''
+  end = Math.min(buf.length, end)
+
+  for (var i = start; i < end; i++) {
+    ret += String.fromCharCode(buf[i] & 0x7F)
+  }
+  return ret
+}
+
+function binarySlice (buf, start, end) {
+  var ret = ''
+  end = Math.min(buf.length, end)
+
+  for (var i = start; i < end; i++) {
+    ret += String.fromCharCode(buf[i])
+  }
+  return ret
+}
+
+function hexSlice (buf, start, end) {
+  var len = buf.length
+
+  if (!start || start < 0) start = 0
+  if (!end || end < 0 || end > len) end = len
+
+  var out = ''
+  for (var i = start; i < end; i++) {
+    out += toHex(buf[i])
+  }
+  return out
+}
+
+function utf16leSlice (buf, start, end) {
+  var bytes = buf.slice(start, end)
+  var res = ''
+  for (var i = 0; i < bytes.length; i += 2) {
+    res += String.fromCharCode(bytes[i] + bytes[i + 1] * 256)
+  }
+  return res
+}
+
+Buffer.prototype.slice = function slice (start, end) {
+  var len = this.length
+  start = ~~start
+  end = end === undefined ? len : ~~end
+
+  if (start < 0) {
+    start += len
+    if (start < 0) start = 0
+  } else if (start > len) {
+    start = len
+  }
+
+  if (end < 0) {
+    end += len
+    if (end < 0) end = 0
+  } else if (end > len) {
+    end = len
+  }
+
+  if (end < start) end = start
+
+  var newBuf
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    newBuf = this.subarray(start, end)
+    newBuf.__proto__ = Buffer.prototype
+  } else {
+    var sliceLen = end - start
+    newBuf = new Buffer(sliceLen, undefined)
+    for (var i = 0; i < sliceLen; i++) {
+      newBuf[i] = this[i + start]
+    }
+  }
+
+  if (newBuf.length) newBuf.parent = this.parent || this
+
+  return newBuf
+}
+
+/*
+ * Need to make sure that buffer isn't trying to write out of bounds.
+ */
+function checkOffset (offset, ext, length) {
+  if ((offset % 1) !== 0 || offset < 0) throw new RangeError('offset is not uint')
+  if (offset + ext > length) throw new RangeError('Trying to access beyond buffer length')
+}
+
+Buffer.prototype.readUIntLE = function readUIntLE (offset, byteLength, noAssert) {
+  offset = offset | 0
+  byteLength = byteLength | 0
+  if (!noAssert) checkOffset(offset, byteLength, this.length)
+
+  var val = this[offset]
+  var mul = 1
+  var i = 0
+  while (++i < byteLength && (mul *= 0x100)) {
+    val += this[offset + i] * mul
+  }
+
+  return val
+}
+
+Buffer.prototype.readUIntBE = function readUIntBE (offset, byteLength, noAssert) {
+  offset = offset | 0
+  byteLength = byteLength | 0
+  if (!noAssert) {
+    checkOffset(offset, byteLength, this.length)
+  }
+
+  var val = this[offset + --byteLength]
+  var mul = 1
+  while (byteLength > 0 && (mul *= 0x100)) {
+    val += this[offset + --byteLength] * mul
+  }
+
+  return val
+}
+
+Buffer.prototype.readUInt8 = function readUInt8 (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 1, this.length)
+  return this[offset]
+}
+
+Buffer.prototype.readUInt16LE = function readUInt16LE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 2, this.length)
+  return this[offset] | (this[offset + 1] << 8)
+}
+
+Buffer.prototype.readUInt16BE = function readUInt16BE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 2, this.length)
+  return (this[offset] << 8) | this[offset + 1]
+}
+
+Buffer.prototype.readUInt32LE = function readUInt32LE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 4, this.length)
+
+  return ((this[offset]) |
+      (this[offset + 1] << 8) |
+      (this[offset + 2] << 16)) +
+      (this[offset + 3] * 0x1000000)
+}
+
+Buffer.prototype.readUInt32BE = function readUInt32BE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 4, this.length)
+
+  return (this[offset] * 0x1000000) +
+    ((this[offset + 1] << 16) |
+    (this[offset + 2] << 8) |
+    this[offset + 3])
+}
+
+Buffer.prototype.readIntLE = function readIntLE (offset, byteLength, noAssert) {
+  offset = offset | 0
+  byteLength = byteLength | 0
+  if (!noAssert) checkOffset(offset, byteLength, this.length)
+
+  var val = this[offset]
+  var mul = 1
+  var i = 0
+  while (++i < byteLength && (mul *= 0x100)) {
+    val += this[offset + i] * mul
+  }
+  mul *= 0x80
+
+  if (val >= mul) val -= Math.pow(2, 8 * byteLength)
+
+  return val
+}
+
+Buffer.prototype.readIntBE = function readIntBE (offset, byteLength, noAssert) {
+  offset = offset | 0
+  byteLength = byteLength | 0
+  if (!noAssert) checkOffset(offset, byteLength, this.length)
+
+  var i = byteLength
+  var mul = 1
+  var val = this[offset + --i]
+  while (i > 0 && (mul *= 0x100)) {
+    val += this[offset + --i] * mul
+  }
+  mul *= 0x80
+
+  if (val >= mul) val -= Math.pow(2, 8 * byteLength)
+
+  return val
+}
+
+Buffer.prototype.readInt8 = function readInt8 (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 1, this.length)
+  if (!(this[offset] & 0x80)) return (this[offset])
+  return ((0xff - this[offset] + 1) * -1)
+}
+
+Buffer.prototype.readInt16LE = function readInt16LE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 2, this.length)
+  var val = this[offset] | (this[offset + 1] << 8)
+  return (val & 0x8000) ? val | 0xFFFF0000 : val
+}
+
+Buffer.prototype.readInt16BE = function readInt16BE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 2, this.length)
+  var val = this[offset + 1] | (this[offset] << 8)
+  return (val & 0x8000) ? val | 0xFFFF0000 : val
+}
+
+Buffer.prototype.readInt32LE = function readInt32LE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 4, this.length)
+
+  return (this[offset]) |
+    (this[offset + 1] << 8) |
+    (this[offset + 2] << 16) |
+    (this[offset + 3] << 24)
+}
+
+Buffer.prototype.readInt32BE = function readInt32BE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 4, this.length)
+
+  return (this[offset] << 24) |
+    (this[offset + 1] << 16) |
+    (this[offset + 2] << 8) |
+    (this[offset + 3])
+}
+
+Buffer.prototype.readFloatLE = function readFloatLE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 4, this.length)
+  return ieee754.read(this, offset, true, 23, 4)
+}
+
+Buffer.prototype.readFloatBE = function readFloatBE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 4, this.length)
+  return ieee754.read(this, offset, false, 23, 4)
+}
+
+Buffer.prototype.readDoubleLE = function readDoubleLE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 8, this.length)
+  return ieee754.read(this, offset, true, 52, 8)
+}
+
+Buffer.prototype.readDoubleBE = function readDoubleBE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 8, this.length)
+  return ieee754.read(this, offset, false, 52, 8)
+}
+
+function checkInt (buf, value, offset, ext, max, min) {
+  if (!Buffer.isBuffer(buf)) throw new TypeError('buffer must be a Buffer instance')
+  if (value > max || value < min) throw new RangeError('value is out of bounds')
+  if (offset + ext > buf.length) throw new RangeError('index out of range')
+}
+
+Buffer.prototype.writeUIntLE = function writeUIntLE (value, offset, byteLength, noAssert) {
+  value = +value
+  offset = offset | 0
+  byteLength = byteLength | 0
+  if (!noAssert) checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0)
+
+  var mul = 1
+  var i = 0
+  this[offset] = value & 0xFF
+  while (++i < byteLength && (mul *= 0x100)) {
+    this[offset + i] = (value / mul) & 0xFF
+  }
+
+  return offset + byteLength
+}
+
+Buffer.prototype.writeUIntBE = function writeUIntBE (value, offset, byteLength, noAssert) {
+  value = +value
+  offset = offset | 0
+  byteLength = byteLength | 0
+  if (!noAssert) checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0)
+
+  var i = byteLength - 1
+  var mul = 1
+  this[offset + i] = value & 0xFF
+  while (--i >= 0 && (mul *= 0x100)) {
+    this[offset + i] = (value / mul) & 0xFF
+  }
+
+  return offset + byteLength
+}
+
+Buffer.prototype.writeUInt8 = function writeUInt8 (value, offset, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) checkInt(this, value, offset, 1, 0xff, 0)
+  if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value)
+  this[offset] = (value & 0xff)
+  return offset + 1
+}
+
+function objectWriteUInt16 (buf, value, offset, littleEndian) {
+  if (value < 0) value = 0xffff + value + 1
+  for (var i = 0, j = Math.min(buf.length - offset, 2); i < j; i++) {
+    buf[offset + i] = (value & (0xff << (8 * (littleEndian ? i : 1 - i)))) >>>
+      (littleEndian ? i : 1 - i) * 8
+  }
+}
+
+Buffer.prototype.writeUInt16LE = function writeUInt16LE (value, offset, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) checkInt(this, value, offset, 2, 0xffff, 0)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value & 0xff)
+    this[offset + 1] = (value >>> 8)
+  } else {
+    objectWriteUInt16(this, value, offset, true)
+  }
+  return offset + 2
+}
+
+Buffer.prototype.writeUInt16BE = function writeUInt16BE (value, offset, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) checkInt(this, value, offset, 2, 0xffff, 0)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value >>> 8)
+    this[offset + 1] = (value & 0xff)
+  } else {
+    objectWriteUInt16(this, value, offset, false)
+  }
+  return offset + 2
+}
+
+function objectWriteUInt32 (buf, value, offset, littleEndian) {
+  if (value < 0) value = 0xffffffff + value + 1
+  for (var i = 0, j = Math.min(buf.length - offset, 4); i < j; i++) {
+    buf[offset + i] = (value >>> (littleEndian ? i : 3 - i) * 8) & 0xff
+  }
+}
+
+Buffer.prototype.writeUInt32LE = function writeUInt32LE (value, offset, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) checkInt(this, value, offset, 4, 0xffffffff, 0)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset + 3] = (value >>> 24)
+    this[offset + 2] = (value >>> 16)
+    this[offset + 1] = (value >>> 8)
+    this[offset] = (value & 0xff)
+  } else {
+    objectWriteUInt32(this, value, offset, true)
+  }
+  return offset + 4
+}
+
+Buffer.prototype.writeUInt32BE = function writeUInt32BE (value, offset, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) checkInt(this, value, offset, 4, 0xffffffff, 0)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value >>> 24)
+    this[offset + 1] = (value >>> 16)
+    this[offset + 2] = (value >>> 8)
+    this[offset + 3] = (value & 0xff)
+  } else {
+    objectWriteUInt32(this, value, offset, false)
+  }
+  return offset + 4
+}
+
+Buffer.prototype.writeIntLE = function writeIntLE (value, offset, byteLength, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) {
+    var limit = Math.pow(2, 8 * byteLength - 1)
+
+    checkInt(this, value, offset, byteLength, limit - 1, -limit)
+  }
+
+  var i = 0
+  var mul = 1
+  var sub = value < 0 ? 1 : 0
+  this[offset] = value & 0xFF
+  while (++i < byteLength && (mul *= 0x100)) {
+    this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
+  }
+
+  return offset + byteLength
+}
+
+Buffer.prototype.writeIntBE = function writeIntBE (value, offset, byteLength, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) {
+    var limit = Math.pow(2, 8 * byteLength - 1)
+
+    checkInt(this, value, offset, byteLength, limit - 1, -limit)
+  }
+
+  var i = byteLength - 1
+  var mul = 1
+  var sub = value < 0 ? 1 : 0
+  this[offset + i] = value & 0xFF
+  while (--i >= 0 && (mul *= 0x100)) {
+    this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
+  }
+
+  return offset + byteLength
+}
+
+Buffer.prototype.writeInt8 = function writeInt8 (value, offset, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) checkInt(this, value, offset, 1, 0x7f, -0x80)
+  if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value)
+  if (value < 0) value = 0xff + value + 1
+  this[offset] = (value & 0xff)
+  return offset + 1
+}
+
+Buffer.prototype.writeInt16LE = function writeInt16LE (value, offset, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) checkInt(this, value, offset, 2, 0x7fff, -0x8000)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value & 0xff)
+    this[offset + 1] = (value >>> 8)
+  } else {
+    objectWriteUInt16(this, value, offset, true)
+  }
+  return offset + 2
+}
+
+Buffer.prototype.writeInt16BE = function writeInt16BE (value, offset, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) checkInt(this, value, offset, 2, 0x7fff, -0x8000)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value >>> 8)
+    this[offset + 1] = (value & 0xff)
+  } else {
+    objectWriteUInt16(this, value, offset, false)
+  }
+  return offset + 2
+}
+
+Buffer.prototype.writeInt32LE = function writeInt32LE (value, offset, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value & 0xff)
+    this[offset + 1] = (value >>> 8)
+    this[offset + 2] = (value >>> 16)
+    this[offset + 3] = (value >>> 24)
+  } else {
+    objectWriteUInt32(this, value, offset, true)
+  }
+  return offset + 4
+}
+
+Buffer.prototype.writeInt32BE = function writeInt32BE (value, offset, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
+  if (value < 0) value = 0xffffffff + value + 1
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value >>> 24)
+    this[offset + 1] = (value >>> 16)
+    this[offset + 2] = (value >>> 8)
+    this[offset + 3] = (value & 0xff)
+  } else {
+    objectWriteUInt32(this, value, offset, false)
+  }
+  return offset + 4
+}
+
+function checkIEEE754 (buf, value, offset, ext, max, min) {
+  if (value > max || value < min) throw new RangeError('value is out of bounds')
+  if (offset + ext > buf.length) throw new RangeError('index out of range')
+  if (offset < 0) throw new RangeError('index out of range')
+}
+
+function writeFloat (buf, value, offset, littleEndian, noAssert) {
+  if (!noAssert) {
+    checkIEEE754(buf, value, offset, 4, 3.4028234663852886e+38, -3.4028234663852886e+38)
+  }
+  ieee754.write(buf, value, offset, littleEndian, 23, 4)
+  return offset + 4
+}
+
+Buffer.prototype.writeFloatLE = function writeFloatLE (value, offset, noAssert) {
+  return writeFloat(this, value, offset, true, noAssert)
+}
+
+Buffer.prototype.writeFloatBE = function writeFloatBE (value, offset, noAssert) {
+  return writeFloat(this, value, offset, false, noAssert)
+}
+
+function writeDouble (buf, value, offset, littleEndian, noAssert) {
+  if (!noAssert) {
+    checkIEEE754(buf, value, offset, 8, 1.7976931348623157E+308, -1.7976931348623157E+308)
+  }
+  ieee754.write(buf, value, offset, littleEndian, 52, 8)
+  return offset + 8
+}
+
+Buffer.prototype.writeDoubleLE = function writeDoubleLE (value, offset, noAssert) {
+  return writeDouble(this, value, offset, true, noAssert)
+}
+
+Buffer.prototype.writeDoubleBE = function writeDoubleBE (value, offset, noAssert) {
+  return writeDouble(this, value, offset, false, noAssert)
+}
+
+// copy(targetBuffer, targetStart=0, sourceStart=0, sourceEnd=buffer.length)
+Buffer.prototype.copy = function copy (target, targetStart, start, end) {
+  if (!start) start = 0
+  if (!end && end !== 0) end = this.length
+  if (targetStart >= target.length) targetStart = target.length
+  if (!targetStart) targetStart = 0
+  if (end > 0 && end < start) end = start
+
+  // Copy 0 bytes; we're done
+  if (end === start) return 0
+  if (target.length === 0 || this.length === 0) return 0
+
+  // Fatal error conditions
+  if (targetStart < 0) {
+    throw new RangeError('targetStart out of bounds')
+  }
+  if (start < 0 || start >= this.length) throw new RangeError('sourceStart out of bounds')
+  if (end < 0) throw new RangeError('sourceEnd out of bounds')
+
+  // Are we oob?
+  if (end > this.length) end = this.length
+  if (target.length - targetStart < end - start) {
+    end = target.length - targetStart + start
+  }
+
+  var len = end - start
+  var i
+
+  if (this === target && start < targetStart && targetStart < end) {
+    // descending copy from end
+    for (i = len - 1; i >= 0; i--) {
+      target[i + targetStart] = this[i + start]
+    }
+  } else if (len < 1000 || !Buffer.TYPED_ARRAY_SUPPORT) {
+    // ascending copy from start
+    for (i = 0; i < len; i++) {
+      target[i + targetStart] = this[i + start]
+    }
+  } else {
+    Uint8Array.prototype.set.call(
+      target,
+      this.subarray(start, start + len),
+      targetStart
+    )
+  }
+
+  return len
+}
+
+// fill(value, start=0, end=buffer.length)
+Buffer.prototype.fill = function fill (value, start, end) {
+  if (!value) value = 0
+  if (!start) start = 0
+  if (!end) end = this.length
+
+  if (end < start) throw new RangeError('end < start')
+
+  // Fill 0 bytes; we're done
+  if (end === start) return
+  if (this.length === 0) return
+
+  if (start < 0 || start >= this.length) throw new RangeError('start out of bounds')
+  if (end < 0 || end > this.length) throw new RangeError('end out of bounds')
+
+  var i
+  if (typeof value === 'number') {
+    for (i = start; i < end; i++) {
+      this[i] = value
+    }
+  } else {
+    var bytes = utf8ToBytes(value.toString())
+    var len = bytes.length
+    for (i = start; i < end; i++) {
+      this[i] = bytes[i % len]
+    }
+  }
+
+  return this
+}
+
+// HELPER FUNCTIONS
+// ================
+
+var INVALID_BASE64_RE = /[^+\/0-9A-Za-z-_]/g
+
+function base64clean (str) {
+  // Node strips out invalid characters like \n and \t from the string, base64-js does not
+  str = stringtrim(str).replace(INVALID_BASE64_RE, '')
+  // Node converts strings with length < 2 to ''
+  if (str.length < 2) return ''
+  // Node allows for non-padded base64 strings (missing trailing ===), base64-js does not
+  while (str.length % 4 !== 0) {
+    str = str + '='
+  }
+  return str
+}
+
+function stringtrim (str) {
+  if (str.trim) return str.trim()
+  return str.replace(/^\s+|\s+$/g, '')
+}
+
+function toHex (n) {
+  if (n < 16) return '0' + n.toString(16)
+  return n.toString(16)
+}
+
+function utf8ToBytes (string, units) {
+  units = units || Infinity
+  var codePoint
+  var length = string.length
+  var leadSurrogate = null
+  var bytes = []
+
+  for (var i = 0; i < length; i++) {
+    codePoint = string.charCodeAt(i)
+
+    // is surrogate component
+    if (codePoint > 0xD7FF && codePoint < 0xE000) {
+      // last char was a lead
+      if (!leadSurrogate) {
+        // no lead yet
+        if (codePoint > 0xDBFF) {
+          // unexpected trail
+          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+          continue
+        } else if (i + 1 === length) {
+          // unpaired lead
+          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+          continue
+        }
+
+        // valid lead
+        leadSurrogate = codePoint
+
+        continue
+      }
+
+      // 2 leads in a row
+      if (codePoint < 0xDC00) {
+        if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+        leadSurrogate = codePoint
+        continue
+      }
+
+      // valid surrogate pair
+      codePoint = (leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00) + 0x10000
+    } else if (leadSurrogate) {
+      // valid bmp char, but last char was a lead
+      if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+    }
+
+    leadSurrogate = null
+
+    // encode utf8
+    if (codePoint < 0x80) {
+      if ((units -= 1) < 0) break
+      bytes.push(codePoint)
+    } else if (codePoint < 0x800) {
+      if ((units -= 2) < 0) break
+      bytes.push(
+        codePoint >> 0x6 | 0xC0,
+        codePoint & 0x3F | 0x80
+      )
+    } else if (codePoint < 0x10000) {
+      if ((units -= 3) < 0) break
+      bytes.push(
+        codePoint >> 0xC | 0xE0,
+        codePoint >> 0x6 & 0x3F | 0x80,
+        codePoint & 0x3F | 0x80
+      )
+    } else if (codePoint < 0x110000) {
+      if ((units -= 4) < 0) break
+      bytes.push(
+        codePoint >> 0x12 | 0xF0,
+        codePoint >> 0xC & 0x3F | 0x80,
+        codePoint >> 0x6 & 0x3F | 0x80,
+        codePoint & 0x3F | 0x80
+      )
+    } else {
+      throw new Error('Invalid code point')
+    }
+  }
+
+  return bytes
+}
+
+function asciiToBytes (str) {
+  var byteArray = []
+  for (var i = 0; i < str.length; i++) {
+    // Node's code seems to be doing this and not & 0x7F..
+    byteArray.push(str.charCodeAt(i) & 0xFF)
+  }
+  return byteArray
+}
+
+function utf16leToBytes (str, units) {
+  var c, hi, lo
+  var byteArray = []
+  for (var i = 0; i < str.length; i++) {
+    if ((units -= 2) < 0) break
+
+    c = str.charCodeAt(i)
+    hi = c >> 8
+    lo = c % 256
+    byteArray.push(lo)
+    byteArray.push(hi)
+  }
+
+  return byteArray
+}
+
+function base64ToBytes (str) {
+  return base64.toByteArray(base64clean(str))
+}
+
+function blitBuffer (src, dst, offset, length) {
+  for (var i = 0; i < length; i++) {
+    if ((i + offset >= dst.length) || (i >= src.length)) break
+    dst[i + offset] = src[i]
+  }
+  return i
+}
+  })();
+});
+
+require.register("ieee754/index.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "ieee754");
+  (function() {
+    exports.read = function (buffer, offset, isLE, mLen, nBytes) {
+  var e, m
+  var eLen = nBytes * 8 - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var nBits = -7
+  var i = isLE ? (nBytes - 1) : 0
+  var d = isLE ? -1 : 1
+  var s = buffer[offset + i]
+
+  i += d
+
+  e = s & ((1 << (-nBits)) - 1)
+  s >>= (-nBits)
+  nBits += eLen
+  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+
+  m = e & ((1 << (-nBits)) - 1)
+  e >>= (-nBits)
+  nBits += mLen
+  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+
+  if (e === 0) {
+    e = 1 - eBias
+  } else if (e === eMax) {
+    return m ? NaN : ((s ? -1 : 1) * Infinity)
+  } else {
+    m = m + Math.pow(2, mLen)
+    e = e - eBias
+  }
+  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
+}
+
+exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
+  var e, m, c
+  var eLen = nBytes * 8 - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
+  var i = isLE ? 0 : (nBytes - 1)
+  var d = isLE ? 1 : -1
+  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
+
+  value = Math.abs(value)
+
+  if (isNaN(value) || value === Infinity) {
+    m = isNaN(value) ? 1 : 0
+    e = eMax
+  } else {
+    e = Math.floor(Math.log(value) / Math.LN2)
+    if (value * (c = Math.pow(2, -e)) < 1) {
+      e--
+      c *= 2
+    }
+    if (e + eBias >= 1) {
+      value += rt / c
+    } else {
+      value += rt * Math.pow(2, 1 - eBias)
+    }
+    if (value * c >= 2) {
+      e++
+      c /= 2
+    }
+
+    if (e + eBias >= eMax) {
+      m = 0
+      e = eMax
+    } else if (e + eBias >= 1) {
+      m = (value * c - 1) * Math.pow(2, mLen)
+      e = e + eBias
+    } else {
+      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
+      e = 0
+    }
+  }
+
+  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
+
+  e = (e << mLen) | m
+  eLen += mLen
+  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
+
+  buffer[offset + i - d] |= s * 128
+}
+  })();
+});
+
+require.register("isarray/index.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "isarray");
+  (function() {
+    var toString = {}.toString;
+
+module.exports = Array.isArray || function (arr) {
+  return toString.call(arr) == '[object Array]';
+};
   })();
 });
 
@@ -12795,192 +14478,212 @@ return jQuery;
 require.register("phoenix/priv/static/phoenix.js", function(exports, require, module) {
   require = __makeRelativeRequire(require, {}, "phoenix");
   (function() {
-    (function(exports){
+    (function (global, factory) {
+typeof exports === 'object' ? factory(exports) :
+typeof define === 'function' && define.amd ? define(['exports'], factory) :
+factory(global.Phoenix = global.Phoenix || {});
+}(this, (function (exports) {
 "use strict";
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-// Phoenix Channels JavaScript client
-//
-// ## Socket Connection
-//
-// A single connection is established to the server and
-// channels are multiplexed over the connection.
-// Connect to the server using the `Socket` class:
-//
-//     let socket = new Socket("/ws", {params: {userToken: "123"}})
-//     socket.connect()
-//
-// The `Socket` constructor takes the mount point of the socket,
-// the authentication params, as well as options that can be found in
-// the Socket docs, such as configuring the `LongPoll` transport, and
-// heartbeat.
-//
-// ## Channels
-//
-// Channels are isolated, concurrent processes on the server that
-// subscribe to topics and broker events between the client and server.
-// To join a channel, you must provide the topic, and channel params for
-// authorization. Here's an example chat room example where `"new_msg"`
-// events are listened for, messages are pushed to the server, and
-// the channel is joined with ok/error/timeout matches:
-//
-//     let channel = socket.channel("room:123", {token: roomToken})
-//     channel.on("new_msg", msg => console.log("Got message", msg) )
-//     $input.onEnter( e => {
-//       channel.push("new_msg", {body: e.target.val}, 10000)
-//        .receive("ok", (msg) => console.log("created message", msg) )
-//        .receive("error", (reasons) => console.log("create failed", reasons) )
-//        .receive("timeout", () => console.log("Networking issue...") )
-//     })
-//     channel.join()
-//       .receive("ok", ({messages}) => console.log("catching up", messages) )
-//       .receive("error", ({reason}) => console.log("failed join", reason) )
-//       .receive("timeout", () => console.log("Networking issue. Still waiting...") )
-//
-//
-// ## Joining
-//
-// Creating a channel with `socket.channel(topic, params)`, binds the params to
-// `channel.params`, which are sent up on `channel.join()`.
-// Subsequent rejoins will send up the modified params for
-// updating authorization params, or passing up last_message_id information.
-// Successful joins receive an "ok" status, while unsuccessful joins
-// receive "error".
-//
-// ## Duplicate Join Subscriptions
-//
-// While the client may join any number of topics on any number of channels,
-// the client may only hold a single subscription for each unique topic at any
-// given time. When attempting to create a duplicate subscription,
-// the server will close the existing channel, log a warning, and
-// spawn a new channel for the topic. The client will have their
-// `channel.onClose` callbacks fired for the existing channel, and the new
-// channel join will have its receive hooks processed as normal.
-//
-// ## Pushing Messages
-//
-// From the previous example, we can see that pushing messages to the server
-// can be done with `channel.push(eventName, payload)` and we can optionally
-// receive responses from the push. Additionally, we can use
-// `receive("timeout", callback)` to abort waiting for our other `receive` hooks
-//  and take action after some period of waiting. The default timeout is 5000ms.
-//
-//
-// ## Socket Hooks
-//
-// Lifecycle events of the multiplexed connection can be hooked into via
-// `socket.onError()` and `socket.onClose()` events, ie:
-//
-//     socket.onError( () => console.log("there was an error with the connection!") )
-//     socket.onClose( () => console.log("the connection dropped") )
-//
-//
-// ## Channel Hooks
-//
-// For each joined channel, you can bind to `onError` and `onClose` events
-// to monitor the channel lifecycle, ie:
-//
-//     channel.onError( () => console.log("there was an error!") )
-//     channel.onClose( () => console.log("the channel has gone away gracefully") )
-//
-// ### onError hooks
-//
-// `onError` hooks are invoked if the socket connection drops, or the channel
-// crashes on the server. In either case, a channel rejoin is attempted
-// automatically in an exponential backoff manner.
-//
-// ### onClose hooks
-//
-// `onClose` hooks are invoked only in two cases. 1) the channel explicitly
-// closed on the server, or 2). The client explicitly closed, by calling
-// `channel.leave()`
-//
-//
-// ## Presence
-//
-// The `Presence` object provides features for syncing presence information
-// from the server with the client and handling presences joining and leaving.
-//
-// ### Syncing initial state from the server
-//
-// `Presence.syncState` is used to sync the list of presences on the server
-// with the client's state. An optional `onJoin` and `onLeave` callback can
-// be provided to react to changes in the client's local presences across
-// disconnects and reconnects with the server.
-//
-// `Presence.syncDiff` is used to sync a diff of presence join and leave
-// events from the server, as they happen. Like `syncState`, `syncDiff`
-// accepts optional `onJoin` and `onLeave` callbacks to react to a user
-// joining or leaving from a device.
-//
-// ### Listing Presences
-//
-// `Presence.list` is used to return a list of presence information
-// based on the local state of metadata. By default, all presence
-// metadata is returned, but a `listBy` function can be supplied to
-// allow the client to select which metadata to use for a given presence.
-// For example, you may have a user online from different devices with a
-// a metadata status of "online", but they have set themselves to "away"
-// on another device. In this case, they app may choose to use the "away"
-// status for what appears on the UI. The example below defines a `listBy`
-// function which prioritizes the first metadata which was registered for
-// each user. This could be the first tab they opened, or the first device
-// they came online from:
-//
-//     let state = {}
-//     state = Presence.syncState(state, stateFromServer)
-//     let listBy = (id, {metas: [first, ...rest]}) => {
-//       first.count = rest.length + 1 // count of this user's presences
-//       first.id = id
-//       return first
-//     }
-//     let onlineUsers = Presence.list(state, listBy)
-//
-//
-// ### Example Usage
-//
-//     // detect if user has joined for the 1st time or from another tab/device
-//     let onJoin = (id, current, newPres) => {
-//       if(!current){
-//         console.log("user has entered for the first time", newPres)
-//       } else {
-//         console.log("user additional presence", newPres)
-//       }
-//     }
-//     // detect if user has left from all tabs/devices, or is still present
-//     let onLeave = (id, current, leftPres) => {
-//       if(current.metas.length === 0){
-//         console.log("user has left from all devices", leftPres)
-//       } else {
-//         console.log("user left from a device", leftPres)
-//       }
-//     }
-//     let presences = {} // client's initial empty presence state
-//     // receive initial presence data from server, sent after join
-//     myChannel.on("presences", state => {
-//       presences = Presence.syncState(presences, state, onJoin, onLeave)
-//       displayUsers(Presence.list(presences))
-//     })
-//     // receive "presence_diff" from server, containing join/leave events
-//     myChannel.on("presence_diff", diff => {
-//       presences = Presence.syncDiff(presences, diff, onJoin, onLeave)
-//       this.setState({users: Presence.list(room.presences, listBy)})
-//     })
-//
-var VSN = "1.0.0";
+/**
+ * Phoenix Channels JavaScript client
+ *
+ * ## Socket Connection
+ *
+ * A single connection is established to the server and
+ * channels are multiplexed over the connection.
+ * Connect to the server using the `Socket` class:
+ *
+ * ```javascript
+ *     let socket = new Socket("/socket", {params: {userToken: "123"}})
+ *     socket.connect()
+ * ```
+ *
+ * The `Socket` constructor takes the mount point of the socket,
+ * the authentication params, as well as options that can be found in
+ * the Socket docs, such as configuring the `LongPoll` transport, and
+ * heartbeat.
+ *
+ * ## Channels
+ *
+ * Channels are isolated, concurrent processes on the server that
+ * subscribe to topics and broker events between the client and server.
+ * To join a channel, you must provide the topic, and channel params for
+ * authorization. Here's an example chat room example where `"new_msg"`
+ * events are listened for, messages are pushed to the server, and
+ * the channel is joined with ok/error/timeout matches:
+ *
+ * ```javascript
+ *     let channel = socket.channel("room:123", {token: roomToken})
+ *     channel.on("new_msg", msg => console.log("Got message", msg) )
+ *     $input.onEnter( e => {
+ *       channel.push("new_msg", {body: e.target.val}, 10000)
+ *        .receive("ok", (msg) => console.log("created message", msg) )
+ *        .receive("error", (reasons) => console.log("create failed", reasons) )
+ *        .receive("timeout", () => console.log("Networking issue...") )
+ *     })
+ *     channel.join()
+ *       .receive("ok", ({messages}) => console.log("catching up", messages) )
+ *       .receive("error", ({reason}) => console.log("failed join", reason) )
+ *       .receive("timeout", () => console.log("Networking issue. Still waiting...") )
+ *```
+ *
+ * ## Joining
+ *
+ * Creating a channel with `socket.channel(topic, params)`, binds the params to
+ * `channel.params`, which are sent up on `channel.join()`.
+ * Subsequent rejoins will send up the modified params for
+ * updating authorization params, or passing up last_message_id information.
+ * Successful joins receive an "ok" status, while unsuccessful joins
+ * receive "error".
+ *
+ * ## Duplicate Join Subscriptions
+ *
+ * While the client may join any number of topics on any number of channels,
+ * the client may only hold a single subscription for each unique topic at any
+ * given time. When attempting to create a duplicate subscription,
+ * the server will close the existing channel, log a warning, and
+ * spawn a new channel for the topic. The client will have their
+ * `channel.onClose` callbacks fired for the existing channel, and the new
+ * channel join will have its receive hooks processed as normal.
+ *
+ * ## Pushing Messages
+ *
+ * From the previous example, we can see that pushing messages to the server
+ * can be done with `channel.push(eventName, payload)` and we can optionally
+ * receive responses from the push. Additionally, we can use
+ * `receive("timeout", callback)` to abort waiting for our other `receive` hooks
+ *  and take action after some period of waiting. The default timeout is 5000ms.
+ *
+ *
+ * ## Socket Hooks
+ *
+ * Lifecycle events of the multiplexed connection can be hooked into via
+ * `socket.onError()` and `socket.onClose()` events, ie:
+ *
+ * ```javascript
+ *     socket.onError( () => console.log("there was an error with the connection!") )
+ *     socket.onClose( () => console.log("the connection dropped") )
+ * ```
+ *
+ *
+ * ## Channel Hooks
+ *
+ * For each joined channel, you can bind to `onError` and `onClose` events
+ * to monitor the channel lifecycle, ie:
+ *
+ * ```javascript
+ *     channel.onError( () => console.log("there was an error!") )
+ *     channel.onClose( () => console.log("the channel has gone away gracefully") )
+ * ```
+ *
+ * ### onError hooks
+ *
+ * `onError` hooks are invoked if the socket connection drops, or the channel
+ * crashes on the server. In either case, a channel rejoin is attempted
+ * automatically in an exponential backoff manner.
+ *
+ * ### onClose hooks
+ *
+ * `onClose` hooks are invoked only in two cases. 1) the channel explicitly
+ * closed on the server, or 2). The client explicitly closed, by calling
+ * `channel.leave()`
+ *
+ *
+ * ## Presence
+ *
+ * The `Presence` object provides features for syncing presence information
+ * from the server with the client and handling presences joining and leaving.
+ *
+ * ### Syncing initial state from the server
+ *
+ * `Presence.syncState` is used to sync the list of presences on the server
+ * with the client's state. An optional `onJoin` and `onLeave` callback can
+ * be provided to react to changes in the client's local presences across
+ * disconnects and reconnects with the server.
+ *
+ * `Presence.syncDiff` is used to sync a diff of presence join and leave
+ * events from the server, as they happen. Like `syncState`, `syncDiff`
+ * accepts optional `onJoin` and `onLeave` callbacks to react to a user
+ * joining or leaving from a device.
+ *
+ * ### Listing Presences
+ *
+ * `Presence.list` is used to return a list of presence information
+ * based on the local state of metadata. By default, all presence
+ * metadata is returned, but a `listBy` function can be supplied to
+ * allow the client to select which metadata to use for a given presence.
+ * For example, you may have a user online from different devices with
+ * a metadata status of "online", but they have set themselves to "away"
+ * on another device. In this case, the app may choose to use the "away"
+ * status for what appears on the UI. The example below defines a `listBy`
+ * function which prioritizes the first metadata which was registered for
+ * each user. This could be the first tab they opened, or the first device
+ * they came online from:
+ *
+ * ```javascript
+ *     let state = {}
+ *     state = Presence.syncState(state, stateFromServer)
+ *     let listBy = (id, {metas: [first, ...rest]}) => {
+ *       first.count = rest.length + 1 // count of this user's presences
+ *       first.id = id
+ *       return first
+ *     }
+ *     let onlineUsers = Presence.list(state, listBy)
+ * ```
+ *
+ *
+ * ### Example Usage
+ *```javascript
+ *     // detect if user has joined for the 1st time or from another tab/device
+ *     let onJoin = (id, current, newPres) => {
+ *       if(!current){
+ *         console.log("user has entered for the first time", newPres)
+ *       } else {
+ *         console.log("user additional presence", newPres)
+ *       }
+ *     }
+ *     // detect if user has left from all tabs/devices, or is still present
+ *     let onLeave = (id, current, leftPres) => {
+ *       if(current.metas.length === 0){
+ *         console.log("user has left from all devices", leftPres)
+ *       } else {
+ *         console.log("user left from a device", leftPres)
+ *       }
+ *     }
+ *     let presences = {} // client's initial empty presence state
+ *     // receive initial presence data from server, sent after join
+ *     myChannel.on("presence_state", state => {
+ *       presences = Presence.syncState(presences, state, onJoin, onLeave)
+ *       displayUsers(Presence.list(presences))
+ *     })
+ *     // receive "presence_diff" from server, containing join/leave events
+ *     myChannel.on("presence_diff", diff => {
+ *       presences = Presence.syncDiff(presences, diff, onJoin, onLeave)
+ *       this.setState({users: Presence.list(room.presences, listBy)})
+ *     })
+ * ```
+ * @module phoenix
+ */
+
+var VSN = "2.0.0";
 var SOCKET_STATES = { connecting: 0, open: 1, closing: 2, closed: 3 };
 var DEFAULT_TIMEOUT = 10000;
+var WS_CLOSE_NORMAL = 1000;
 var CHANNEL_STATES = {
   closed: "closed",
   errored: "errored",
@@ -12995,21 +14698,21 @@ var CHANNEL_EVENTS = {
   reply: "phx_reply",
   leave: "phx_leave"
 };
+var CHANNEL_LIFECYCLE_EVENTS = [CHANNEL_EVENTS.close, CHANNEL_EVENTS.error, CHANNEL_EVENTS.join, CHANNEL_EVENTS.reply, CHANNEL_EVENTS.leave];
 var TRANSPORTS = {
   longpoll: "longpoll",
   websocket: "websocket"
 };
 
+/**
+ * Initializes the Push
+ * @param {Channel} channel - The Channel
+ * @param {string} event - The event, for example `"phx_join"`
+ * @param {Object} payload - The payload, for example `{user_id: 123}`
+ * @param {number} timeout - The push timeout in milliseconds
+ */
+
 var Push = function () {
-
-  // Initializes the Push
-  //
-  // channel - The Channel
-  // event - The event, for example `"phx_join"`
-  // payload - The payload, for example `{user_id: 123}`
-  // timeout - The push timeout in milliseconds
-  //
-
   function Push(channel, event, payload, timeout) {
     _classCallCheck(this, Push);
 
@@ -13023,17 +14726,24 @@ var Push = function () {
     this.sent = false;
   }
 
+  /**
+   *
+   * @param {number} timeout
+   */
+
+
   _createClass(Push, [{
     key: "resend",
     value: function resend(timeout) {
       this.timeout = timeout;
-      this.cancelRefEvent();
-      this.ref = null;
-      this.refEvent = null;
-      this.receivedResp = null;
-      this.sent = false;
+      this.reset();
       this.send();
     }
+
+    /**
+     *
+     */
+
   }, {
     key: "send",
     value: function send() {
@@ -13046,9 +14756,17 @@ var Push = function () {
         topic: this.channel.topic,
         event: this.event,
         payload: this.payload,
-        ref: this.ref
+        ref: this.ref,
+        join_ref: this.channel.joinRef()
       });
     }
+
+    /**
+     *
+     * @param {*} status
+     * @param {*} callback
+     */
+
   }, {
     key: "receive",
     value: function receive(status, callback) {
@@ -13063,11 +14781,20 @@ var Push = function () {
     // private
 
   }, {
+    key: "reset",
+    value: function reset() {
+      this.cancelRefEvent();
+      this.ref = null;
+      this.refEvent = null;
+      this.receivedResp = null;
+      this.sent = false;
+    }
+  }, {
     key: "matchReceive",
     value: function matchReceive(_ref) {
-      var status = _ref.status;
-      var response = _ref.response;
-      var ref = _ref.ref;
+      var status = _ref.status,
+          response = _ref.response,
+          ref = _ref.ref;
 
       this.recHooks.filter(function (h) {
         return h.status === status;
@@ -13095,7 +14822,7 @@ var Push = function () {
       var _this = this;
 
       if (this.timeoutTimer) {
-        return;
+        this.cancelTimeout();
       }
       this.ref = this.channel.socket.makeRef();
       this.refEvent = this.channel.replyEventName(this.ref);
@@ -13125,6 +14852,14 @@ var Push = function () {
 
   return Push;
 }();
+
+/**
+ *
+ * @param {string} topic
+ * @param {Object} params
+ * @param {Socket} socket
+ */
+
 
 var Channel = exports.Channel = function () {
   function Channel(topic, params, socket) {
@@ -13170,8 +14905,11 @@ var Channel = exports.Channel = function () {
       if (!_this2.isJoining()) {
         return;
       }
-      _this2.socket.log("channel", "timeout " + _this2.topic, _this2.joinPush.timeout);
+      _this2.socket.log("channel", "timeout " + _this2.topic + " (" + _this2.joinRef() + ")", _this2.joinPush.timeout);
+      var leavePush = new Push(_this2, CHANNEL_EVENTS.leave, {}, _this2.timeout);
+      leavePush.send();
       _this2.state = CHANNEL_STATES.errored;
+      _this2.joinPush.reset();
       _this2.rejoinTimer.scheduleTimeout();
     });
     this.on(CHANNEL_EVENTS.reply, function (payload, ref) {
@@ -13190,7 +14928,7 @@ var Channel = exports.Channel = function () {
   }, {
     key: "join",
     value: function join() {
-      var timeout = arguments.length <= 0 || arguments[0] === undefined ? this.timeout : arguments[0];
+      var timeout = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.timeout;
 
       if (this.joinedOnce) {
         throw "tried to join multiple times. 'join' can only be called a single time per channel instance";
@@ -13232,7 +14970,7 @@ var Channel = exports.Channel = function () {
   }, {
     key: "push",
     value: function push(event, payload) {
-      var timeout = arguments.length <= 2 || arguments[2] === undefined ? this.timeout : arguments[2];
+      var timeout = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this.timeout;
 
       if (!this.joinedOnce) {
         throw "tried to push '" + event + "' to '" + this.topic + "' before joining. Use channel.join() before pushing events";
@@ -13248,30 +14986,32 @@ var Channel = exports.Channel = function () {
       return pushEvent;
     }
 
-    // Leaves the channel
-    //
-    // Unsubscribes from server events, and
-    // instructs channel to terminate on server
-    //
-    // Triggers onClose() hooks
-    //
-    // To receive leave acknowledgements, use the a `receive`
-    // hook to bind to the server ack, ie:
-    //
-    //     channel.leave().receive("ok", () => alert("left!") )
-    //
+    /** Leaves the channel
+     *
+     * Unsubscribes from server events, and
+     * instructs channel to terminate on server
+     *
+     * Triggers onClose() hooks
+     *
+     * To receive leave acknowledgements, use the a `receive`
+     * hook to bind to the server ack, ie:
+     *
+     * ```javascript
+     *     channel.leave().receive("ok", () => alert("left!") )
+     * ```
+     */
 
   }, {
     key: "leave",
     value: function leave() {
       var _this3 = this;
 
-      var timeout = arguments.length <= 0 || arguments[0] === undefined ? this.timeout : arguments[0];
+      var timeout = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.timeout;
 
       this.state = CHANNEL_STATES.leaving;
       var onClose = function onClose() {
         _this3.socket.log("channel", "leave " + _this3.topic);
-        _this3.trigger(CHANNEL_EVENTS.close, "leave", _this3.joinRef());
+        _this3.trigger(CHANNEL_EVENTS.close, "leave");
       };
       var leavePush = new Push(this, CHANNEL_EVENTS.leave, {}, timeout);
       leavePush.receive("ok", function () {
@@ -13287,12 +15027,14 @@ var Channel = exports.Channel = function () {
       return leavePush;
     }
 
-    // Overridable message hook
-    //
-    // Receives all events for specialized message handling
-    // before dispatching to the channel callbacks.
-    //
-    // Must return the payload, modified or unmodified
+    /**
+     * Overridable message hook
+     *
+     * Receives all events for specialized message handling
+     * before dispatching to the channel callbacks.
+     *
+     * Must return the payload, modified or unmodified
+     */
 
   }, {
     key: "onMessage",
@@ -13304,8 +15046,18 @@ var Channel = exports.Channel = function () {
 
   }, {
     key: "isMember",
-    value: function isMember(topic) {
-      return this.topic === topic;
+    value: function isMember(topic, event, payload, joinRef) {
+      if (this.topic !== topic) {
+        return false;
+      }
+      var isLifecycleEvent = CHANNEL_LIFECYCLE_EVENTS.indexOf(event) >= 0;
+
+      if (joinRef && isLifecycleEvent && joinRef !== this.joinRef()) {
+        this.socket.log("channel", "dropping outdated message", { topic: topic, event: event, payload: payload, joinRef: joinRef });
+        return false;
+      } else {
+        return true;
+      }
     }
   }, {
     key: "joinRef",
@@ -13321,7 +15073,7 @@ var Channel = exports.Channel = function () {
   }, {
     key: "rejoin",
     value: function rejoin() {
-      var timeout = arguments.length <= 0 || arguments[0] === undefined ? this.timeout : arguments[0];
+      var timeout = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.timeout;
       if (this.isLeaving()) {
         return;
       }
@@ -13329,16 +15081,10 @@ var Channel = exports.Channel = function () {
     }
   }, {
     key: "trigger",
-    value: function trigger(event, payload, ref) {
-      var close = CHANNEL_EVENTS.close;
-      var error = CHANNEL_EVENTS.error;
-      var leave = CHANNEL_EVENTS.leave;
-      var join = CHANNEL_EVENTS.join;
+    value: function trigger(event, payload, ref, joinRef) {
+      var _this4 = this;
 
-      if (ref && [close, error, leave, join].indexOf(event) >= 0 && ref !== this.joinRef()) {
-        return;
-      }
-      var handledPayload = this.onMessage(event, payload, ref);
+      var handledPayload = this.onMessage(event, payload, ref, joinRef);
       if (payload && !handledPayload) {
         throw "channel onMessage callbacks must return the payload, modified or unmodified";
       }
@@ -13346,7 +15092,7 @@ var Channel = exports.Channel = function () {
       this.bindings.filter(function (bind) {
         return bind.event === event;
       }).map(function (bind) {
-        return bind.callback(handledPayload, ref);
+        return bind.callback(handledPayload, ref, joinRef || _this4.joinRef());
       });
     }
   }, {
@@ -13384,41 +15130,84 @@ var Channel = exports.Channel = function () {
   return Channel;
 }();
 
+var Serializer = {
+  encode: function encode(msg, callback) {
+    var payload = [msg.join_ref, msg.ref, msg.topic, msg.event, msg.payload];
+    return callback(JSON.stringify(payload));
+  },
+  decode: function decode(rawPayload, callback) {
+    var _JSON$parse = JSON.parse(rawPayload),
+        _JSON$parse2 = _slicedToArray(_JSON$parse, 5),
+        join_ref = _JSON$parse2[0],
+        ref = _JSON$parse2[1],
+        topic = _JSON$parse2[2],
+        event = _JSON$parse2[3],
+        payload = _JSON$parse2[4];
+
+    return callback({ join_ref: join_ref, ref: ref, topic: topic, event: event, payload: payload });
+  }
+};
+
+/** Initializes the Socket
+ *
+ *
+ * For IE8 support use an ES5-shim (https://github.com/es-shims/es5-shim)
+ *
+ * @param {string} endPoint - The string WebSocket endpoint, ie, `"ws://example.com/socket"`,
+ *                                               `"wss://example.com"`
+ *                                               `"/socket"` (inherited host & protocol)
+ * @param {Object} opts - Optional configuration
+ * @param {string} opts.transport - The Websocket Transport, for example WebSocket or Phoenix.LongPoll.
+ *
+ * Defaults to WebSocket with automatic LongPoll fallback.
+ * @param {Function} opts.encode - The function to encode outgoing messages.
+ *
+ * Defaults to JSON:
+ *
+ * ```javascript
+ * (payload, callback) => callback(JSON.stringify(payload))
+ * ```
+ *
+ * @param {Function} opts.decode - The function to decode incoming messages.
+ *
+ * Defaults to JSON:
+ *
+ * ```javascript
+ * (payload, callback) => callback(JSON.parse(payload))
+ * ```
+ *
+ * @param {number} opts.timeout - The default timeout in milliseconds to trigger push timeouts.
+ *
+ * Defaults `DEFAULT_TIMEOUT`
+ * @param {number} opts.heartbeatIntervalMs - The millisec interval to send a heartbeat message
+ * @param {number} opts.reconnectAfterMs - The optional function that returns the millsec reconnect interval.
+ *
+ * Defaults to stepped backoff of:
+ *
+ * ```javascript
+ *  function(tries){
+ *    return [1000, 5000, 10000][tries - 1] || 10000
+ *  }
+ * ```
+ * @param {Function} opts.logger - The optional function for specialized logging, ie:
+ * ```javascript
+ * logger: (kind, msg, data) => { console.log(`${kind}: ${msg}`, data) }
+ * ```
+ *
+ * @param {number}  opts.longpollerTimeout - The maximum timeout of a long poll AJAX request.
+ *
+ * Defaults to 20s (double the server long poll timer).
+ *
+ * @param {Object}  opts.params - The optional params to pass when connecting
+ *
+ *
+*/
+
 var Socket = exports.Socket = function () {
-
-  // Initializes the Socket
-  //
-  // endPoint - The string WebSocket endpoint, ie, "ws://example.com/ws",
-  //                                               "wss://example.com"
-  //                                               "/ws" (inherited host & protocol)
-  // opts - Optional configuration
-  //   transport - The Websocket Transport, for example WebSocket or Phoenix.LongPoll.
-  //               Defaults to WebSocket with automatic LongPoll fallback.
-  //   timeout - The default timeout in milliseconds to trigger push timeouts.
-  //             Defaults `DEFAULT_TIMEOUT`
-  //   heartbeatIntervalMs - The millisec interval to send a heartbeat message
-  //   reconnectAfterMs - The optional function that returns the millsec
-  //                      reconnect interval. Defaults to stepped backoff of:
-  //
-  //     function(tries){
-  //       return [1000, 5000, 10000][tries - 1] || 10000
-  //     }
-  //
-  //   logger - The optional function for specialized logging, ie:
-  //     `logger: (kind, msg, data) => { console.log(`${kind}: ${msg}`, data) }
-  //
-  //   longpollerTimeout - The maximum timeout of a long poll AJAX request.
-  //                        Defaults to 20s (double the server long poll timer).
-  //
-  //   params - The optional params to pass when connecting
-  //
-  // For IE8 support use an ES5-shim (https://github.com/es-shims/es5-shim)
-  //
-
   function Socket(endPoint) {
-    var _this4 = this;
+    var _this5 = this;
 
-    var opts = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+    var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     _classCallCheck(this, Socket);
 
@@ -13428,6 +15217,15 @@ var Socket = exports.Socket = function () {
     this.ref = 0;
     this.timeout = opts.timeout || DEFAULT_TIMEOUT;
     this.transport = opts.transport || window.WebSocket || LongPoll;
+    this.defaultEncoder = Serializer.encode;
+    this.defaultDecoder = Serializer.decode;
+    if (this.transport !== LongPoll) {
+      this.encode = opts.encode || this.defaultEncoder;
+      this.decode = opts.decode || this.defaultDecoder;
+    } else {
+      this.encode = this.defaultEncoder;
+      this.decode = this.defaultDecoder;
+    }
     this.heartbeatIntervalMs = opts.heartbeatIntervalMs || 30000;
     this.reconnectAfterMs = opts.reconnectAfterMs || function (tries) {
       return [1000, 2000, 5000, 10000][tries - 1] || 10000;
@@ -13436,9 +15234,11 @@ var Socket = exports.Socket = function () {
     this.longpollerTimeout = opts.longpollerTimeout || 20000;
     this.params = opts.params || {};
     this.endPoint = endPoint + "/" + TRANSPORTS.websocket;
+    this.heartbeatTimer = null;
+    this.pendingHeartbeatRef = null;
     this.reconnectTimer = new Timer(function () {
-      _this4.disconnect(function () {
-        return _this4.connect();
+      _this5.disconnect(function () {
+        return _this5.connect();
       });
     }, this.reconnectAfterMs);
   }
@@ -13476,12 +15276,15 @@ var Socket = exports.Socket = function () {
       callback && callback();
     }
 
-    // params - The params to send when connecting, for example `{user_id: userToken}`
+    /**
+     *
+     * @param {Object} params - The params to send when connecting, for example `{user_id: userToken}`
+     */
 
   }, {
     key: "connect",
     value: function connect(params) {
-      var _this5 = this;
+      var _this6 = this;
 
       if (params) {
         console && console.log("passing params to connect is deprecated. Instead pass :params to the Socket constructor");
@@ -13494,20 +15297,25 @@ var Socket = exports.Socket = function () {
       this.conn = new this.transport(this.endPointURL());
       this.conn.timeout = this.longpollerTimeout;
       this.conn.onopen = function () {
-        return _this5.onConnOpen();
+        return _this6.onConnOpen();
       };
       this.conn.onerror = function (error) {
-        return _this5.onConnError(error);
+        return _this6.onConnError(error);
       };
       this.conn.onmessage = function (event) {
-        return _this5.onConnMessage(event);
+        return _this6.onConnMessage(event);
       };
       this.conn.onclose = function (event) {
-        return _this5.onConnClose(event);
+        return _this6.onConnClose(event);
       };
     }
 
-    // Logs the message. Override `this.logger` for specialized logging. noops by default
+    /**
+     * Logs the message. Override `this.logger` for specialized logging. noops by default
+     * @param {string} kind
+     * @param {string} msg
+     * @param {Object} data
+     */
 
   }, {
     key: "log",
@@ -13545,15 +15353,15 @@ var Socket = exports.Socket = function () {
   }, {
     key: "onConnOpen",
     value: function onConnOpen() {
-      var _this6 = this;
+      var _this7 = this;
 
-      this.log("transport", "connected to " + this.endPointURL(), this.transport.prototype);
+      this.log("transport", "connected to " + this.endPointURL());
       this.flushSendBuffer();
       this.reconnectTimer.reset();
       if (!this.conn.skipHeartbeat) {
         clearInterval(this.heartbeatTimer);
         this.heartbeatTimer = setInterval(function () {
-          return _this6.sendHeartbeat();
+          return _this7.sendHeartbeat();
         }, this.heartbeatIntervalMs);
       }
       this.stateChangeCallbacks.open.forEach(function (callback) {
@@ -13616,7 +15424,7 @@ var Socket = exports.Socket = function () {
   }, {
     key: "channel",
     value: function channel(topic) {
-      var chanParams = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+      var chanParams = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
       var chan = new Channel(topic, chanParams, this);
       this.channels.push(chan);
@@ -13625,17 +15433,20 @@ var Socket = exports.Socket = function () {
   }, {
     key: "push",
     value: function push(data) {
-      var _this7 = this;
+      var _this8 = this;
 
-      var topic = data.topic;
-      var event = data.event;
-      var payload = data.payload;
-      var ref = data.ref;
+      var topic = data.topic,
+          event = data.event,
+          payload = data.payload,
+          ref = data.ref,
+          join_ref = data.join_ref;
 
       var callback = function callback() {
-        return _this7.conn.send(JSON.stringify(data));
+        _this8.encode(data, function (result) {
+          _this8.conn.send(result);
+        });
       };
-      this.log("push", topic + " " + event + " (" + ref + ")", payload);
+      this.log("push", topic + " " + event + " (" + join_ref + ", " + ref + ")", payload);
       if (this.isConnected()) {
         callback();
       } else {
@@ -13643,7 +15454,9 @@ var Socket = exports.Socket = function () {
       }
     }
 
-    // Return the next message ref, accounting for overflows
+    /**
+     * Return the next message ref, accounting for overflows
+     */
 
   }, {
     key: "makeRef",
@@ -13663,7 +15476,14 @@ var Socket = exports.Socket = function () {
       if (!this.isConnected()) {
         return;
       }
-      this.push({ topic: "phoenix", event: "heartbeat", payload: {}, ref: this.makeRef() });
+      if (this.pendingHeartbeatRef) {
+        this.pendingHeartbeatRef = null;
+        this.log("transport", "heartbeat timeout. Attempting to re-establish connection");
+        this.conn.close(WS_CLOSE_NORMAL, "hearbeat timeout");
+        return;
+      }
+      this.pendingHeartbeatRef = this.makeRef();
+      this.push({ topic: "phoenix", event: "heartbeat", payload: {}, ref: this.pendingHeartbeatRef });
     }
   }, {
     key: "flushSendBuffer",
@@ -13678,20 +15498,28 @@ var Socket = exports.Socket = function () {
   }, {
     key: "onConnMessage",
     value: function onConnMessage(rawMessage) {
-      var msg = JSON.parse(rawMessage.data);
-      var topic = msg.topic;
-      var event = msg.event;
-      var payload = msg.payload;
-      var ref = msg.ref;
+      var _this9 = this;
 
-      this.log("receive", (payload.status || "") + " " + topic + " " + event + " " + (ref && "(" + ref + ")" || ""), payload);
-      this.channels.filter(function (channel) {
-        return channel.isMember(topic);
-      }).forEach(function (channel) {
-        return channel.trigger(event, payload, ref);
-      });
-      this.stateChangeCallbacks.message.forEach(function (callback) {
-        return callback(msg);
+      this.decode(rawMessage.data, function (msg) {
+        var topic = msg.topic,
+            event = msg.event,
+            payload = msg.payload,
+            ref = msg.ref,
+            join_ref = msg.join_ref;
+
+        if (ref && ref === _this9.pendingHeartbeatRef) {
+          _this9.pendingHeartbeatRef = null;
+        }
+
+        _this9.log("receive", (payload.status || "") + " " + topic + " " + event + " " + (ref && "(" + ref + ")" || ""), payload);
+        _this9.channels.filter(function (channel) {
+          return channel.isMember(topic, event, payload, join_ref);
+        }).forEach(function (channel) {
+          return channel.trigger(event, payload, ref, join_ref);
+        });
+        _this9.stateChangeCallbacks.message.forEach(function (callback) {
+          return callback(msg);
+        });
       });
     }
   }]);
@@ -13741,7 +15569,7 @@ var LongPoll = exports.LongPoll = function () {
   }, {
     key: "poll",
     value: function poll() {
-      var _this8 = this;
+      var _this10 = this;
 
       if (!(this.readyState === SOCKET_STATES.open || this.readyState === SOCKET_STATES.connecting)) {
         return;
@@ -13749,11 +15577,11 @@ var LongPoll = exports.LongPoll = function () {
 
       Ajax.request("GET", this.endpointURL(), "application/json", null, this.timeout, this.ontimeout.bind(this), function (resp) {
         if (resp) {
-          var status = resp.status;
-          var token = resp.token;
-          var messages = resp.messages;
+          var status = resp.status,
+              token = resp.token,
+              messages = resp.messages;
 
-          _this8.token = token;
+          _this10.token = token;
         } else {
           var status = 0;
         }
@@ -13761,22 +15589,22 @@ var LongPoll = exports.LongPoll = function () {
         switch (status) {
           case 200:
             messages.forEach(function (msg) {
-              return _this8.onmessage({ data: JSON.stringify(msg) });
+              return _this10.onmessage({ data: msg });
             });
-            _this8.poll();
+            _this10.poll();
             break;
           case 204:
-            _this8.poll();
+            _this10.poll();
             break;
           case 410:
-            _this8.readyState = SOCKET_STATES.open;
-            _this8.onopen();
-            _this8.poll();
+            _this10.readyState = SOCKET_STATES.open;
+            _this10.onopen();
+            _this10.poll();
             break;
           case 0:
           case 500:
-            _this8.onerror();
-            _this8.closeAndRetry();
+            _this10.onerror();
+            _this10.closeAndRetry();
             break;
           default:
             throw "unhandled poll status " + status;
@@ -13786,12 +15614,12 @@ var LongPoll = exports.LongPoll = function () {
   }, {
     key: "send",
     value: function send(body) {
-      var _this9 = this;
+      var _this11 = this;
 
       Ajax.request("POST", this.endpointURL(), "application/json", body, this.timeout, this.onerror.bind(this, "timeout"), function (resp) {
         if (!resp || resp.status !== 200) {
-          _this9.onerror(status);
-          _this9.closeAndRetry();
+          _this11.onerror(resp && resp.status);
+          _this11.closeAndRetry();
         }
       });
     }
@@ -13818,20 +15646,20 @@ var Ajax = exports.Ajax = function () {
         var req = new XDomainRequest(); // IE8, IE9
         this.xdomainRequest(req, method, endPoint, body, timeout, ontimeout, callback);
       } else {
-        var req = window.XMLHttpRequest ? new XMLHttpRequest() : // IE7+, Firefox, Chrome, Opera, Safari
+        var _req = window.XMLHttpRequest ? new window.XMLHttpRequest() : // IE7+, Firefox, Chrome, Opera, Safari
         new ActiveXObject("Microsoft.XMLHTTP"); // IE6, IE5
-        this.xhrRequest(req, method, endPoint, accept, body, timeout, ontimeout, callback);
+        this.xhrRequest(_req, method, endPoint, accept, body, timeout, ontimeout, callback);
       }
     }
   }, {
     key: "xdomainRequest",
     value: function xdomainRequest(req, method, endPoint, body, timeout, ontimeout, callback) {
-      var _this10 = this;
+      var _this12 = this;
 
       req.timeout = timeout;
       req.open(method, endPoint);
       req.onload = function () {
-        var response = _this10.parseJSON(req.responseText);
+        var response = _this12.parseJSON(req.responseText);
         callback && callback(response);
       };
       if (ontimeout) {
@@ -13846,17 +15674,17 @@ var Ajax = exports.Ajax = function () {
   }, {
     key: "xhrRequest",
     value: function xhrRequest(req, method, endPoint, accept, body, timeout, ontimeout, callback) {
-      var _this11 = this;
+      var _this13 = this;
 
-      req.timeout = timeout;
       req.open(method, endPoint, true);
+      req.timeout = timeout;
       req.setRequestHeader("Content-Type", accept);
       req.onerror = function () {
         callback && callback(null);
       };
       req.onreadystatechange = function () {
-        if (req.readyState === _this11.states.complete && callback) {
-          var response = _this11.parseJSON(req.responseText);
+        if (req.readyState === _this13.states.complete && callback) {
+          var response = _this13.parseJSON(req.responseText);
           callback(response);
         }
       };
@@ -13869,7 +15697,16 @@ var Ajax = exports.Ajax = function () {
   }, {
     key: "parseJSON",
     value: function parseJSON(resp) {
-      return resp && resp !== "" ? JSON.parse(resp) : null;
+      if (!resp || resp === "") {
+        return null;
+      }
+
+      try {
+        return JSON.parse(resp);
+      } catch (e) {
+        console && console.log("failed to parse JSON response", resp);
+        return null;
+      }
     }
   }, {
     key: "serialize",
@@ -13908,7 +15745,7 @@ Ajax.states = { complete: 4 };
 
 var Presence = exports.Presence = {
   syncState: function syncState(currentState, newState, onJoin, onLeave) {
-    var _this12 = this;
+    var _this14 = this;
 
     var state = this.clone(currentState);
     var joins = {};
@@ -13922,28 +15759,26 @@ var Presence = exports.Presence = {
     this.map(newState, function (key, newPresence) {
       var currentPresence = state[key];
       if (currentPresence) {
-        (function () {
-          var newRefs = newPresence.metas.map(function (m) {
-            return m.phx_ref;
-          });
-          var curRefs = currentPresence.metas.map(function (m) {
-            return m.phx_ref;
-          });
-          var joinedMetas = newPresence.metas.filter(function (m) {
-            return curRefs.indexOf(m.phx_ref) < 0;
-          });
-          var leftMetas = currentPresence.metas.filter(function (m) {
-            return newRefs.indexOf(m.phx_ref) < 0;
-          });
-          if (joinedMetas.length > 0) {
-            joins[key] = newPresence;
-            joins[key].metas = joinedMetas;
-          }
-          if (leftMetas.length > 0) {
-            leaves[key] = _this12.clone(currentPresence);
-            leaves[key].metas = leftMetas;
-          }
-        })();
+        var newRefs = newPresence.metas.map(function (m) {
+          return m.phx_ref;
+        });
+        var curRefs = currentPresence.metas.map(function (m) {
+          return m.phx_ref;
+        });
+        var joinedMetas = newPresence.metas.filter(function (m) {
+          return curRefs.indexOf(m.phx_ref) < 0;
+        });
+        var leftMetas = currentPresence.metas.filter(function (m) {
+          return newRefs.indexOf(m.phx_ref) < 0;
+        });
+        if (joinedMetas.length > 0) {
+          joins[key] = newPresence;
+          joins[key].metas = joinedMetas;
+        }
+        if (leftMetas.length > 0) {
+          leaves[key] = _this14.clone(currentPresence);
+          leaves[key].metas = leftMetas;
+        }
       } else {
         joins[key] = newPresence;
       }
@@ -13951,8 +15786,8 @@ var Presence = exports.Presence = {
     return this.syncDiff(state, { joins: joins, leaves: leaves }, onJoin, onLeave);
   },
   syncDiff: function syncDiff(currentState, _ref2, onJoin, onLeave) {
-    var joins = _ref2.joins;
-    var leaves = _ref2.leaves;
+    var joins = _ref2.joins,
+        leaves = _ref2.leaves;
 
     var state = this.clone(currentState);
     if (!onJoin) {
@@ -14002,6 +15837,7 @@ var Presence = exports.Presence = {
     });
   },
 
+
   // private
 
   map: function map(obj, func) {
@@ -14014,19 +15850,25 @@ var Presence = exports.Presence = {
   }
 };
 
-// Creates a timer that accepts a `timerCalc` function to perform
-// calculated timeout retries, such as exponential backoff.
-//
-// ## Examples
-//
-//    let reconnectTimer = new Timer(() => this.connect(), function(tries){
-//      return [1000, 5000, 10000][tries - 1] || 10000
-//    })
-//    reconnectTimer.scheduleTimeout() // fires after 1000
-//    reconnectTimer.scheduleTimeout() // fires after 5000
-//    reconnectTimer.reset()
-//    reconnectTimer.scheduleTimeout() // fires after 1000
-//
+/**
+ *
+ * Creates a timer that accepts a `timerCalc` function to perform
+ * calculated timeout retries, such as exponential backoff.
+ *
+ * ## Examples
+ *
+ * ```javascript
+ *    let reconnectTimer = new Timer(() => this.connect(), function(tries){
+ *      return [1000, 5000, 10000][tries - 1] || 10000
+ *    })
+ *    reconnectTimer.scheduleTimeout() // fires after 1000
+ *    reconnectTimer.scheduleTimeout() // fires after 5000
+ *    reconnectTimer.reset()
+ *    reconnectTimer.scheduleTimeout() // fires after 1000
+ * ```
+ * @param {Function} callback
+ * @param {Function} timerCalc
+ */
 
 var Timer = function () {
   function Timer(callback, timerCalc) {
@@ -14045,18 +15887,20 @@ var Timer = function () {
       clearTimeout(this.timer);
     }
 
-    // Cancels any previous scheduleTimeout and schedules callback
+    /**
+     * Cancels any previous scheduleTimeout and schedules callback
+     */
 
   }, {
     key: "scheduleTimeout",
     value: function scheduleTimeout() {
-      var _this13 = this;
+      var _this15 = this;
 
       clearTimeout(this.timer);
 
       this.timer = setTimeout(function () {
-        _this13.tries = _this13.tries + 1;
-        _this13.callback();
+        _this15.tries = _this15.tries + 1;
+        _this15.callback();
       }, this.timerCalc(this.tries + 1));
     }
   }]);
@@ -14064,7 +15908,7 @@ var Timer = function () {
   return Timer;
 }();
 
-})(typeof(exports) === "undefined" ? window.Phoenix = window.Phoenix || {} : exports);
+})));
   })();
 });
 
@@ -15556,6 +17400,181 @@ process.umask = function() { return 0; };
   })();
 });
 
+require.register("xterm/lib/Buffer.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "xterm");
+  var _Buffer = require('buffer'); var Buffer = _Buffer && _Buffer.Buffer;
+(function() {
+    "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var CircularList_1 = require("./utils/CircularList");
+var Buffer = (function () {
+    function Buffer(_terminal) {
+        this._terminal = _terminal;
+        this.clear();
+    }
+    Object.defineProperty(Buffer.prototype, "lines", {
+        get: function () {
+            return this._lines;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Buffer.prototype.fillViewportRows = function () {
+        if (this._lines.length === 0) {
+            var i = this._terminal.rows;
+            while (i--) {
+                this.lines.push(this._terminal.blankLine());
+            }
+        }
+    };
+    Buffer.prototype.clear = function () {
+        this.ydisp = 0;
+        this.ybase = 0;
+        this.y = 0;
+        this.x = 0;
+        this.scrollBottom = 0;
+        this.scrollTop = 0;
+        this.tabs = {};
+        this._lines = new CircularList_1.CircularList(this._terminal.scrollback);
+        this.scrollBottom = this._terminal.rows - 1;
+    };
+    Buffer.prototype.resize = function (newCols, newRows) {
+        if (this._lines.length === 0) {
+            return;
+        }
+        if (this._terminal.cols < newCols) {
+            var ch = [this._terminal.defAttr, ' ', 1];
+            for (var i = 0; i < this._lines.length; i++) {
+                if (this._lines.get(i) === undefined) {
+                    this._lines.set(i, this._terminal.blankLine());
+                }
+                while (this._lines.get(i).length < newCols) {
+                    this._lines.get(i).push(ch);
+                }
+            }
+        }
+        var addToY = 0;
+        if (this._terminal.rows < newRows) {
+            for (var y = this._terminal.rows; y < newRows; y++) {
+                if (this._lines.length < newRows + this.ybase) {
+                    if (this.ybase > 0 && this._lines.length <= this.ybase + this.y + addToY + 1) {
+                        this.ybase--;
+                        addToY++;
+                        if (this.ydisp > 0) {
+                            this.ydisp--;
+                        }
+                    }
+                    else {
+                        this._lines.push(this._terminal.blankLine());
+                    }
+                }
+            }
+        }
+        else {
+            for (var y = this._terminal.rows; y > newRows; y--) {
+                if (this._lines.length > newRows + this.ybase) {
+                    if (this._lines.length > this.ybase + this.y + 1) {
+                        this._lines.pop();
+                    }
+                    else {
+                        this.ybase++;
+                        this.ydisp++;
+                    }
+                }
+            }
+        }
+        if (this.y >= newRows) {
+            this.y = newRows - 1;
+        }
+        if (addToY) {
+            this.y += addToY;
+        }
+        if (this.x >= newCols) {
+            this.x = newCols - 1;
+        }
+        this.scrollTop = 0;
+        this.scrollBottom = newRows - 1;
+    };
+    return Buffer;
+}());
+exports.Buffer = Buffer;
+
+//# sourceMappingURL=Buffer.js.map
+  })();
+});
+
+require.register("xterm/lib/BufferSet.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "xterm");
+  var _Buffer = require('buffer'); var Buffer = _Buffer && _Buffer.Buffer;
+(function() {
+    "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var Buffer_1 = require("./Buffer");
+var EventEmitter_1 = require("./EventEmitter");
+var BufferSet = (function (_super) {
+    __extends(BufferSet, _super);
+    function BufferSet(_terminal) {
+        var _this = _super.call(this) || this;
+        _this._terminal = _terminal;
+        _this._normal = new Buffer_1.Buffer(_this._terminal);
+        _this._normal.fillViewportRows();
+        _this._alt = new Buffer_1.Buffer(_this._terminal);
+        _this._activeBuffer = _this._normal;
+        return _this;
+    }
+    Object.defineProperty(BufferSet.prototype, "alt", {
+        get: function () {
+            return this._alt;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BufferSet.prototype, "active", {
+        get: function () {
+            return this._activeBuffer;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BufferSet.prototype, "normal", {
+        get: function () {
+            return this._normal;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    BufferSet.prototype.activateNormalBuffer = function () {
+        this._alt.clear();
+        this._activeBuffer = this._normal;
+        this.emit('activate', this._normal);
+    };
+    BufferSet.prototype.activateAltBuffer = function () {
+        this._alt.fillViewportRows();
+        this._activeBuffer = this._alt;
+        this.emit('activate', this._alt);
+    };
+    BufferSet.prototype.resize = function (newCols, newRows) {
+        this._normal.resize(newCols, newRows);
+        this._alt.resize(newCols, newRows);
+    };
+    return BufferSet;
+}(EventEmitter_1.EventEmitter));
+exports.BufferSet = BufferSet;
+
+//# sourceMappingURL=BufferSet.js.map
+  })();
+});
+
 require.register("xterm/lib/Charsets.js", function(exports, require, module) {
   require = __makeRelativeRequire(require, {}, "xterm");
   (function() {
@@ -15980,31 +17999,34 @@ var InputHandler = (function () {
     }
     InputHandler.prototype.addChar = function (char, code) {
         if (char >= ' ') {
-            var ch_width = wcwidth(code);
+            var ch_width = exports.wcwidth(code);
             if (this._terminal.charset && this._terminal.charset[char]) {
                 char = this._terminal.charset[char];
             }
-            var row = this._terminal.y + this._terminal.ybase;
-            if (!ch_width && this._terminal.x) {
-                if (this._terminal.lines.get(row)[this._terminal.x - 1]) {
-                    if (!this._terminal.lines.get(row)[this._terminal.x - 1][2]) {
-                        if (this._terminal.lines.get(row)[this._terminal.x - 2])
-                            this._terminal.lines.get(row)[this._terminal.x - 2][1] += char;
+            var row = this._terminal.buffer.y + this._terminal.buffer.ybase;
+            if (!ch_width && this._terminal.buffer.x) {
+                if (this._terminal.buffer.lines.get(row)[this._terminal.buffer.x - 1]) {
+                    if (!this._terminal.buffer.lines.get(row)[this._terminal.buffer.x - 1][2]) {
+                        if (this._terminal.buffer.lines.get(row)[this._terminal.buffer.x - 2])
+                            this._terminal.buffer.lines.get(row)[this._terminal.buffer.x - 2][1] += char;
                     }
                     else {
-                        this._terminal.lines.get(row)[this._terminal.x - 1][1] += char;
+                        this._terminal.buffer.lines.get(row)[this._terminal.buffer.x - 1][1] += char;
                     }
-                    this._terminal.updateRange(this._terminal.y);
+                    this._terminal.updateRange(this._terminal.buffer.y);
                 }
                 return;
             }
-            if (this._terminal.x + ch_width - 1 >= this._terminal.cols) {
+            if (this._terminal.buffer.x + ch_width - 1 >= this._terminal.cols) {
                 if (this._terminal.wraparoundMode) {
-                    this._terminal.x = 0;
-                    this._terminal.y++;
-                    if (this._terminal.y > this._terminal.scrollBottom) {
-                        this._terminal.y--;
+                    this._terminal.buffer.x = 0;
+                    this._terminal.buffer.y++;
+                    if (this._terminal.buffer.y > this._terminal.buffer.scrollBottom) {
+                        this._terminal.buffer.y--;
                         this._terminal.scroll(true);
+                    }
+                    else {
+                        this._terminal.buffer.lines.get(this._terminal.buffer.y).isWrapped = true;
                     }
                 }
                 else {
@@ -16012,24 +18034,24 @@ var InputHandler = (function () {
                         return;
                 }
             }
-            row = this._terminal.y + this._terminal.ybase;
+            row = this._terminal.buffer.y + this._terminal.buffer.ybase;
             if (this._terminal.insertMode) {
                 for (var moves = 0; moves < ch_width; ++moves) {
-                    var removed = this._terminal.lines.get(this._terminal.y + this._terminal.ybase).pop();
+                    var removed = this._terminal.buffer.lines.get(this._terminal.buffer.y + this._terminal.buffer.ybase).pop();
                     if (removed[2] === 0
-                        && this._terminal.lines.get(row)[this._terminal.cols - 2]
-                        && this._terminal.lines.get(row)[this._terminal.cols - 2][2] === 2) {
-                        this._terminal.lines.get(row)[this._terminal.cols - 2] = [this._terminal.curAttr, ' ', 1];
+                        && this._terminal.buffer.lines.get(row)[this._terminal.cols - 2]
+                        && this._terminal.buffer.lines.get(row)[this._terminal.cols - 2][2] === 2) {
+                        this._terminal.buffer.lines.get(row)[this._terminal.cols - 2] = [this._terminal.curAttr, ' ', 1];
                     }
-                    this._terminal.lines.get(row).splice(this._terminal.x, 0, [this._terminal.curAttr, ' ', 1]);
+                    this._terminal.buffer.lines.get(row).splice(this._terminal.buffer.x, 0, [this._terminal.curAttr, ' ', 1]);
                 }
             }
-            this._terminal.lines.get(row)[this._terminal.x] = [this._terminal.curAttr, char, ch_width];
-            this._terminal.x++;
-            this._terminal.updateRange(this._terminal.y);
+            this._terminal.buffer.lines.get(row)[this._terminal.buffer.x] = [this._terminal.curAttr, char, ch_width];
+            this._terminal.buffer.x++;
+            this._terminal.updateRange(this._terminal.buffer.y);
             if (ch_width === 2) {
-                this._terminal.lines.get(row)[this._terminal.x] = [this._terminal.curAttr, '', 0];
-                this._terminal.x++;
+                this._terminal.buffer.lines.get(row)[this._terminal.buffer.x] = [this._terminal.curAttr, '', 0];
+                this._terminal.buffer.x++;
             }
         }
     };
@@ -16046,27 +18068,28 @@ var InputHandler = (function () {
     };
     InputHandler.prototype.lineFeed = function () {
         if (this._terminal.convertEol) {
-            this._terminal.x = 0;
+            this._terminal.buffer.x = 0;
         }
-        this._terminal.y++;
-        if (this._terminal.y > this._terminal.scrollBottom) {
-            this._terminal.y--;
+        this._terminal.buffer.y++;
+        if (this._terminal.buffer.y > this._terminal.buffer.scrollBottom) {
+            this._terminal.buffer.y--;
             this._terminal.scroll();
         }
-        if (this._terminal.x >= this._terminal.cols) {
-            this._terminal.x--;
+        if (this._terminal.buffer.x >= this._terminal.cols) {
+            this._terminal.buffer.x--;
         }
+        this._terminal.emit('lineFeed');
     };
     InputHandler.prototype.carriageReturn = function () {
-        this._terminal.x = 0;
+        this._terminal.buffer.x = 0;
     };
     InputHandler.prototype.backspace = function () {
-        if (this._terminal.x > 0) {
-            this._terminal.x--;
+        if (this._terminal.buffer.x > 0) {
+            this._terminal.buffer.x--;
         }
     };
     InputHandler.prototype.tab = function () {
-        this._terminal.x = this._terminal.nextStop();
+        this._terminal.buffer.x = this._terminal.nextStop();
     };
     InputHandler.prototype.shiftOut = function () {
         this._terminal.setgLevel(1);
@@ -16079,12 +18102,12 @@ var InputHandler = (function () {
         param = params[0];
         if (param < 1)
             param = 1;
-        row = this._terminal.y + this._terminal.ybase;
-        j = this._terminal.x;
+        row = this._terminal.buffer.y + this._terminal.buffer.ybase;
+        j = this._terminal.buffer.x;
         ch = [this._terminal.eraseAttr(), ' ', 1];
         while (param-- && j < this._terminal.cols) {
-            this._terminal.lines.get(row).splice(j++, 0, ch);
-            this._terminal.lines.get(row).pop();
+            this._terminal.buffer.lines.get(row).splice(j++, 0, ch);
+            this._terminal.buffer.lines.get(row).pop();
         }
     };
     InputHandler.prototype.cursorUp = function (params) {
@@ -16092,9 +18115,9 @@ var InputHandler = (function () {
         if (param < 1) {
             param = 1;
         }
-        this._terminal.y -= param;
-        if (this._terminal.y < 0) {
-            this._terminal.y = 0;
+        this._terminal.buffer.y -= param;
+        if (this._terminal.buffer.y < 0) {
+            this._terminal.buffer.y = 0;
         }
     };
     InputHandler.prototype.cursorDown = function (params) {
@@ -16102,12 +18125,12 @@ var InputHandler = (function () {
         if (param < 1) {
             param = 1;
         }
-        this._terminal.y += param;
-        if (this._terminal.y >= this._terminal.rows) {
-            this._terminal.y = this._terminal.rows - 1;
+        this._terminal.buffer.y += param;
+        if (this._terminal.buffer.y >= this._terminal.rows) {
+            this._terminal.buffer.y = this._terminal.rows - 1;
         }
-        if (this._terminal.x >= this._terminal.cols) {
-            this._terminal.x--;
+        if (this._terminal.buffer.x >= this._terminal.cols) {
+            this._terminal.buffer.x--;
         }
     };
     InputHandler.prototype.cursorForward = function (params) {
@@ -16115,9 +18138,9 @@ var InputHandler = (function () {
         if (param < 1) {
             param = 1;
         }
-        this._terminal.x += param;
-        if (this._terminal.x >= this._terminal.cols) {
-            this._terminal.x = this._terminal.cols - 1;
+        this._terminal.buffer.x += param;
+        if (this._terminal.buffer.x >= this._terminal.cols) {
+            this._terminal.buffer.x = this._terminal.cols - 1;
         }
     };
     InputHandler.prototype.cursorBackward = function (params) {
@@ -16125,12 +18148,12 @@ var InputHandler = (function () {
         if (param < 1) {
             param = 1;
         }
-        if (this._terminal.x >= this._terminal.cols) {
-            this._terminal.x--;
+        if (this._terminal.buffer.x >= this._terminal.cols) {
+            this._terminal.buffer.x--;
         }
-        this._terminal.x -= param;
-        if (this._terminal.x < 0) {
-            this._terminal.x = 0;
+        this._terminal.buffer.x -= param;
+        if (this._terminal.buffer.x < 0) {
+            this._terminal.buffer.x = 0;
         }
     };
     InputHandler.prototype.cursorNextLine = function (params) {
@@ -16138,31 +18161,29 @@ var InputHandler = (function () {
         if (param < 1) {
             param = 1;
         }
-        this._terminal.y += param;
-        if (this._terminal.y >= this._terminal.rows) {
-            this._terminal.y = this._terminal.rows - 1;
+        this._terminal.buffer.y += param;
+        if (this._terminal.buffer.y >= this._terminal.rows) {
+            this._terminal.buffer.y = this._terminal.rows - 1;
         }
-        this._terminal.x = 0;
+        this._terminal.buffer.x = 0;
     };
-    ;
     InputHandler.prototype.cursorPrecedingLine = function (params) {
         var param = params[0];
         if (param < 1) {
             param = 1;
         }
-        this._terminal.y -= param;
-        if (this._terminal.y < 0) {
-            this._terminal.y = 0;
+        this._terminal.buffer.y -= param;
+        if (this._terminal.buffer.y < 0) {
+            this._terminal.buffer.y = 0;
         }
-        this._terminal.x = 0;
+        this._terminal.buffer.x = 0;
     };
-    ;
     InputHandler.prototype.cursorCharAbsolute = function (params) {
         var param = params[0];
         if (param < 1) {
             param = 1;
         }
-        this._terminal.x = param - 1;
+        this._terminal.buffer.x = param - 1;
     };
     InputHandler.prototype.cursorPosition = function (params) {
         var row, col;
@@ -16185,28 +18206,28 @@ var InputHandler = (function () {
         else if (col >= this._terminal.cols) {
             col = this._terminal.cols - 1;
         }
-        this._terminal.x = col;
-        this._terminal.y = row;
+        this._terminal.buffer.x = col;
+        this._terminal.buffer.y = row;
     };
     InputHandler.prototype.cursorForwardTab = function (params) {
         var param = params[0] || 1;
         while (param--) {
-            this._terminal.x = this._terminal.nextStop();
+            this._terminal.buffer.x = this._terminal.nextStop();
         }
     };
     InputHandler.prototype.eraseInDisplay = function (params) {
         var j;
         switch (params[0]) {
             case 0:
-                this._terminal.eraseRight(this._terminal.x, this._terminal.y);
-                j = this._terminal.y + 1;
+                this._terminal.eraseRight(this._terminal.buffer.x, this._terminal.buffer.y);
+                j = this._terminal.buffer.y + 1;
                 for (; j < this._terminal.rows; j++) {
                     this._terminal.eraseLine(j);
                 }
                 break;
             case 1:
-                this._terminal.eraseLeft(this._terminal.x, this._terminal.y);
-                j = this._terminal.y;
+                this._terminal.eraseLeft(this._terminal.buffer.x, this._terminal.buffer.y);
+                j = this._terminal.buffer.y;
                 while (j--) {
                     this._terminal.eraseLine(j);
                 }
@@ -16217,11 +18238,12 @@ var InputHandler = (function () {
                     this._terminal.eraseLine(j);
                 break;
             case 3:
-                var scrollBackSize = this._terminal.lines.length - this._terminal.rows;
+                var scrollBackSize = this._terminal.buffer.lines.length - this._terminal.rows;
                 if (scrollBackSize > 0) {
-                    this._terminal.lines.trimStart(scrollBackSize);
-                    this._terminal.ybase = Math.max(this._terminal.ybase - scrollBackSize, 0);
-                    this._terminal.ydisp = Math.max(this._terminal.ydisp - scrollBackSize, 0);
+                    this._terminal.buffer.lines.trimStart(scrollBackSize);
+                    this._terminal.buffer.ybase = Math.max(this._terminal.buffer.ybase - scrollBackSize, 0);
+                    this._terminal.buffer.ydisp = Math.max(this._terminal.buffer.ydisp - scrollBackSize, 0);
+                    this._terminal.emit('scroll', 0);
                 }
                 break;
         }
@@ -16229,13 +18251,13 @@ var InputHandler = (function () {
     InputHandler.prototype.eraseInLine = function (params) {
         switch (params[0]) {
             case 0:
-                this._terminal.eraseRight(this._terminal.x, this._terminal.y);
+                this._terminal.eraseRight(this._terminal.buffer.x, this._terminal.buffer.y);
                 break;
             case 1:
-                this._terminal.eraseLeft(this._terminal.x, this._terminal.y);
+                this._terminal.eraseLeft(this._terminal.buffer.x, this._terminal.buffer.y);
                 break;
             case 2:
-                this._terminal.eraseLine(this._terminal.y);
+                this._terminal.eraseLine(this._terminal.buffer.y);
                 break;
         }
     };
@@ -16245,22 +18267,22 @@ var InputHandler = (function () {
         if (param < 1) {
             param = 1;
         }
-        row = this._terminal.y + this._terminal.ybase;
-        j = this._terminal.rows - 1 - this._terminal.scrollBottom;
-        j = this._terminal.rows - 1 + this._terminal.ybase - j + 1;
+        row = this._terminal.buffer.y + this._terminal.buffer.ybase;
+        j = this._terminal.rows - 1 - this._terminal.buffer.scrollBottom;
+        j = this._terminal.rows - 1 + this._terminal.buffer.ybase - j + 1;
         while (param--) {
-            if (this._terminal.lines.length === this._terminal.lines.maxLength) {
-                this._terminal.lines.trimStart(1);
-                this._terminal.ybase--;
-                this._terminal.ydisp--;
+            if (this._terminal.buffer.lines.length === this._terminal.buffer.lines.maxLength) {
+                this._terminal.buffer.lines.trimStart(1);
+                this._terminal.buffer.ybase--;
+                this._terminal.buffer.ydisp--;
                 row--;
                 j--;
             }
-            this._terminal.lines.splice(row, 0, this._terminal.blankLine(true));
-            this._terminal.lines.splice(j, 1);
+            this._terminal.buffer.lines.splice(row, 0, this._terminal.blankLine(true));
+            this._terminal.buffer.lines.splice(j, 1);
         }
-        this._terminal.updateRange(this._terminal.y);
-        this._terminal.updateRange(this._terminal.scrollBottom);
+        this._terminal.updateRange(this._terminal.buffer.y);
+        this._terminal.updateRange(this._terminal.buffer.scrollBottom);
     };
     InputHandler.prototype.deleteLines = function (params) {
         var param, row, j;
@@ -16268,20 +18290,20 @@ var InputHandler = (function () {
         if (param < 1) {
             param = 1;
         }
-        row = this._terminal.y + this._terminal.ybase;
-        j = this._terminal.rows - 1 - this._terminal.scrollBottom;
-        j = this._terminal.rows - 1 + this._terminal.ybase - j;
+        row = this._terminal.buffer.y + this._terminal.buffer.ybase;
+        j = this._terminal.rows - 1 - this._terminal.buffer.scrollBottom;
+        j = this._terminal.rows - 1 + this._terminal.buffer.ybase - j;
         while (param--) {
-            if (this._terminal.lines.length === this._terminal.lines.maxLength) {
-                this._terminal.lines.trimStart(1);
-                this._terminal.ybase -= 1;
-                this._terminal.ydisp -= 1;
+            if (this._terminal.buffer.lines.length === this._terminal.buffer.lines.maxLength) {
+                this._terminal.buffer.lines.trimStart(1);
+                this._terminal.buffer.ybase -= 1;
+                this._terminal.buffer.ydisp -= 1;
             }
-            this._terminal.lines.splice(j + 1, 0, this._terminal.blankLine(true));
-            this._terminal.lines.splice(row, 1);
+            this._terminal.buffer.lines.splice(j + 1, 0, this._terminal.blankLine(true));
+            this._terminal.buffer.lines.splice(row, 1);
         }
-        this._terminal.updateRange(this._terminal.y);
-        this._terminal.updateRange(this._terminal.scrollBottom);
+        this._terminal.updateRange(this._terminal.buffer.y);
+        this._terminal.updateRange(this._terminal.buffer.scrollBottom);
     };
     InputHandler.prototype.deleteChars = function (params) {
         var param, row, ch;
@@ -16289,30 +18311,30 @@ var InputHandler = (function () {
         if (param < 1) {
             param = 1;
         }
-        row = this._terminal.y + this._terminal.ybase;
+        row = this._terminal.buffer.y + this._terminal.buffer.ybase;
         ch = [this._terminal.eraseAttr(), ' ', 1];
         while (param--) {
-            this._terminal.lines.get(row).splice(this._terminal.x, 1);
-            this._terminal.lines.get(row).push(ch);
+            this._terminal.buffer.lines.get(row).splice(this._terminal.buffer.x, 1);
+            this._terminal.buffer.lines.get(row).push(ch);
         }
     };
     InputHandler.prototype.scrollUp = function (params) {
         var param = params[0] || 1;
         while (param--) {
-            this._terminal.lines.splice(this._terminal.ybase + this._terminal.scrollTop, 1);
-            this._terminal.lines.splice(this._terminal.ybase + this._terminal.scrollBottom, 0, this._terminal.blankLine());
+            this._terminal.buffer.lines.splice(this._terminal.buffer.ybase + this._terminal.buffer.scrollTop, 1);
+            this._terminal.buffer.lines.splice(this._terminal.buffer.ybase + this._terminal.buffer.scrollBottom, 0, this._terminal.blankLine());
         }
-        this._terminal.updateRange(this._terminal.scrollTop);
-        this._terminal.updateRange(this._terminal.scrollBottom);
+        this._terminal.updateRange(this._terminal.buffer.scrollTop);
+        this._terminal.updateRange(this._terminal.buffer.scrollBottom);
     };
     InputHandler.prototype.scrollDown = function (params) {
         var param = params[0] || 1;
         while (param--) {
-            this._terminal.lines.splice(this._terminal.ybase + this._terminal.scrollBottom, 1);
-            this._terminal.lines.splice(this._terminal.ybase + this._terminal.scrollTop, 0, this._terminal.blankLine());
+            this._terminal.buffer.lines.splice(this._terminal.buffer.ybase + this._terminal.buffer.scrollBottom, 1);
+            this._terminal.buffer.lines.splice(this._terminal.buffer.ybase + this._terminal.buffer.scrollTop, 0, this._terminal.blankLine());
         }
-        this._terminal.updateRange(this._terminal.scrollTop);
-        this._terminal.updateRange(this._terminal.scrollBottom);
+        this._terminal.updateRange(this._terminal.buffer.scrollTop);
+        this._terminal.updateRange(this._terminal.buffer.scrollBottom);
     };
     InputHandler.prototype.eraseChars = function (params) {
         var param, row, j, ch;
@@ -16320,17 +18342,17 @@ var InputHandler = (function () {
         if (param < 1) {
             param = 1;
         }
-        row = this._terminal.y + this._terminal.ybase;
-        j = this._terminal.x;
+        row = this._terminal.buffer.y + this._terminal.buffer.ybase;
+        j = this._terminal.buffer.x;
         ch = [this._terminal.eraseAttr(), ' ', 1];
         while (param-- && j < this._terminal.cols) {
-            this._terminal.lines.get(row)[j++] = ch;
+            this._terminal.buffer.lines.get(row)[j++] = ch;
         }
     };
     InputHandler.prototype.cursorBackwardTab = function (params) {
         var param = params[0] || 1;
         while (param--) {
-            this._terminal.x = this._terminal.prevStop();
+            this._terminal.buffer.x = this._terminal.prevStop();
         }
     };
     InputHandler.prototype.charPosAbsolute = function (params) {
@@ -16338,9 +18360,9 @@ var InputHandler = (function () {
         if (param < 1) {
             param = 1;
         }
-        this._terminal.x = param - 1;
-        if (this._terminal.x >= this._terminal.cols) {
-            this._terminal.x = this._terminal.cols - 1;
+        this._terminal.buffer.x = param - 1;
+        if (this._terminal.buffer.x >= this._terminal.cols) {
+            this._terminal.buffer.x = this._terminal.cols - 1;
         }
     };
     InputHandler.prototype.HPositionRelative = function (params) {
@@ -16348,15 +18370,15 @@ var InputHandler = (function () {
         if (param < 1) {
             param = 1;
         }
-        this._terminal.x += param;
-        if (this._terminal.x >= this._terminal.cols) {
-            this._terminal.x = this._terminal.cols - 1;
+        this._terminal.buffer.x += param;
+        if (this._terminal.buffer.x >= this._terminal.cols) {
+            this._terminal.buffer.x = this._terminal.cols - 1;
         }
     };
     InputHandler.prototype.repeatPrecedingCharacter = function (params) {
-        var param = params[0] || 1, line = this._terminal.lines.get(this._terminal.ybase + this._terminal.y), ch = line[this._terminal.x - 1] || [this._terminal.defAttr, ' ', 1];
+        var param = params[0] || 1, line = this._terminal.buffer.lines.get(this._terminal.buffer.ybase + this._terminal.buffer.y), ch = line[this._terminal.buffer.x - 1] || [this._terminal.defAttr, ' ', 1];
         while (param--) {
-            line[this._terminal.x++] = ch;
+            line[this._terminal.buffer.x++] = ch;
         }
     };
     InputHandler.prototype.sendDeviceAttributes = function (params) {
@@ -16391,9 +18413,9 @@ var InputHandler = (function () {
         if (param < 1) {
             param = 1;
         }
-        this._terminal.y = param - 1;
-        if (this._terminal.y >= this._terminal.rows) {
-            this._terminal.y = this._terminal.rows - 1;
+        this._terminal.buffer.y = param - 1;
+        if (this._terminal.buffer.y >= this._terminal.rows) {
+            this._terminal.buffer.y = this._terminal.rows - 1;
         }
     };
     InputHandler.prototype.VPositionRelative = function (params) {
@@ -16401,12 +18423,12 @@ var InputHandler = (function () {
         if (param < 1) {
             param = 1;
         }
-        this._terminal.y += param;
-        if (this._terminal.y >= this._terminal.rows) {
-            this._terminal.y = this._terminal.rows - 1;
+        this._terminal.buffer.y += param;
+        if (this._terminal.buffer.y >= this._terminal.rows) {
+            this._terminal.buffer.y = this._terminal.rows - 1;
         }
-        if (this._terminal.x >= this._terminal.cols) {
-            this._terminal.x--;
+        if (this._terminal.buffer.x >= this._terminal.cols) {
+            this._terminal.buffer.x--;
         }
     };
     InputHandler.prototype.HVPosition = function (params) {
@@ -16414,22 +18436,22 @@ var InputHandler = (function () {
             params[0] = 1;
         if (params[1] < 1)
             params[1] = 1;
-        this._terminal.y = params[0] - 1;
-        if (this._terminal.y >= this._terminal.rows) {
-            this._terminal.y = this._terminal.rows - 1;
+        this._terminal.buffer.y = params[0] - 1;
+        if (this._terminal.buffer.y >= this._terminal.rows) {
+            this._terminal.buffer.y = this._terminal.rows - 1;
         }
-        this._terminal.x = params[1] - 1;
-        if (this._terminal.x >= this._terminal.cols) {
-            this._terminal.x = this._terminal.cols - 1;
+        this._terminal.buffer.x = params[1] - 1;
+        if (this._terminal.buffer.x >= this._terminal.cols) {
+            this._terminal.buffer.x = this._terminal.cols - 1;
         }
     };
     InputHandler.prototype.tabClear = function (params) {
         var param = params[0];
         if (param <= 0) {
-            delete this._terminal.tabs[this._terminal.x];
+            delete this._terminal.buffer.tabs[this._terminal.buffer.x];
         }
         else if (param === 3) {
-            this._terminal.tabs = {};
+            this._terminal.buffer.tabs = {};
         }
     };
     InputHandler.prototype.setMode = function (params) {
@@ -16504,25 +18526,11 @@ var InputHandler = (function () {
                     this._terminal.cursorHidden = false;
                     break;
                 case 1049:
-                    ;
                 case 47:
                 case 1047:
-                    if (!this._terminal.normal) {
-                        var normal = {
-                            lines: this._terminal.lines,
-                            ybase: this._terminal.ybase,
-                            ydisp: this._terminal.ydisp,
-                            x: this._terminal.x,
-                            y: this._terminal.y,
-                            scrollTop: this._terminal.scrollTop,
-                            scrollBottom: this._terminal.scrollBottom,
-                            tabs: this._terminal.tabs
-                        };
-                        this._terminal.reset();
-                        this._terminal.viewport.syncScrollArea();
-                        this._terminal.normal = normal;
-                        this._terminal.showCursor();
-                    }
+                    this._terminal.buffers.activateAltBuffer();
+                    this._terminal.viewport.syncScrollArea();
+                    this._terminal.showCursor();
                     break;
             }
         }
@@ -16594,24 +18602,13 @@ var InputHandler = (function () {
                     this._terminal.cursorHidden = true;
                     break;
                 case 1049:
-                    ;
                 case 47:
                 case 1047:
-                    if (this._terminal.normal) {
-                        this._terminal.lines = this._terminal.normal.lines;
-                        this._terminal.ybase = this._terminal.normal.ybase;
-                        this._terminal.ydisp = this._terminal.normal.ydisp;
-                        this._terminal.x = this._terminal.normal.x;
-                        this._terminal.y = this._terminal.normal.y;
-                        this._terminal.scrollTop = this._terminal.normal.scrollTop;
-                        this._terminal.scrollBottom = this._terminal.normal.scrollBottom;
-                        this._terminal.tabs = this._terminal.normal.tabs;
-                        this._terminal.normal = null;
-                        this._terminal.selectionManager.setBuffer(this._terminal.lines);
-                        this._terminal.refresh(0, this._terminal.rows - 1);
-                        this._terminal.viewport.syncScrollArea();
-                        this._terminal.showCursor();
-                    }
+                    this._terminal.buffers.activateNormalBuffer();
+                    this._terminal.selectionManager.setBuffer(this._terminal.buffer.lines);
+                    this._terminal.refresh(0, this._terminal.rows - 1);
+                    this._terminal.viewport.syncScrollArea();
+                    this._terminal.showCursor();
                     break;
             }
         }
@@ -16725,9 +18722,9 @@ var InputHandler = (function () {
                     break;
                 case 6:
                     this._terminal.send(EscapeSequences_1.C0.ESC + '['
-                        + (this._terminal.y + 1)
+                        + (this._terminal.buffer.y + 1)
                         + ';'
-                        + (this._terminal.x + 1)
+                        + (this._terminal.buffer.x + 1)
                         + 'R');
                     break;
             }
@@ -16736,9 +18733,9 @@ var InputHandler = (function () {
             switch (params[0]) {
                 case 6:
                     this._terminal.send(EscapeSequences_1.C0.ESC + '[?'
-                        + (this._terminal.y + 1)
+                        + (this._terminal.buffer.y + 1)
                         + ';'
-                        + (this._terminal.x + 1)
+                        + (this._terminal.buffer.x + 1)
                         + 'R');
                     break;
                 case 15:
@@ -16760,10 +18757,10 @@ var InputHandler = (function () {
         this._terminal.applicationKeypad = false;
         this._terminal.viewport.syncScrollArea();
         this._terminal.applicationCursor = false;
-        this._terminal.scrollTop = 0;
-        this._terminal.scrollBottom = this._terminal.rows - 1;
+        this._terminal.buffer.scrollTop = 0;
+        this._terminal.buffer.scrollBottom = this._terminal.rows - 1;
         this._terminal.curAttr = this._terminal.defAttr;
-        this._terminal.x = this._terminal.y = 0;
+        this._terminal.buffer.x = this._terminal.buffer.y = 0;
         this._terminal.charset = null;
         this._terminal.glevel = 0;
         this._terminal.charsets = [null];
@@ -16790,24 +18787,24 @@ var InputHandler = (function () {
     InputHandler.prototype.setScrollRegion = function (params) {
         if (this._terminal.prefix)
             return;
-        this._terminal.scrollTop = (params[0] || 1) - 1;
-        this._terminal.scrollBottom = (params[1] && params[1] <= this._terminal.rows ? params[1] : this._terminal.rows) - 1;
-        this._terminal.x = 0;
-        this._terminal.y = 0;
+        this._terminal.buffer.scrollTop = (params[0] || 1) - 1;
+        this._terminal.buffer.scrollBottom = (params[1] && params[1] <= this._terminal.rows ? params[1] : this._terminal.rows) - 1;
+        this._terminal.buffer.x = 0;
+        this._terminal.buffer.y = 0;
     };
     InputHandler.prototype.saveCursor = function (params) {
-        this._terminal.savedX = this._terminal.x;
-        this._terminal.savedY = this._terminal.y;
+        this._terminal.buffer.savedX = this._terminal.buffer.x;
+        this._terminal.buffer.savedY = this._terminal.buffer.y;
     };
     InputHandler.prototype.restoreCursor = function (params) {
-        this._terminal.x = this._terminal.savedX || 0;
-        this._terminal.y = this._terminal.savedY || 0;
+        this._terminal.buffer.x = this._terminal.buffer.savedX || 0;
+        this._terminal.buffer.y = this._terminal.buffer.savedY || 0;
     };
     return InputHandler;
 }());
 exports.InputHandler = InputHandler;
-var wcwidth = (function (opts) {
-    var COMBINING = [
+exports.wcwidth = (function (opts) {
+    var COMBINING_BMP = [
         [0x0300, 0x036F], [0x0483, 0x0486], [0x0488, 0x0489],
         [0x0591, 0x05BD], [0x05BF, 0x05BF], [0x05C1, 0x05C2],
         [0x05C4, 0x05C5], [0x05C7, 0x05C7], [0x0600, 0x0603],
@@ -16851,42 +18848,44 @@ var wcwidth = (function (opts) {
         [0x3099, 0x309A], [0xA806, 0xA806], [0xA80B, 0xA80B],
         [0xA825, 0xA826], [0xFB1E, 0xFB1E], [0xFE00, 0xFE0F],
         [0xFE20, 0xFE23], [0xFEFF, 0xFEFF], [0xFFF9, 0xFFFB],
+    ];
+    var COMBINING_HIGH = [
         [0x10A01, 0x10A03], [0x10A05, 0x10A06], [0x10A0C, 0x10A0F],
         [0x10A38, 0x10A3A], [0x10A3F, 0x10A3F], [0x1D167, 0x1D169],
         [0x1D173, 0x1D182], [0x1D185, 0x1D18B], [0x1D1AA, 0x1D1AD],
         [0x1D242, 0x1D244], [0xE0001, 0xE0001], [0xE0020, 0xE007F],
         [0xE0100, 0xE01EF]
     ];
-    function bisearch(ucs) {
+    function bisearch(ucs, data) {
         var min = 0;
-        var max = COMBINING.length - 1;
+        var max = data.length - 1;
         var mid;
-        if (ucs < COMBINING[0][0] || ucs > COMBINING[max][1])
+        if (ucs < data[0][0] || ucs > data[max][1])
             return false;
         while (max >= min) {
-            mid = Math.floor((min + max) / 2);
-            if (ucs > COMBINING[mid][1])
+            mid = (min + max) >> 1;
+            if (ucs > data[mid][1])
                 min = mid + 1;
-            else if (ucs < COMBINING[mid][0])
+            else if (ucs < data[mid][0])
                 max = mid - 1;
             else
                 return true;
         }
         return false;
     }
-    function wcwidth(ucs) {
+    function wcwidthBMP(ucs) {
         if (ucs === 0)
             return opts.nul;
         if (ucs < 32 || (ucs >= 0x7f && ucs < 0xa0))
             return opts.control;
-        if (bisearch(ucs))
+        if (bisearch(ucs, COMBINING_BMP))
             return 0;
-        if (isWide(ucs)) {
+        if (isWideBMP(ucs)) {
             return 2;
         }
         return 1;
     }
-    function isWide(ucs) {
+    function isWideBMP(ucs) {
         return (ucs >= 0x1100 && (ucs <= 0x115f ||
             ucs === 0x2329 ||
             ucs === 0x232a ||
@@ -16896,11 +18895,47 @@ var wcwidth = (function (opts) {
             (ucs >= 0xfe10 && ucs <= 0xfe19) ||
             (ucs >= 0xfe30 && ucs <= 0xfe6f) ||
             (ucs >= 0xff00 && ucs <= 0xff60) ||
-            (ucs >= 0xffe0 && ucs <= 0xffe6) ||
-            (ucs >= 0x20000 && ucs <= 0x2fffd) ||
-            (ucs >= 0x30000 && ucs <= 0x3fffd)));
+            (ucs >= 0xffe0 && ucs <= 0xffe6)));
     }
-    return wcwidth;
+    function wcwidthHigh(ucs) {
+        if (bisearch(ucs, COMBINING_HIGH))
+            return 0;
+        if ((ucs >= 0x20000 && ucs <= 0x2fffd) || (ucs >= 0x30000 && ucs <= 0x3fffd)) {
+            return 2;
+        }
+        return 1;
+    }
+    var control = opts.control | 0;
+    var table = null;
+    function init_table() {
+        var CODEPOINTS = 65536;
+        var BITWIDTH = 2;
+        var ITEMSIZE = 32;
+        var CONTAINERSIZE = CODEPOINTS * BITWIDTH / ITEMSIZE;
+        var CODEPOINTS_PER_ITEM = ITEMSIZE / BITWIDTH;
+        table = (typeof Uint32Array === 'undefined')
+            ? new Array(CONTAINERSIZE)
+            : new Uint32Array(CONTAINERSIZE);
+        for (var i = 0; i < CONTAINERSIZE; ++i) {
+            var num = 0;
+            var pos = CODEPOINTS_PER_ITEM;
+            while (pos--)
+                num = (num << 2) | wcwidthBMP(CODEPOINTS_PER_ITEM * i + pos);
+            table[i] = num;
+        }
+        return table;
+    }
+    return function (num) {
+        num = num | 0;
+        if (num < 32)
+            return control | 0;
+        if (num < 127)
+            return 1;
+        var t = table || init_table();
+        if (num < 65536)
+            return t[num >> 4] >> ((num & 15) << 1) & 3;
+        return wcwidthHigh(num);
+    };
 })({ nul: 0, control: 0 });
 
 //# sourceMappingURL=InputHandler.js.map
@@ -17191,7 +19226,7 @@ escapedStateHandler['c'] = function (parser, terminal) {
     terminal.reset();
 };
 escapedStateHandler['E'] = function (parser, terminal) {
-    terminal.x = 0;
+    terminal.buffer.x = 0;
     terminal.index();
     parser.setState(ParserState.NORMAL);
 };
@@ -17301,6 +19336,9 @@ var Parser = (function () {
     }
     Parser.prototype.parse = function (data) {
         var l = data.length, j, cs, ch, code, low;
+        if (this._terminal.debug) {
+            this._terminal.log('data: ' + data);
+        }
         this._position = 0;
         if (this._terminal.surrogate_high) {
             data = this._terminal.surrogate_high + data;
@@ -17515,6 +19553,9 @@ var Parser = (function () {
                     this._state = ParserState.CSI;
                 case ParserState.CSI:
                     if (ch in csiStateHandler) {
+                        if (this._terminal.debug) {
+                            this._terminal.log("CSI " + (this._terminal.prefix ? this._terminal.prefix : '') + " " + (this._terminal.params ? this._terminal.params.join(';') : '') + " " + (this._terminal.postfix ? this._terminal.postfix : '') + " " + ch);
+                        }
                         csiStateHandler[ch](this._inputHandler, this._terminal.params, this._terminal.prefix, this._terminal.postfix, this);
                     }
                     else {
@@ -17545,9 +19586,9 @@ var Parser = (function () {
                                         break;
                                     case 'r':
                                         pt = ''
-                                            + (this._terminal.scrollTop + 1)
+                                            + (this._terminal.buffer.scrollTop + 1)
                                             + ';'
-                                            + (this._terminal.scrollBottom + 1)
+                                            + (this._terminal.buffer.scrollBottom + 1)
                                             + 'r';
                                         break;
                                     case 'm':
@@ -17710,13 +19751,13 @@ var Renderer = (function () {
             end = this._terminal.rows - 1;
         }
         for (; y <= end; y++) {
-            var row = y + this._terminal.ydisp;
-            var line = this._terminal.lines.get(row);
+            var row = y + this._terminal.buffer.ydisp;
+            var line = this._terminal.buffer.lines.get(row);
             var x = void 0;
-            if (this._terminal.y === y - (this._terminal.ybase - this._terminal.ydisp) &&
+            if (this._terminal.buffer.y === y - (this._terminal.buffer.ybase - this._terminal.buffer.ydisp) &&
                 this._terminal.cursorState &&
                 !this._terminal.cursorHidden) {
-                x = this._terminal.x;
+                x = this._terminal.buffer.x;
             }
             else {
                 x = -1;
@@ -17734,14 +19775,12 @@ var Renderer = (function () {
                 var data = line[i][0];
                 var ch = line[i][1];
                 var ch_width = line[i][2];
+                var isCursor = i === x;
                 if (!ch_width) {
                     continue;
                 }
-                if (i === x) {
-                    data = -1;
-                }
-                if (data !== attr) {
-                    if (attr !== this._terminal.defAttr) {
+                if (data !== attr || isCursor) {
+                    if (attr !== this._terminal.defAttr && !isCursor) {
                         if (innerHTML) {
                             currentElement.innerHTML = innerHTML;
                             innerHTML = '';
@@ -17749,7 +19788,7 @@ var Renderer = (function () {
                         documentFragment.appendChild(currentElement);
                         currentElement = null;
                     }
-                    if (data !== this._terminal.defAttr) {
+                    if (data !== this._terminal.defAttr || isCursor) {
                         if (innerHTML && !currentElement) {
                             currentElement = this._spanElementObjectPool.acquire();
                         }
@@ -17761,53 +19800,51 @@ var Renderer = (function () {
                             documentFragment.appendChild(currentElement);
                         }
                         currentElement = this._spanElementObjectPool.acquire();
-                        if (data === -1) {
+                        var bg = data & 0x1ff;
+                        var fg = (data >> 9) & 0x1ff;
+                        var flags = data >> 18;
+                        if (isCursor) {
                             currentElement.classList.add('reverse-video');
                             currentElement.classList.add('terminal-cursor');
                         }
-                        else {
-                            var bg = data & 0x1ff;
-                            var fg = (data >> 9) & 0x1ff;
-                            var flags = data >> 18;
-                            if (flags & FLAGS.BOLD) {
-                                if (!brokenBold) {
-                                    currentElement.classList.add('xterm-bold');
-                                }
-                                if (fg < 8) {
-                                    fg += 8;
-                                }
+                        if (flags & FLAGS.BOLD) {
+                            if (!brokenBold) {
+                                currentElement.classList.add('xterm-bold');
                             }
-                            if (flags & FLAGS.UNDERLINE) {
-                                currentElement.classList.add('xterm-underline');
+                            if (fg < 8) {
+                                fg += 8;
                             }
-                            if (flags & FLAGS.BLINK) {
-                                currentElement.classList.add('xterm-blink');
+                        }
+                        if (flags & FLAGS.UNDERLINE) {
+                            currentElement.classList.add('xterm-underline');
+                        }
+                        if (flags & FLAGS.BLINK) {
+                            currentElement.classList.add('xterm-blink');
+                        }
+                        if (flags & FLAGS.INVERSE) {
+                            var temp = bg;
+                            bg = fg;
+                            fg = temp;
+                            if ((flags & 1) && fg < 8) {
+                                fg += 8;
                             }
-                            if (flags & FLAGS.INVERSE) {
-                                var temp = bg;
-                                bg = fg;
-                                fg = temp;
-                                if ((flags & 1) && fg < 8) {
-                                    fg += 8;
-                                }
+                        }
+                        if (flags & FLAGS.INVISIBLE && !isCursor) {
+                            currentElement.classList.add('xterm-hidden');
+                        }
+                        if (flags & FLAGS.INVERSE) {
+                            if (bg === 257) {
+                                bg = 15;
                             }
-                            if (flags & FLAGS.INVISIBLE) {
-                                currentElement.classList.add('xterm-hidden');
+                            if (fg === 256) {
+                                fg = 0;
                             }
-                            if (flags & FLAGS.INVERSE) {
-                                if (bg === 257) {
-                                    bg = 15;
-                                }
-                                if (fg === 256) {
-                                    fg = 0;
-                                }
-                            }
-                            if (bg < 256) {
-                                currentElement.classList.add("xterm-bg-color-" + bg);
-                            }
-                            if (fg < 256) {
-                                currentElement.classList.add("xterm-color-" + fg);
-                            }
+                        }
+                        if (bg < 256) {
+                            currentElement.classList.add("xterm-bg-color-" + bg);
+                        }
+                        if (fg < 256) {
+                            currentElement.classList.add("xterm-color-" + fg);
                         }
                     }
                 }
@@ -17838,7 +19875,7 @@ var Renderer = (function () {
                             break;
                     }
                 }
-                attr = data;
+                attr = isCursor ? -1 : data;
             }
             if (innerHTML && !currentElement) {
                 currentElement = this._spanElementObjectPool.acquire();
@@ -17866,8 +19903,8 @@ var Renderer = (function () {
         if (!start || !end) {
             return;
         }
-        var viewportStartRow = start[1] - this._terminal.ydisp;
-        var viewportEndRow = end[1] - this._terminal.ydisp;
+        var viewportStartRow = start[1] - this._terminal.buffer.ydisp;
+        var viewportEndRow = end[1] - this._terminal.buffer.ydisp;
         var viewportCappedStartRow = Math.max(viewportStartRow, 0);
         var viewportCappedEndRow = Math.min(viewportEndRow, this._terminal.rows - 1);
         if (viewportCappedStartRow >= this._terminal.rows || viewportCappedEndRow < 0) {
@@ -17934,11 +19971,10 @@ var Mouse = require("./utils/Mouse");
 var Browser = require("./utils/Browser");
 var EventEmitter_1 = require("./EventEmitter");
 var SelectionModel_1 = require("./SelectionModel");
+var BufferLine_1 = require("./utils/BufferLine");
 var DRAG_SCROLL_MAX_THRESHOLD = 50;
 var DRAG_SCROLL_MAX_SPEED = 15;
 var DRAG_SCROLL_INTERVAL = 50;
-var CLEAR_MOUSE_DOWN_TIME = 400;
-var CLEAR_MOUSE_DISTANCE = 10;
 var WORD_SEPARATORS = ' ()[]{}\'"';
 var LINE_DATA_CHAR_INDEX = 1;
 var LINE_DATA_WIDTH_INDEX = 2;
@@ -17958,33 +19994,41 @@ var SelectionManager = (function (_super) {
         _this._buffer = _buffer;
         _this._rowContainer = _rowContainer;
         _this._charMeasure = _charMeasure;
+        _this._enabled = true;
         _this._initListeners();
         _this.enable();
         _this._model = new SelectionModel_1.SelectionModel(_terminal);
-        _this._lastMouseDownTime = 0;
         _this._activeSelectionMode = SelectionMode.NORMAL;
         return _this;
     }
     SelectionManager.prototype._initListeners = function () {
         var _this = this;
-        this._bufferTrimListener = function (amount) { return _this._onTrim(amount); };
         this._mouseMoveListener = function (event) { return _this._onMouseMove(event); };
-        this._mouseDownListener = function (event) { return _this._onMouseDown(event); };
         this._mouseUpListener = function (event) { return _this._onMouseUp(event); };
+        this._rowContainer.addEventListener('mousedown', function (event) { return _this._onMouseDown(event); });
+        this._buffer.on('trim', function (amount) { return _this._onTrim(amount); });
     };
     SelectionManager.prototype.disable = function () {
         this.clearSelection();
-        this._buffer.off('trim', this._bufferTrimListener);
-        this._rowContainer.removeEventListener('mousedown', this._mouseDownListener);
+        this._enabled = false;
     };
     SelectionManager.prototype.enable = function () {
-        this._buffer.on('trim', this._bufferTrimListener);
-        this._rowContainer.addEventListener('mousedown', this._mouseDownListener);
+        this._enabled = true;
     };
     SelectionManager.prototype.setBuffer = function (buffer) {
         this._buffer = buffer;
         this.clearSelection();
     };
+    Object.defineProperty(SelectionManager.prototype, "selectionStart", {
+        get: function () { return this._model.finalSelectionStart; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SelectionManager.prototype, "selectionEnd", {
+        get: function () { return this._model.finalSelectionEnd; },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(SelectionManager.prototype, "hasSelection", {
         get: function () {
             var start = this._model.finalSelectionStart;
@@ -18006,10 +20050,10 @@ var SelectionManager = (function (_super) {
             }
             var startRowEndCol = start[1] === end[1] ? end[0] : null;
             var result = [];
-            result.push(this._translateBufferLineToString(this._buffer.get(start[1]), true, start[0], startRowEndCol));
+            result.push(BufferLine_1.translateBufferLineToString(this._buffer.get(start[1]), true, start[0], startRowEndCol));
             for (var i = start[1] + 1; i <= end[1] - 1; i++) {
                 var bufferLine = this._buffer.get(i);
-                var lineText = this._translateBufferLineToString(bufferLine, true);
+                var lineText = BufferLine_1.translateBufferLineToString(bufferLine, true);
                 if (bufferLine.isWrapped) {
                     result[result.length - 1] += lineText;
                 }
@@ -18019,7 +20063,7 @@ var SelectionManager = (function (_super) {
             }
             if (start[1] !== end[1]) {
                 var bufferLine = this._buffer.get(end[1]);
-                var lineText = this._translateBufferLineToString(bufferLine, true, 0, end[0]);
+                var lineText = BufferLine_1.translateBufferLineToString(bufferLine, true, 0, end[0]);
                 if (bufferLine.isWrapped) {
                     result[result.length - 1] += lineText;
                 }
@@ -18039,36 +20083,6 @@ var SelectionManager = (function (_super) {
         this._model.clearSelection();
         this._removeMouseDownListeners();
         this.refresh();
-    };
-    SelectionManager.prototype._translateBufferLineToString = function (line, trimRight, startCol, endCol) {
-        if (startCol === void 0) { startCol = 0; }
-        if (endCol === void 0) { endCol = null; }
-        var lineString = '';
-        var widthAdjustedStartCol = startCol;
-        var widthAdjustedEndCol = endCol;
-        for (var i = 0; i < line.length; i++) {
-            var char = line[i];
-            lineString += char[LINE_DATA_CHAR_INDEX];
-            if (char[LINE_DATA_WIDTH_INDEX] === 0) {
-                if (startCol >= i) {
-                    widthAdjustedStartCol--;
-                }
-                if (endCol >= i) {
-                    widthAdjustedEndCol--;
-                }
-            }
-        }
-        var finalEndCol = widthAdjustedEndCol || line.length;
-        if (trimRight) {
-            var rightWhitespaceIndex = lineString.search(/\s+$/);
-            if (rightWhitespaceIndex !== -1) {
-                finalEndCol = Math.min(finalEndCol, rightWhitespaceIndex);
-            }
-            if (finalEndCol <= widthAdjustedStartCol) {
-                return '';
-            }
-        }
-        return lineString.substring(widthAdjustedStartCol, finalEndCol);
     };
     SelectionManager.prototype.refresh = function (isNewSelection) {
         var _this = this;
@@ -18098,9 +20112,12 @@ var SelectionManager = (function (_super) {
     };
     SelectionManager.prototype._getMouseBufferCoords = function (event) {
         var coords = Mouse.getCoords(event, this._rowContainer, this._charMeasure, this._terminal.cols, this._terminal.rows, true);
+        if (!coords) {
+            return null;
+        }
         coords[0]--;
         coords[1]--;
-        coords[1] += this._terminal.ydisp;
+        coords[1] += this._terminal.buffer.ydisp;
         return coords;
     };
     SelectionManager.prototype._getMouseEventScrollAmount = function (event) {
@@ -18117,23 +20134,33 @@ var SelectionManager = (function (_super) {
         return (offset / Math.abs(offset)) + Math.round(offset * (DRAG_SCROLL_MAX_SPEED - 1));
     };
     SelectionManager.prototype._onMouseDown = function (event) {
+        if (event.button === 2 && this.hasSelection) {
+            event.stopPropagation();
+            return;
+        }
         if (event.button !== 0) {
             return;
         }
+        if (!this._enabled) {
+            var shouldForceSelection = Browser.isMac && event.altKey;
+            if (!shouldForceSelection) {
+                return;
+            }
+            event.stopPropagation();
+        }
         event.preventDefault();
         this._dragScrollAmount = 0;
-        this._setMouseClickCount(event);
-        if (event.shiftKey) {
-            this._onShiftClick(event);
+        if (this._enabled && event.shiftKey) {
+            this._onIncrementalClick(event);
         }
         else {
-            if (this._clickCount === 1) {
+            if (event.detail === 1) {
                 this._onSingleClick(event);
             }
-            else if (this._clickCount === 2) {
+            else if (event.detail === 2) {
                 this._onDoubleClick(event);
             }
-            else if (this._clickCount === 3) {
+            else if (event.detail === 3) {
                 this._onTripleClick(event);
             }
         }
@@ -18152,7 +20179,7 @@ var SelectionManager = (function (_super) {
         clearInterval(this._dragScrollIntervalTimer);
         this._dragScrollIntervalTimer = null;
     };
-    SelectionManager.prototype._onShiftClick = function (event) {
+    SelectionManager.prototype._onIncrementalClick = function (event) {
         if (this._model.selectionStart) {
             this._model.selectionEnd = this._getMouseBufferCoords(event);
         }
@@ -18162,12 +20189,17 @@ var SelectionManager = (function (_super) {
         this._model.isSelectAllActive = false;
         this._activeSelectionMode = SelectionMode.NORMAL;
         this._model.selectionStart = this._getMouseBufferCoords(event);
-        if (this._model.selectionStart) {
-            this._model.selectionEnd = null;
-            var char = this._buffer.get(this._model.selectionStart[1])[this._model.selectionStart[0]];
-            if (char[LINE_DATA_WIDTH_INDEX] === 0) {
-                this._model.selectionStart[0]++;
-            }
+        if (!this._model.selectionStart) {
+            return;
+        }
+        this._model.selectionEnd = null;
+        var line = this._buffer.get(this._model.selectionStart[1]);
+        if (!line) {
+            return;
+        }
+        var char = line[this._model.selectionStart[0]];
+        if (char[LINE_DATA_WIDTH_INDEX] === 0) {
+            this._model.selectionStart[0]++;
         }
     };
     SelectionManager.prototype._onDoubleClick = function (event) {
@@ -18184,22 +20216,13 @@ var SelectionManager = (function (_super) {
             this._selectLineAt(coords[1]);
         }
     };
-    SelectionManager.prototype._setMouseClickCount = function (event) {
-        var currentTime = (new Date()).getTime();
-        if (currentTime - this._lastMouseDownTime > CLEAR_MOUSE_DOWN_TIME || this._distanceFromLastMousePosition(event) > CLEAR_MOUSE_DISTANCE) {
-            this._clickCount = 0;
-        }
-        this._lastMouseDownTime = currentTime;
-        this._lastMousePosition = [event.pageX, event.pageY];
-        this._clickCount++;
-    };
-    SelectionManager.prototype._distanceFromLastMousePosition = function (event) {
-        var result = Math.max(Math.abs(this._lastMousePosition[0] - event.pageX), Math.abs(this._lastMousePosition[1] - event.pageY));
-        return result;
-    };
     SelectionManager.prototype._onMouseMove = function (event) {
         var previousSelectionEnd = this._model.selectionEnd ? [this._model.selectionEnd[0], this._model.selectionEnd[1]] : null;
         this._model.selectionEnd = this._getMouseBufferCoords(event);
+        if (!this._model.selectionEnd) {
+            this.refresh(true);
+            return;
+        }
         if (this._activeSelectionMode === SelectionMode.LINE) {
             if (this._model.selectionEnd[1] < this._model.selectionStart[1]) {
                 this._model.selectionEnd[0] = 0;
@@ -18234,10 +20257,10 @@ var SelectionManager = (function (_super) {
         if (this._dragScrollAmount) {
             this._terminal.scrollDisp(this._dragScrollAmount, false);
             if (this._dragScrollAmount > 0) {
-                this._model.selectionEnd = [this._terminal.cols - 1, this._terminal.ydisp + this._terminal.rows];
+                this._model.selectionEnd = [this._terminal.cols - 1, this._terminal.buffer.ydisp + this._terminal.rows];
             }
             else {
-                this._model.selectionEnd = [0, this._terminal.ydisp];
+                this._model.selectionEnd = [0, this._terminal.buffer.ydisp];
             }
             this.refresh();
         }
@@ -18255,9 +20278,19 @@ var SelectionManager = (function (_super) {
         }
         return charIndex;
     };
+    SelectionManager.prototype.setSelection = function (col, row, length) {
+        this._model.clearSelection();
+        this._removeMouseDownListeners();
+        this._model.selectionStart = [col, row];
+        this._model.selectionStartLength = length;
+        this.refresh();
+    };
     SelectionManager.prototype._getWordAt = function (coords) {
         var bufferLine = this._buffer.get(coords[1]);
-        var line = this._translateBufferLineToString(bufferLine, false);
+        if (!bufferLine) {
+            return null;
+        }
+        var line = BufferLine_1.translateBufferLineToString(bufferLine, false);
         var endIndex = this._convertViewportColToCharacterIndex(bufferLine, coords);
         var startIndex = endIndex;
         var charOffset = coords[0] - startIndex;
@@ -18305,12 +20338,16 @@ var SelectionManager = (function (_super) {
     };
     SelectionManager.prototype._selectWordAt = function (coords) {
         var wordPosition = this._getWordAt(coords);
-        this._model.selectionStart = [wordPosition.start, coords[1]];
-        this._model.selectionStartLength = wordPosition.length;
+        if (wordPosition) {
+            this._model.selectionStart = [wordPosition.start, coords[1]];
+            this._model.selectionStartLength = wordPosition.length;
+        }
     };
     SelectionManager.prototype._selectToWordAt = function (coords) {
         var wordPosition = this._getWordAt(coords);
-        this._model.selectionEnd = [this._model.areSelectionValuesReversed() ? wordPosition.start : (wordPosition.start + wordPosition.length), coords[1]];
+        if (wordPosition) {
+            this._model.selectionEnd = [this._model.areSelectionValuesReversed() ? wordPosition.start : (wordPosition.start + wordPosition.length), coords[1]];
+        }
     };
     SelectionManager.prototype._isCharWordSeparator = function (char) {
         return WORD_SEPARATORS.indexOf(char) >= 0;
@@ -18359,7 +20396,7 @@ var SelectionModel = (function () {
     Object.defineProperty(SelectionModel.prototype, "finalSelectionEnd", {
         get: function () {
             if (this.isSelectAllActive) {
-                return [this._terminal.cols, this._terminal.ybase + this._terminal.rows - 1];
+                return [this._terminal.cols, this._terminal.buffer.ybase + this._terminal.rows - 1];
             }
             if (!this.selectionStart) {
                 return null;
@@ -18444,8 +20481,8 @@ var Viewport = (function () {
         }
     };
     Viewport.prototype.syncScrollArea = function () {
-        if (this.lastRecordedBufferLength !== this.terminal.lines.length) {
-            this.lastRecordedBufferLength = this.terminal.lines.length;
+        if (this.lastRecordedBufferLength !== this.terminal.buffer.lines.length) {
+            this.lastRecordedBufferLength = this.terminal.buffer.lines.length;
             this.refresh();
         }
         else if (this.lastRecordedViewportHeight !== this.terminal.rows) {
@@ -18456,14 +20493,14 @@ var Viewport = (function () {
                 this.refresh();
             }
         }
-        var scrollTop = this.terminal.ydisp * this.currentRowHeight;
+        var scrollTop = this.terminal.buffer.ydisp * this.currentRowHeight;
         if (this.viewportElement.scrollTop !== scrollTop) {
             this.viewportElement.scrollTop = scrollTop;
         }
     };
     Viewport.prototype.onScroll = function (ev) {
         var newRow = Math.round(this.viewportElement.scrollTop / this.currentRowHeight);
-        var diff = newRow - this.terminal.ydisp;
+        var diff = newRow - this.terminal.buffer.ydisp;
         this.terminal.scrollDisp(diff, true);
     };
     Viewport.prototype.onWheel = function (ev) {
@@ -18744,6 +20781,49 @@ exports.isMSWindows = Generic_1.contains(['Windows', 'Win16', 'Win32', 'WinCE'],
 exports.isLinux = platform.indexOf('Linux') >= 0;
 
 //# sourceMappingURL=Browser.js.map
+  })();
+});
+
+require.register("xterm/lib/utils/BufferLine.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "xterm");
+  (function() {
+    "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var LINE_DATA_CHAR_INDEX = 1;
+var LINE_DATA_WIDTH_INDEX = 2;
+function translateBufferLineToString(line, trimRight, startCol, endCol) {
+    if (startCol === void 0) { startCol = 0; }
+    if (endCol === void 0) { endCol = null; }
+    var lineString = '';
+    var widthAdjustedStartCol = startCol;
+    var widthAdjustedEndCol = endCol;
+    for (var i = 0; i < line.length; i++) {
+        var char = line[i];
+        lineString += char[LINE_DATA_CHAR_INDEX];
+        if (char[LINE_DATA_WIDTH_INDEX] === 0) {
+            if (startCol >= i) {
+                widthAdjustedStartCol--;
+            }
+            if (endCol >= i) {
+                widthAdjustedEndCol--;
+            }
+        }
+    }
+    var finalEndCol = widthAdjustedEndCol || line.length;
+    if (trimRight) {
+        var rightWhitespaceIndex = lineString.search(/\s+$/);
+        if (rightWhitespaceIndex !== -1) {
+            finalEndCol = Math.min(finalEndCol, rightWhitespaceIndex);
+        }
+        if (finalEndCol <= widthAdjustedStartCol) {
+            return '';
+        }
+    }
+    return lineString.substring(widthAdjustedStartCol, finalEndCol);
+}
+exports.translateBufferLineToString = translateBufferLineToString;
+
+//# sourceMappingURL=BufferLine.js.map
   })();
 });
 
@@ -19075,7 +21155,13 @@ function getCoordsRelativeToElement(event, element) {
 }
 exports.getCoordsRelativeToElement = getCoordsRelativeToElement;
 function getCoords(event, rowContainer, charMeasure, colCount, rowCount, isSelection) {
+    if (!charMeasure.width || !charMeasure.height) {
+        return null;
+    }
     var coords = getCoordsRelativeToElement(event, rowContainer);
+    if (!coords) {
+        return null;
+    }
     coords[0] = Math.ceil((coords[0] + (isSelection ? charMeasure.width / 2 : 0)) / charMeasure.width);
     coords[1] = Math.ceil(coords[1] / charMeasure.height);
     coords[0] = Math.min(Math.max(coords[0], 1), colCount + 1);
@@ -19099,14 +21185,15 @@ exports.getRawByteCoords = getRawByteCoords;
 
 require.register("xterm/lib/xterm.js", function(exports, require, module) {
   require = __makeRelativeRequire(require, {}, "xterm");
-  (function() {
+  var _Buffer = require('buffer'); var Buffer = _Buffer && _Buffer.Buffer;
+(function() {
     "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var BufferSet_1 = require("./BufferSet");
 var CompositionHelper_1 = require("./CompositionHelper");
 var EventEmitter_1 = require("./EventEmitter");
 var Viewport_1 = require("./Viewport");
 var Clipboard_1 = require("./handlers/Clipboard");
-var CircularList_1 = require("./utils/CircularList");
 var EscapeSequences_1 = require("./EscapeSequences");
 var InputHandler_1 = require("./InputHandler");
 var Parser_1 = require("./Parser");
@@ -19116,6 +21203,7 @@ var SelectionManager_1 = require("./SelectionManager");
 var CharMeasure_1 = require("./utils/CharMeasure");
 var Browser = require("./utils/Browser");
 var Mouse_1 = require("./utils/Mouse");
+var BufferLine_1 = require("./utils/BufferLine");
 var document = (typeof window != 'undefined') ? window.document : null;
 var WRITE_BUFFER_PAUSE_THRESHOLD = 5;
 var WRITE_BATCH_SIZE = 300;
@@ -19166,16 +21254,10 @@ function Terminal(options) {
     if (options.handler) {
         this.on('data', options.handler);
     }
-    this.ybase = 0;
-    this.ydisp = 0;
-    this.x = 0;
-    this.y = 0;
     this.cursorState = 0;
     this.cursorHidden = false;
     this.convertEol;
     this.queue = '';
-    this.scrollTop = 0;
-    this.scrollBottom = this.rows - 1;
     this.customKeyEventHandler = null;
     this.cursorBlinkInterval = null;
     this.applicationKeypad = false;
@@ -19183,7 +21265,6 @@ function Terminal(options) {
     this.originMode = false;
     this.insertMode = false;
     this.wraparoundMode = true;
-    this.normal = null;
     this.charset = null;
     this.gcharset = null;
     this.glevel = 0;
@@ -19223,15 +21304,14 @@ function Terminal(options) {
     this.xoffSentToCatchUp = false;
     this.writeStopped = false;
     this.surrogate_high = '';
-    this.lines = new CircularList_1.CircularList(this.scrollback);
-    var i = this.rows;
-    while (i--) {
-        this.lines.push(this.blankLine());
-    }
+    this.buffers = new BufferSet_1.BufferSet(this);
+    this.buffer = this.buffers.active;
+    this.buffers.on('activate', function (buffer) {
+        this._terminal.buffer = buffer;
+    });
     if (this.selectionManager) {
-        this.selectionManager.setBuffer(this.lines);
+        this.selectionManager.setBuffer(this.buffer.lines);
     }
-    this.tabs;
     this.setupStops();
     this.userScrolling = false;
 }
@@ -19317,7 +21397,7 @@ each(keys(Terminal.defaults), function (key) {
 Terminal.prototype.focus = function () {
     return this.textarea.focus();
 };
-Terminal.prototype.getOption = function (key, value) {
+Terminal.prototype.getOption = function (key) {
     if (!(key in Terminal.defaults)) {
         throw new Error('No option with key "' + key + '"');
     }
@@ -19339,17 +21419,17 @@ Terminal.prototype.setOption = function (key, value) {
                 return false;
             }
             if (this.options[key] !== value) {
-                if (this.lines.length > value) {
-                    var amountToTrim = this.lines.length - value;
-                    var needsRefresh = (this.ydisp - amountToTrim < 0);
-                    this.lines.trimStart(amountToTrim);
-                    this.ybase = Math.max(this.ybase - amountToTrim, 0);
-                    this.ydisp = Math.max(this.ydisp - amountToTrim, 0);
+                if (this.buffer.lines.length > value) {
+                    var amountToTrim = this.buffer.lines.length - value;
+                    var needsRefresh = (this.buffer.ydisp - amountToTrim < 0);
+                    this.buffer.lines.trimStart(amountToTrim);
+                    this.buffer.ybase = Math.max(this.buffer.ybase - amountToTrim, 0);
+                    this.buffer.ydisp = Math.max(this.buffer.ydisp - amountToTrim, 0);
                     if (needsRefresh) {
                         this.refresh(0, this.rows - 1);
                     }
                 }
-                this.lines.maxLength = value;
+                this.buffer.lines.maxLength = value;
                 this.viewport.syncScrollArea();
             }
             break;
@@ -19361,6 +21441,7 @@ Terminal.prototype.setOption = function (key, value) {
             this.setCursorBlinking(value);
             break;
         case 'cursorStyle':
+            this.element.classList.toggle("xterm-cursor-style-block", value === 'block');
             this.element.classList.toggle("xterm-cursor-style-underline", value === 'underline');
             this.element.classList.toggle("xterm-cursor-style-bar", value === 'bar');
             break;
@@ -19406,7 +21487,7 @@ Terminal.prototype.blur = function () {
 };
 Terminal.bindBlur = function (term) {
     on(term.textarea, 'blur', function (ev) {
-        term.refresh(term.y, term.y);
+        term.refresh(term.buffer.y, term.buffer.y);
         if (term.sendFocus) {
             term.send(EscapeSequences_1.C0.ESC + '[O');
         }
@@ -19423,7 +21504,7 @@ Terminal.prototype.initGlobal = function () {
     Terminal.bindFocus(this);
     Terminal.bindBlur(this);
     on(this.element, 'copy', function (event) {
-        if (_this.mouseEvents) {
+        if (!term.hasSelection()) {
             return;
         }
         Clipboard_1.copyHandler(event, term, _this.selectionManager);
@@ -19506,6 +21587,7 @@ Terminal.prototype.open = function (parent, focus) {
     this.element.classList.add('terminal');
     this.element.classList.add('xterm');
     this.element.classList.add('xterm-theme-' + this.theme);
+    this.element.classList.add("xterm-cursor-style-" + this.options.cursorStyle);
     this.setCursorBlinking(this.options.cursorBlink);
     this.element.setAttribute('tabindex', 0);
     this.viewportElement = document.createElement('div');
@@ -19555,7 +21637,7 @@ Terminal.prototype.open = function (parent, focus) {
     this.charMeasure.measure();
     this.viewport = new Viewport_1.Viewport(this, this.viewportElement, this.viewportScrollArea, this.charMeasure);
     this.renderer = new Renderer_1.Renderer(this);
-    this.selectionManager = new SelectionManager_1.SelectionManager(this, this.lines, this.rowContainer, this.charMeasure);
+    this.selectionManager = new SelectionManager_1.SelectionManager(this, this.buffer.lines, this.rowContainer, this.charMeasure);
     this.selectionManager.on('refresh', function (data) {
         _this.renderer.refreshSelection(data.start, data.end);
     });
@@ -19578,12 +21660,6 @@ Terminal.prototype.open = function (parent, focus) {
     if (focus) {
         this.focus();
     }
-    on(this.element, 'click', function () {
-        var selection = document.getSelection(), collapsed = selection.isCollapsed, isRange = typeof collapsed == 'boolean' ? !collapsed : selection.type == 'Range';
-        if (!isRange) {
-            self.focus();
-        }
-    });
     this.bindMouse();
     this.emit('open');
 };
@@ -19767,10 +21843,11 @@ Terminal.prototype.bindMouse = function () {
         return button;
     }
     on(el, 'mousedown', function (ev) {
+        ev.preventDefault();
+        self.focus();
         if (!self.mouseEvents)
             return;
         sendButton(ev);
-        self.focus();
         if (self.vt200Mouse) {
             ev.overrideType = 'mouseup';
             sendButton(ev);
@@ -19843,62 +21920,60 @@ Terminal.prototype.queueLinkification = function (start, end) {
 Terminal.prototype.showCursor = function () {
     if (!this.cursorState) {
         this.cursorState = 1;
-        this.refresh(this.y, this.y);
+        this.refresh(this.buffer.y, this.buffer.y);
     }
 };
 Terminal.prototype.scroll = function (isWrapped) {
     var row;
-    if (this.lines.length === this.lines.maxLength) {
-        this.lines.trimStart(1);
-        this.ybase--;
-        if (this.ydisp !== 0) {
-            this.ydisp--;
+    if (this.buffer.lines.length === this.buffer.lines.maxLength) {
+        this.buffer.lines.trimStart(1);
+        this.buffer.ybase--;
+        if (this.buffer.ydisp !== 0) {
+            this.buffer.ydisp--;
         }
     }
-    this.ybase++;
+    this.buffer.ybase++;
     if (!this.userScrolling) {
-        this.ydisp = this.ybase;
+        this.buffer.ydisp = this.buffer.ybase;
     }
-    row = this.ybase + this.rows - 1;
-    row -= this.rows - 1 - this.scrollBottom;
-    if (row === this.lines.length) {
-        this.lines.push(this.blankLine(undefined, isWrapped));
+    row = this.buffer.ybase + this.rows - 1;
+    row -= this.rows - 1 - this.buffer.scrollBottom;
+    if (row === this.buffer.lines.length) {
+        this.buffer.lines.push(this.blankLine(undefined, isWrapped));
     }
     else {
-        this.lines.splice(row, 0, this.blankLine(undefined, isWrapped));
+        this.buffer.lines.splice(row, 0, this.blankLine(undefined, isWrapped));
     }
-    if (this.scrollTop !== 0) {
-        if (this.ybase !== 0) {
-            this.ybase--;
+    if (this.buffer.scrollTop !== 0) {
+        if (this.buffer.ybase !== 0) {
+            this.buffer.ybase--;
             if (!this.userScrolling) {
-                this.ydisp = this.ybase;
+                this.buffer.ydisp = this.buffer.ybase;
             }
         }
-        this.lines.splice(this.ybase + this.scrollTop, 1);
+        this.buffer.lines.splice(this.buffer.ybase + this.buffer.scrollTop, 1);
     }
-    this.updateRange(this.scrollTop);
-    this.updateRange(this.scrollBottom);
-    this.emit('scroll', this.ydisp);
+    this.updateRange(this.buffer.scrollTop);
+    this.updateRange(this.buffer.scrollBottom);
+    this.emit('scroll', this.buffer.ydisp);
 };
 Terminal.prototype.scrollDisp = function (disp, suppressScrollEvent) {
     if (disp < 0) {
-        if (this.ydisp === 0) {
+        if (this.buffer.ydisp === 0) {
             return;
         }
         this.userScrolling = true;
     }
-    else if (disp + this.ydisp >= this.ybase) {
+    else if (disp + this.buffer.ydisp >= this.buffer.ybase) {
         this.userScrolling = false;
     }
-    this.ydisp += disp;
-    if (this.ydisp > this.ybase) {
-        this.ydisp = this.ybase;
-    }
-    else if (this.ydisp < 0) {
-        this.ydisp = 0;
+    var oldYdisp = this.buffer.ydisp;
+    this.buffer.ydisp = Math.max(Math.min(this.buffer.ydisp + disp, this.buffer.ybase), 0);
+    if (oldYdisp === this.buffer.ydisp) {
+        return;
     }
     if (!suppressScrollEvent) {
-        this.emit('scroll', this.ydisp);
+        this.emit('scroll', this.buffer.ydisp);
     }
     this.refresh(0, this.rows - 1);
 };
@@ -19906,10 +21981,10 @@ Terminal.prototype.scrollPages = function (pageCount) {
     this.scrollDisp(pageCount * (this.rows - 1));
 };
 Terminal.prototype.scrollToTop = function () {
-    this.scrollDisp(-this.ydisp);
+    this.scrollDisp(-this.buffer.ydisp);
 };
 Terminal.prototype.scrollToBottom = function () {
-    this.scrollDisp(this.ybase - this.ydisp);
+    this.scrollDisp(this.buffer.ybase - this.buffer.ydisp);
 };
 Terminal.prototype.write = function (data) {
     this.writeBuffer.push(data);
@@ -19934,11 +22009,11 @@ Terminal.prototype.innerWrite = function () {
             this.send(EscapeSequences_1.C0.DC1);
             this.xoffSentToCatchUp = false;
         }
-        this.refreshStart = this.y;
-        this.refreshEnd = this.y;
+        this.refreshStart = this.buffer.y;
+        this.refreshEnd = this.buffer.y;
         var state = this.parser.parse(data);
         this.parser.setState(state);
-        this.updateRange(this.y);
+        this.updateRange(this.buffer.y);
         this.refresh(this.refreshStart, this.refreshEnd);
     }
     if (this.writeBuffer.length > 0) {
@@ -19991,16 +22066,20 @@ Terminal.prototype.deregisterLinkMatcher = function (matcherId) {
     }
 };
 Terminal.prototype.hasSelection = function () {
-    return this.selectionManager.hasSelection;
+    return this.selectionManager ? this.selectionManager.hasSelection : false;
 };
 Terminal.prototype.getSelection = function () {
-    return this.selectionManager.selectionText;
+    return this.selectionManager ? this.selectionManager.selectionText : '';
 };
 Terminal.prototype.clearSelection = function () {
-    this.selectionManager.clearSelection();
+    if (this.selectionManager) {
+        this.selectionManager.clearSelection();
+    }
 };
 Terminal.prototype.selectAll = function () {
-    this.selectionManager.selectAll();
+    if (this.selectionManager) {
+        this.selectionManager.selectAll();
+    }
 };
 Terminal.prototype.keyDown = function (ev) {
     if (this.customKeyEventHandler && this.customKeyEventHandler(ev) === false) {
@@ -20008,7 +22087,7 @@ Terminal.prototype.keyDown = function (ev) {
     }
     this.restartCursorBlinking();
     if (!this.compositionHelper.keydown.bind(this.compositionHelper)(ev)) {
-        if (this.ybase !== this.ydisp) {
+        if (this.buffer.ybase !== this.buffer.ydisp) {
             this.scrollToBottom();
         }
         return false;
@@ -20396,80 +22475,30 @@ Terminal.prototype.resize = function (x, y) {
     }
     var line, el, i, j, ch, addToY;
     if (x === this.cols && y === this.rows) {
+        if (!this.charMeasure.width || !this.charMeasure.height) {
+            this.charMeasure.measure();
+        }
         return;
     }
     if (x < 1)
         x = 1;
     if (y < 1)
         y = 1;
-    j = this.cols;
-    if (j < x) {
-        ch = [this.defAttr, ' ', 1];
-        i = this.lines.length;
-        while (i--) {
-            while (this.lines.get(i).length < x) {
-                this.lines.get(i).push(ch);
-            }
-        }
+    this.buffers.resize(x, y);
+    while (this.children.length < y) {
+        this.insertRow();
+    }
+    while (this.children.length > y) {
+        el = this.children.shift();
+        if (!el)
+            continue;
+        el.parentNode.removeChild(el);
     }
     this.cols = x;
-    this.setupStops(this.cols);
-    j = this.rows;
-    addToY = 0;
-    if (j < y) {
-        el = this.element;
-        while (j++ < y) {
-            if (this.lines.length < y + this.ybase) {
-                if (this.ybase > 0 && this.lines.length <= this.ybase + this.y + addToY + 1) {
-                    this.ybase--;
-                    addToY++;
-                    if (this.ydisp > 0) {
-                        this.ydisp--;
-                    }
-                }
-                else {
-                    this.lines.push(this.blankLine());
-                }
-            }
-            if (this.children.length < y) {
-                this.insertRow();
-            }
-        }
-    }
-    else {
-        while (j-- > y) {
-            if (this.lines.length > y + this.ybase) {
-                if (this.lines.length > this.ybase + this.y + 1) {
-                    this.lines.pop();
-                }
-                else {
-                    this.ybase++;
-                    this.ydisp++;
-                }
-            }
-            if (this.children.length > y) {
-                el = this.children.shift();
-                if (!el)
-                    continue;
-                el.parentNode.removeChild(el);
-            }
-        }
-    }
     this.rows = y;
-    if (this.y >= y) {
-        this.y = y - 1;
-    }
-    if (addToY) {
-        this.y += addToY;
-    }
-    if (this.x >= x) {
-        this.x = x - 1;
-    }
-    this.scrollTop = 0;
-    this.scrollBottom = y - 1;
+    this.setupStops(this.cols);
     this.charMeasure.measure();
     this.refresh(0, this.rows - 1);
-    this.normal = null;
     this.geometry = [this.cols, this.rows];
     this.emit('resize', { terminal: this, cols: x, rows: y });
 };
@@ -20485,22 +22514,22 @@ Terminal.prototype.maxRange = function () {
 };
 Terminal.prototype.setupStops = function (i) {
     if (i != null) {
-        if (!this.tabs[i]) {
+        if (!this.buffer.tabs[i]) {
             i = this.prevStop(i);
         }
     }
     else {
-        this.tabs = {};
+        this.buffer.tabs = {};
         i = 0;
     }
     for (; i < this.cols; i += this.getOption('tabStopWidth')) {
-        this.tabs[i] = true;
+        this.buffer.tabs[i] = true;
     }
 };
 Terminal.prototype.prevStop = function (x) {
     if (x == null)
-        x = this.x;
-    while (!this.tabs[--x] && x > 0)
+        x = this.buffer.x;
+    while (!this.buffer.tabs[--x] && x > 0)
         ;
     return x >= this.cols
         ? this.cols - 1
@@ -20508,15 +22537,15 @@ Terminal.prototype.prevStop = function (x) {
 };
 Terminal.prototype.nextStop = function (x) {
     if (x == null)
-        x = this.x;
-    while (!this.tabs[++x] && x < this.cols)
+        x = this.buffer.x;
+    while (!this.buffer.tabs[++x] && x < this.cols)
         ;
     return x >= this.cols
         ? this.cols - 1
         : x < 0 ? 0 : x;
 };
 Terminal.prototype.eraseRight = function (x, y) {
-    var line = this.lines.get(this.ybase + y);
+    var line = this.buffer.lines.get(this.buffer.ybase + y);
     if (!line) {
         return;
     }
@@ -20527,7 +22556,7 @@ Terminal.prototype.eraseRight = function (x, y) {
     this.updateRange(y);
 };
 Terminal.prototype.eraseLeft = function (x, y) {
-    var line = this.lines.get(this.ybase + y);
+    var line = this.buffer.lines.get(this.buffer.ybase + y);
     if (!line) {
         return;
     }
@@ -20539,19 +22568,19 @@ Terminal.prototype.eraseLeft = function (x, y) {
     this.updateRange(y);
 };
 Terminal.prototype.clear = function () {
-    if (this.ybase === 0 && this.y === 0) {
+    if (this.buffer.ybase === 0 && this.buffer.y === 0) {
         return;
     }
-    this.lines.set(0, this.lines.get(this.ybase + this.y));
-    this.lines.length = 1;
-    this.ydisp = 0;
-    this.ybase = 0;
-    this.y = 0;
+    this.buffer.lines.set(0, this.buffer.lines.get(this.buffer.ybase + this.buffer.y));
+    this.buffer.lines.length = 1;
+    this.buffer.ydisp = 0;
+    this.buffer.ybase = 0;
+    this.buffer.y = 0;
     for (var i = 1; i < this.rows; i++) {
-        this.lines.push(this.blankLine());
+        this.buffer.lines.push(this.blankLine());
     }
     this.refresh(0, this.rows - 1);
-    this.emit('scroll', this.ydisp);
+    this.emit('scroll', this.buffer.ydisp);
 };
 Terminal.prototype.eraseLine = function (y) {
     this.eraseRight(0, y);
@@ -20582,7 +22611,10 @@ Terminal.prototype.handler = function (data) {
     if (this.options.disableStdin) {
         return;
     }
-    if (this.ybase !== this.ydisp) {
+    if (this.selectionManager && this.selectionManager.hasSelection) {
+        this.selectionManager.clearSelection();
+    }
+    if (this.buffer.ybase !== this.buffer.ydisp) {
         this.scrollToBottom();
     }
     this.emit('data', data);
@@ -20591,25 +22623,25 @@ Terminal.prototype.handleTitle = function (title) {
     this.emit('title', title);
 };
 Terminal.prototype.index = function () {
-    this.y++;
-    if (this.y > this.scrollBottom) {
-        this.y--;
+    this.buffer.y++;
+    if (this.buffer.y > this.buffer.scrollBottom) {
+        this.buffer.y--;
         this.scroll();
     }
-    if (this.x >= this.cols) {
-        this.x--;
+    if (this.buffer.x >= this.cols) {
+        this.buffer.x--;
     }
 };
 Terminal.prototype.reverseIndex = function () {
     var j;
-    if (this.y === this.scrollTop) {
-        this.lines.shiftElements(this.y + this.ybase, this.rows - 1, 1);
-        this.lines.set(this.y + this.ybase, this.blankLine(true));
-        this.updateRange(this.scrollTop);
-        this.updateRange(this.scrollBottom);
+    if (this.buffer.y === this.buffer.scrollTop) {
+        this.buffer.lines.shiftElements(this.buffer.y + this.buffer.ybase, this.rows - 1, 1);
+        this.buffer.lines.set(this.buffer.y + this.buffer.ybase, this.blankLine(true));
+        this.updateRange(this.buffer.scrollTop);
+        this.updateRange(this.buffer.scrollBottom);
     }
     else {
-        this.y--;
+        this.buffer.y--;
     }
 };
 Terminal.prototype.reset = function () {
@@ -20617,14 +22649,16 @@ Terminal.prototype.reset = function () {
     this.options.cols = this.cols;
     var customKeyEventHandler = this.customKeyEventHandler;
     var cursorBlinkInterval = this.cursorBlinkInterval;
+    var inputHandler = this.inputHandler;
     Terminal.call(this, this.options);
     this.customKeyEventHandler = customKeyEventHandler;
     this.cursorBlinkInterval = cursorBlinkInterval;
+    this.inputHandler = inputHandler;
     this.refresh(0, this.rows - 1);
     this.viewport.syncScrollArea();
 };
 Terminal.prototype.tabSet = function () {
-    this.tabs[this.x] = true;
+    this.buffer.tabs[this.buffer.x] = true;
 };
 function on(el, type, handler, capture) {
     if (!Array.isArray(el)) {
@@ -20721,6 +22755,7 @@ function keys(obj) {
     }
     return keys;
 }
+Terminal.translateBufferLineToString = BufferLine_1.translateBufferLineToString;
 Terminal.EventEmitter = EventEmitter_1.EventEmitter;
 Terminal.inherits = inherits;
 Terminal.on = on;
@@ -21209,7 +23244,8 @@ require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass"
 require.alias("jquery/dist/jquery.js", "jquery");
 require.alias("process/browser.js", "process");
 require.alias("prismjs/prism.js", "prismjs");
-require.alias("xterm/lib/xterm.js", "xterm");process = require('process');require.register("___globals___", function(exports, require, module) {
+require.alias("xterm/lib/xterm.js", "xterm");
+require.alias("buffer/index.js", "buffer");process = require('process');require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');
 
