@@ -2,6 +2,7 @@ defmodule ExDebugToolbar.Breakpoint do
   @moduledoc false
 
   alias ExDebugToolbar.Breakpoint.{IEx.Server, Pry}
+  alias ExDebugToolbar.{Breakpoint, Request}
 
   defstruct [
     :id,
@@ -33,5 +34,23 @@ defmodule ExDebugToolbar.Breakpoint do
       %__MODULE__{} -> breakpoint
       term -> raise ArgumentError, "Expected string to be base64 encoded %Breakpoint{}, but got #{inspect(term)}"
     end
+  end
+
+  def get_code_snippet_start_line(%Breakpoint{code_snippet: code_snippet}) do
+    code_snippet |> hd |> Tuple.to_list |> List.last
+  end
+
+  def get_sorted_binding(%Breakpoint{binding: binding}) do
+    binding |> Keyword.keys |> Enum.sort
+  end
+
+  def get_relative_line(%Breakpoint{code_snippet: code_snippet, line: line}) do
+    code_snippet
+    |> Enum.find_index(fn {_, n} -> n == line end)
+    |> Kernel.+(1)
+  end
+
+  def get_uuid(%Request{uuid: request_id}, %Breakpoint{id: id}) do
+    %Breakpoint.UUID{request_id: request_id, breakpoint_id: id}
   end
 end

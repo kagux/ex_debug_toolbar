@@ -2,8 +2,6 @@ defmodule ExDebugToolbar.ToolbarView do
   @moduledoc false
 
   use ExDebugToolbar.Web, :view
-  alias ExDebugToolbar.Data.Timeline
-  alias ExDebugToolbar.{Breakpoint, Request}
 
   @millisecond System.convert_time_unit(1, :millisecond, :native)
 
@@ -37,23 +35,5 @@ defmodule ExDebugToolbar.ToolbarView do
     |> (&Enum.zip(~w(Fastest Slowest Total), &1)).()
     |> Enum.map(fn {label, value} -> label <> ": " <> value end)
     |> Enum.join("<br>")
-  end
-
-  def breakpoint_code_snippet_start_line(%Breakpoint{code_snippet: code_snippet}) do
-    code_snippet |> hd |> Tuple.to_list |> List.last
-  end
-
-  def breakpoint_sorted_binding(%Breakpoint{binding: binding}) do
-    binding |> Keyword.keys |> Enum.sort
-  end
-
-  def breakpoint_relative_line(%Breakpoint{code_snippet: code_snippet, line: line}) do
-    code_snippet
-    |> Enum.find_index(fn {_, n} -> n == line end)
-    |> Kernel.+(1)
-  end
-
-  def breakpoint_uuid(%Request{uuid: request_id}, %Breakpoint{id: id}) do
-    %Breakpoint.UUID{request_id: request_id, breakpoint_id: id}
   end
 end

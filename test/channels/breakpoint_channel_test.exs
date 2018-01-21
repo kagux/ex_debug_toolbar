@@ -2,7 +2,7 @@ defmodule ExDebugToolbar.BreakpointChannelTest do
   use ExDebugToolbar.ChannelCase, async: true
 
   alias ExDebugToolbar.BreakpointChannel
-  alias ExDebugToolbar.ToolbarView
+  alias ExDebugToolbar.Breakpoint
   require ExDebugToolbar
 
   setup :start_request
@@ -12,7 +12,7 @@ defmodule ExDebugToolbar.BreakpointChannelTest do
     :timer.sleep 500
     {:ok, request} = get_request()
     breakpoint = request.breakpoints.entries |> Map.values |> hd
-    topic = "breakpoint:#{ToolbarView.breakpoint_uuid(request, breakpoint)}"
+    topic = "breakpoint:#{Breakpoint.get_uuid(request, breakpoint)}"
 
     # initial output
     {:ok, _, socket} = socket() |> subscribe_and_join(BreakpointChannel, topic, %{})

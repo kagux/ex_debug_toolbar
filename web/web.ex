@@ -33,7 +33,8 @@ defmodule ExDebugToolbar.Web do
       import ExDebugToolbar.View.Helpers.ConnHelpers
       import ExDebugToolbar.View.Helpers.HistoryHelpers
 
-      import ExDebugToolbar.Data.Timeline
+      alias ExDebugToolbar.Data.Timeline
+      alias ExDebugToolbar.Breakpoint 
     end
   end
 
