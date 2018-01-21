@@ -34,7 +34,7 @@
             <th> Average </th>
           </thead>
           <tbody>
-            <%= for {name, stats} <- rendered_templates(@timeline) do %>
+            <%= for {name, stats} <- Timeline.templates_duration_breakdown(@timeline) do %>
               <tr>
                 <td class="col-lg-8 text-muted"><%= name %></td>
                 <td class="col-lg-2 text-info"><%= stats.count %></td>

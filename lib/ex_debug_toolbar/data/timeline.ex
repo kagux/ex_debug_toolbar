@@ -70,6 +70,30 @@ defmodule ExDebugToolbar.Data.Timeline do
     ]
   end
 
+  def templates_duration_breakdown(%Timeline{} = timeline) do
+    timeline
+    |> Timeline.get_all_events
+    |> Stream.filter(&String.starts_with?(&1.name, "template#"))
+    |> Enum.reduce(%{}, fn event, acc ->
+      Map.update(
+        acc,
+        event.name,
+        %{count: 1, durations: [event.duration], min: 0, max: 0, avg: 0, total: 0},
+        &(%{&1 | count: &1.count + 1, durations: [event.duration | &1.durations]})
+      )
+    end)
+    |> Stream.map(fn {name, stats} ->
+      {name, %{stats |
+        min: Enum.min(stats.durations),
+        max: Enum.max(stats.durations),
+        total: Enum.sum(stats.durations),
+        avg: div(Enum.sum(stats.durations), Enum.count(stats.durations))
+      }}
+    end)
+    |> Stream.map(fn {name, stats} -> {String.trim_leading(name, "template#"), stats} end)
+    |> Enum.sort_by(fn {_, stats} -> -stats.total end)
+  end
+
   defp set_duration(event, opts) do
     duration = case {opts[:duration], opts[:timestamp]} do
       {nil, nil} -> 0

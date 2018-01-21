@@ -30,30 +30,6 @@ defmodule ExDebugToolbar.ToolbarView do
     end
   end
 
-  def rendered_templates(%Timeline{} = timeline) do
-    timeline
-    |> Timeline.get_all_events
-    |> Stream.filter(&String.starts_with?(&1.name, "template#"))
-    |> Enum.reduce(%{}, fn event, acc ->
-      Map.update(
-        acc,
-        event.name,
-        %{count: 1, durations: [event.duration], min: 0, max: 0, avg: 0, total: 0},
-        &(%{&1 | count: &1.count + 1, durations: [event.duration | &1.durations]})
-      )
-    end)
-    |> Stream.map(fn {name, stats} ->
-      {name, %{stats |
-        min: Enum.min(stats.durations),
-        max: Enum.max(stats.durations),
-        total: Enum.sum(stats.durations),
-        avg: div(Enum.sum(stats.durations), Enum.count(stats.durations))
-      }}
-    end)
-    |> Stream.map(fn {name, stats} -> {String.trim_leading(name, "template#"), stats} end)
-    |> Enum.sort_by(fn {_, stats} -> -stats.total end)
-  end
-
   def stats_popover_text(stats) do
     ~w(min max total)a
     |> Stream.map(&Map.get(stats, &1))
@@ -61,14 +37,6 @@ defmodule ExDebugToolbar.ToolbarView do
     |> (&Enum.zip(~w(Fastest Slowest Total), &1)).()
     |> Enum.map(fn {label, value} -> label <> ": " <> value end)
     |> Enum.join("<br>")
-  end
-
-  def ecto_inline_queries(queries) do
-    queries |> Enum.filter(fn {_, _, type} -> type == :inline end)
-  end
-
-  def ecto_parallel_queries(queries) do
-    queries |> Enum.filter(fn {_, _, type} -> type == :parallel end)
   end
 
   def breakpoint_code_snippet_start_line(%Breakpoint{code_snippet: code_snippet}) do
