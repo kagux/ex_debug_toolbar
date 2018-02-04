@@ -25,7 +25,7 @@ defmodule ExDebugToolbar.Collector.TemplateTest do
     assert {:ok, request} = get_request()
     timeline = request.timeline
     assert timeline.duration > 0
-    assert %Event{name: "template#test/fixtures/templates/eex_template.html.eex"} = timeline.events |> hd
+    assert %Event{name: "template.test/fixtures/templates/eex_template.html.eex"} = timeline.events |> hd
   end
 
   def compile_template(engine \\ EExEngine, name) do

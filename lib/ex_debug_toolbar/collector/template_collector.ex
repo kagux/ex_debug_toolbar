@@ -8,7 +8,7 @@ defmodule ExDebugToolbar.Collector.TemplateCollector do
       def compile(path, name) do
         compiled_template = unquote(opts[:engine]).compile(path, name)
         quote do
-          ExDebugToolbar.record_event("template##{unquote(path)}", fn ->
+          ExDebugToolbar.record_event("template.#{unquote(path)}", fn ->
             unquote(compiled_template)
           end)
         end
