@@ -13953,5 +13953,11 @@ table.text-center th {
 .box-body .progress {
   margin-bottom: 0px; }
 
+.progress > .progress-bar {
+  border-radius: 0; }
+
+td.duration {
+  min-width: 200px; }
+
 
 /*# sourceMappingURL=dashboard.css.map*/

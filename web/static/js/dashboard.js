@@ -19,7 +19,7 @@ class App {
     this.logger.debug('Rendering dashboard')
     this.joinToolbarChannel(this.socket);
     $("#requests-history").on("click", "tr", this.onRequestClick);
-    $('[data-toggle="tooltip"]').tooltip();
+    this.renderTooltips();
   }
 
   initSocket() {
@@ -54,6 +54,7 @@ class App {
     this.logger.debug('Adding request', data.request.uuid, data.request);
     $(data.html).prependTo('#requests-history > tbody');
     this.requestCountEl.text(++this.requestsCount);
+    this.renderTooltips();
     if (this.requestsCount == 1) {
       $('#no-requests-history').hide();
       $('#requests-history-container').removeClass('hidden');
@@ -63,6 +64,10 @@ class App {
   onRequestClick() {
     const id = $(this).attr("id");
     window.location = "/__ex_debug_toolbar__/requests/" + id;
+  }
+
+  renderTooltips() {
+    $('[data-toggle="tooltip"]').tooltip();
   }
 }
 

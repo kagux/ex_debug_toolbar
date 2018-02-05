@@ -5,8 +5,8 @@
         <th> Status </th>
         <th> Method </th>
         <th> Path </th>
-        <th> Controller </th>
         <th> Duration </th>
+        <th> Controller </th>
         <th> Timestamp </th>
       </thead>
       <tbody>

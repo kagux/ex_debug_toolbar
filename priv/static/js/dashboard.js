@@ -14479,7 +14479,7 @@ var App = function () {
       this.logger.debug('Rendering dashboard');
       this.joinToolbarChannel(this.socket);
       (0, _jquery2.default)("#requests-history").on("click", "tr", this.onRequestClick);
-      (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+      this.renderTooltips();
     }
   }, {
     key: 'initSocket',
@@ -14517,6 +14517,7 @@ var App = function () {
       this.logger.debug('Adding request', data.request.uuid, data.request);
       (0, _jquery2.default)(data.html).prependTo('#requests-history > tbody');
       this.requestCountEl.text(++this.requestsCount);
+      this.renderTooltips();
       if (this.requestsCount == 1) {
         (0, _jquery2.default)('#no-requests-history').hide();
         (0, _jquery2.default)('#requests-history-container').removeClass('hidden');
@@ -14527,6 +14528,11 @@ var App = function () {
     value: function onRequestClick() {
       var id = (0, _jquery2.default)(this).attr("id");
       window.location = "/__ex_debug_toolbar__/requests/" + id;
+    }
+  }, {
+    key: 'renderTooltips',
+    value: function renderTooltips() {
+      (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
     }
   }]);
 
