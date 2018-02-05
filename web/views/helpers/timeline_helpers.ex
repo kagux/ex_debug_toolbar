@@ -17,7 +17,7 @@ defmodule ExDebugToolbar.View.Helpers.TimelineHelpers do
     |> Stream.zip(colors)
     |> Enum.map(fn {{name, duration}, color} ->
       percentage = round(duration / timeline.duration * 100)
-      {name, duration, percentage, color}
+      {String.capitalize(name), duration, percentage, color}
     end)
   end
 end

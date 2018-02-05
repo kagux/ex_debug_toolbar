@@ -9,18 +9,18 @@
               <dd>
               <span class="label label-<%= conn_status_color_class(@request.conn) %>"><%= @request.conn.status %></span>
               </dd>
-              <dt>Method</dt>
-              <dd><%= @request.conn.method %></dd>
+              <dt>Duration</dt>
+              <dd><%= native_time_to_string(@request.timeline.duration) %></dd>
               <dt>Path</dt>
               <dd><%= @request.conn.request_path %></dd>
             </dl>
           </div>
           <div class="col-xs-6">
             <dl class="dl-horizontal">
+              <dt>Method</dt>
+              <dd><%= @request.conn.method %></dd>
               <dt>Controller</dt>
               <dd><%= controller_action(@request.conn) %></dd>
-              <dt>Duration</dt>
-              <dd><%= native_time_to_string(@request.timeline.duration) %></dd>
               <dt>Timestamp</dt>
               <dd><%= datetime_to_string(@request.created_at) %></dd>
             </dl>
@@ -30,9 +30,12 @@
           <div class="col-xs-12">
             <div class="progress">
               <%= for {group, duration, percentage, color} <- group_events_own_durations(@request.timeline) do %>
-                <div class="progress-bar <%= color %>" style="width: <%= percentage %>%" data-toggle="tooltip" title="<%= percentage %>% (<%= native_time_to_string(duration) %>)">
+                <div class="progress-bar <%= color %>"
+                     style="width: <%= percentage %>%"
+                     data-toggle="tooltip"
+                     title="<%= group %> <%= percentage %>% - <%= native_time_to_string(duration) %>">
                   <%= if percentage >= 5 do %>
-                    <span> <%= group |> String.capitalize() %> </span>
+                    <span> <%= group %> </span>
                   <% end %>
                 </div>
               <% end %>

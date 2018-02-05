@@ -15,8 +15,8 @@ defmodule ExDebugToolbar.View.Helpers.TimelineHelpersTest do
         %Timeline.Event{name: "group2", own_duration: 750},
       ]}
       [group_a, group_b] = TimelineHelpers.group_events_own_durations(timeline)
-      assert {"group1", 250, 25, _} = group_a
-      assert {"group2", 750, 75, _} = group_b
+      assert {"Group1", 250, 25, _} = group_a
+      assert {"Group2", 750, 75, _} = group_b
     end
   end
 end
