@@ -28,18 +28,7 @@
         </div>
         <div class="row">
           <div class="col-xs-12">
-            <div class="progress">
-              <%= for {group, duration, percentage, color} <- group_events_own_durations(@request.timeline) do %>
-                <div class="progress-bar <%= color %>"
-                     style="width: <%= percentage %>%"
-                     data-toggle="tooltip"
-                     title="<%= group %> <%= percentage %>% - <%= native_time_to_string(duration) %>">
-                  <%= if percentage >= 5 do %>
-                    <span> <%= group %> </span>
-                  <% end %>
-                </div>
-              <% end %>
-            </div>
+            <%= render "show/_duration_breakdown.html", timeline: @request.timeline %>
           </div>
         </div>
       </div>

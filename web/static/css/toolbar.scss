@@ -11,9 +11,17 @@
 
   // namespacing to avoid conflicts
   @import "bootstrap";
+
+  @import 'font-awesome';
+
+  @import 'dashboard/fonts';
+  @import 'admin-lte/dist/css/AdminLTE';
+  @import 'admin-lte/dist/css/skins/skin-yellow';
+
   @import "prismjs/themes/prism";
   @import "prismjs/plugins/line-numbers/prism-line-numbers";
   @import "prismjs/plugins/line-highlight/prism-line-highlight";
+
   @import "xterm/dist/xterm";
   @import "xterm/dist/addons/fullscreen/fullscreen";
 
