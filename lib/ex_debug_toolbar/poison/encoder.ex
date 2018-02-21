@@ -34,6 +34,10 @@ if ExDebugToolbar.Config.enabled?() do
   defimpl Poison.Encoder, for: Function do
     defdelegate encode(func, options), to: Encoder, as: :encode_inspect
   end
+
+  defimpl Poison.Encoder, for: Reference do
+    defdelegate encode(func, options), to: Encoder, as: :encode_inspect
+  end
 end
 
 Code.compiler_options(ignore_module_conflict: false)
