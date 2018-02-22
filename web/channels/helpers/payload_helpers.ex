@@ -1,5 +1,5 @@
 defmodule ExDebugToolbar.Channel.Helpers.PayloadHelpers do
-  alias ExDebugToolbar.Logger
+  alias ExDebugToolbar.{Logger, Config}
   alias ExDebugToolbar.View.Helpers.TimeHelpers
 
   def build_request_payload(request, render_fun) do
@@ -17,7 +17,8 @@ defmodule ExDebugToolbar.Channel.Helpers.PayloadHelpers do
   defp do_build_payload(request, render_fun) do
     %{
       html: render_fun.(),
-      request: request
+      uuid: request.uuid,
+      request: (if Config.debug?(), do: request, else: nil)
     }
   end
 end

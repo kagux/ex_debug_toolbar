@@ -55,18 +55,18 @@ class App {
     }
   }
 
-  renderToolbar({html: html, request: request}){
+  renderToolbar({html: html, uuid: uuid, request: request}){
     this.logger.debug('Request data', request)
     const content = $('<div>').html(html);
-    if (this.originalRequestId != request.uuid) {
+    if (this.originalRequestId != uuid) {
       this.logger.debug('Historic request');
       content.addClass("historic-request");
     }
     this.toolbar.html(content);
     this.renderPanels(this.toolbar);
     this.renderPopovers(this.toolbar);
-    this.breakpointsPanel.render(request.uuid);
-    this.historyPanel.render(request.uuid);
+    this.breakpointsPanel.render(uuid);
+    this.historyPanel.render(uuid);
     this.highlightCode(this.toolbar);
   }
 

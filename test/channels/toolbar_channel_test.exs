@@ -10,6 +10,7 @@ defmodule ExDebugToolbar.ToolbarChannelTest do
       {:ok, payload, _} = subscribe_and_join_toolbar(@request_id)
       assert %{} = payload
       assert payload |> Map.has_key?(:html)
+      assert payload.uuid == @request_id
     end
 
     test "it returns pending message if request is still running" do

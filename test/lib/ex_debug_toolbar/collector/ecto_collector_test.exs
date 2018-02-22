@@ -60,6 +60,23 @@ defmodule ExDebugToolbar.Collector.EctoCollectorTest do
     assert {%{result: {:error, _}}, _, _} = request.ecto |> hd
   end
 
+  test "it handles streamed query" do
+    entry = %Ecto.LogEntry{
+      query: "query",
+      result: {:ok, %Postgrex.Cursor{
+        connection_id: 6837,
+        max_rows: 500,
+        portal: "NMR",
+        ref: :erlang.monitor(:process ,self())
+      }}
+    }
+    Collector.log entry
+    assert {:ok, request} = get_request()
+    {saved_entry, _, _} = request.ecto |> hd
+    assert {:ok, result} = saved_entry.result
+    assert result.max_rows == 500
+  end
+
   test "it converts binary ecto uuid to a string" do
     uuid = <<134, 8, 204, 149, 179, 187, 75, 177, 186, 76, 144, 162, 54, 243, 218, 130>>
     %Ecto.LogEntry{query: "query", params: [uuid]} |> Collector.log
