@@ -23,7 +23,10 @@ if Code.ensure_compiled?(Ecto) do
       end
     end
 
-    defp remove_result_rows(%{result: {:ok, result}} = entry) do
+    defp remove_result_rows(%{result: {:ok, %Postgrex.Cursor{} = result}} = entry) do
+      %{entry | result: {:ok, %{result | ref: nil}}}
+    end
+    defp remove_result_rows(%{result: {:ok, %{rows: rows} = result}} = entry) when is_list(rows) do
       %{entry | result: {:ok, %{result | rows: []}}}
     end
     defp remove_result_rows(entry), do: entry
