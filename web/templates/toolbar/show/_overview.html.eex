@@ -1,5 +1,5 @@
 <span class="toolbar-item" data-toggle="panel">
-  <i class="glyphicon glyphicon-time" aria-hidden="true"></i>
+  <i class="fa fa-clock-o" aria-hidden="true"></i>
   <%= native_time_to_string @request.timeline.duration %>
   <span class="label label-<%= conn_status_color_class(@request.conn) %>"><%= @request.conn.status %></span>
   <span class="label label-default"><%= controller_action(@request.conn) %></span>
@@ -16,21 +16,28 @@
     </div>
     <div class="row">
       <div class="col-lg-6">
-        <table class="table table-hover table-condensed table-bordered">
-          <caption> Connection parameters </caption>
+        <table class="table table-hover table-condensed">
           <thead>
-            <th> Parameter </th>
-            <th> Value </th>
+            <th></th>
+            <th> Duration </th>
+            <th> Share </th>
           </thead>
           <tbody>
-            <%= for {key, value} <- conn_details(@request.conn) do %>
-              <tr>
-                <td class="col-lg-2 text-muted"><%= key %></td>
-                <td class="col-lg-10 text-info"><%= value %></td>
-              </tr>
-            <% end %>
+          <%= for {group, duration, percentage, color} <- group_events_own_durations(@request.timeline) do %>
+            <tr>
+              <td class="<%= color %>"> <%= group %> </td>
+              <td> <%= native_time_to_string(duration) %> </td>
+              <td> <%= percentage %>% </td>
+            </tr>
+          <% end %>
           </tbody>
         </table>
+      </div>
+      <div class="col-lg-6">
+        <span class="btn btn-link">
+          <%= link "Open request details", to: request_path(ExDebugToolbar.Endpoint, :show, @request.uuid), target: :blank %>
+          <i class="fa fa-external-link" aria-hidden="true"></i>
+        </span>
       </div>
     </div>
   </div>
