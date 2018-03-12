@@ -3,6 +3,7 @@ import $ from './lib/jquery';
 import Logger from './lib/logger';
 window.$ = $;
 window.jQuery = $;
+import Highlight from './lib/highlight';
 
 require('admin-lte');
 
@@ -13,6 +14,7 @@ class App {
     this.socket = this.initSocket();
     this.requestCountEl = $('#requests-count');
     this.requestsCount = parseInt(this.requestCountEl.text(), 10);
+    this.highlight = new Highlight;
   }
 
   render() {
@@ -20,6 +22,7 @@ class App {
     this.joinToolbarChannel(this.socket);
     $("#requests-history").on("click", "tr", this.onRequestClick);
     this.renderTooltips();
+    this.highlight.render("body");
   }
 
   initSocket() {

@@ -1,0 +1,33 @@
+<div class="row">
+<div class="col-xs-12">
+  <h3> Parameters </h3>
+  <h4> Route </h4>
+  <pre>
+    <code class="language-elixir">
+      <%= inspect(@conn.path_params, limit: 200, pretty: true) %>
+    </code>
+  </pre>
+  <h4> Query </h4>
+  <pre>
+    <code class="language-elixir">
+      <%= inspect(@conn.query_params, limit: 200, pretty: true) %>
+    </code>
+  </pre>
+  <h4> Assigns </h4>
+  <pre>
+    <code class="language-elixir">
+      <%= inspect(@conn.assigns, limit: 200, pretty: true) %>
+    </code>
+  </pre>
+<hr>
+</div>
+</div>
+<div class="row">
+<div class="col-xs-12">
+  <h3> Parameters </h3>
+  <p>
+  test text
+  </p>
+<hr>
+</div>
+</div>

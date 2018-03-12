@@ -22766,6 +22766,60 @@ module.exports = Terminal;
 //# sourceMappingURL=xterm.js.map
   })();
 });
+require.register("web/static/js/lib/highlight.js", function(exports, require, module) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _prismjs = require('prismjs');
+
+var _prismjs2 = _interopRequireDefault(_prismjs);
+
+require('prismjs/components/prism-elixir');
+
+require('prismjs/components/prism-sql');
+
+require('prismjs/plugins/normalize-whitespace/prism-normalize-whitespace');
+
+require('prismjs/plugins/line-numbers/prism-line-numbers');
+
+require('prismjs/plugins/line-highlight/prism-line-highlight');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Highlight = function () {
+  function Highlight() {
+    _classCallCheck(this, Highlight);
+  }
+
+  _createClass(Highlight, [{
+    key: 'render',
+    value: function render(el) {
+      _prismjs2.default.plugins.NormalizeWhitespace.setDefaults({
+        'remove-trailing': true,
+        'remove-indent': true,
+        'left-trim': true,
+        'right-trim': true,
+        'remove-initial-line-feed': true
+      });
+      $(el).find(".code").each(function (i, el) {
+        _prismjs2.default.highlightElement(el, false);
+      });
+    }
+  }]);
+
+  return Highlight;
+}();
+
+exports.default = Highlight;
+});
+
 require.register("web/static/js/lib/jquery.js", function(exports, require, module) {
 'use strict';
 
@@ -22862,19 +22916,9 @@ var _history_panel = require('./toolbar/history_panel');
 
 var _history_panel2 = _interopRequireDefault(_history_panel);
 
-var _prismjs = require('prismjs');
+var _highlight = require('./lib/highlight');
 
-var _prismjs2 = _interopRequireDefault(_prismjs);
-
-require('prismjs/components/prism-elixir');
-
-require('prismjs/components/prism-sql');
-
-require('prismjs/plugins/normalize-whitespace/prism-normalize-whitespace');
-
-require('prismjs/plugins/line-numbers/prism-line-numbers');
-
-require('prismjs/plugins/line-highlight/prism-line-highlight');
+var _highlight2 = _interopRequireDefault(_highlight);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22891,6 +22935,7 @@ var App = function () {
     this.toolbar = (0, _jquery2.default)("<div>", { id: "ex-debug-toolbar" });
     this.breakpointsPanel = new _breakpoints_panel2.default(this.socket, this.toolbar);
     this.historyPanel = new _history_panel2.default(this.toolbar, this.originalRequestId, this.render.bind(this));
+    this.highlight = new _highlight2.default();
     (0, _jquery2.default)("body").append(this.toolbar);
   }
 
@@ -22948,7 +22993,7 @@ var App = function () {
       this.renderPopovers(this.toolbar);
       this.breakpointsPanel.render(uuid);
       this.historyPanel.render(uuid);
-      this.highlightCode(this.toolbar);
+      this.highlight.render(this.toolbar);
     }
   }, {
     key: 'renderPanels',
@@ -23001,20 +23046,6 @@ var App = function () {
         panel.data('panel-id', id);
       }
       return panel.data('panel-id');
-    }
-  }, {
-    key: 'highlightCode',
-    value: function highlightCode(toolbar) {
-      _prismjs2.default.plugins.NormalizeWhitespace.setDefaults({
-        'remove-trailing': true,
-        'remove-indent': true,
-        'left-trim': true,
-        'right-trim': true,
-        'remove-initial-line-feed': true
-      });
-      toolbar.find(".code").each(function (i, el) {
-        _prismjs2.default.highlightElement(el, false);
-      });
     }
   }, {
     key: 'renderPopovers',
@@ -23239,12 +23270,12 @@ var HistoryPanel = function () {
 exports.default = HistoryPanel;
 });
 
-require.alias("admin-lte/dist/js/adminlte.min.js", "admin-lte");
-require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("bootstrap-sass/assets/javascripts/bootstrap.js", "bootstrap-sass");
 require.alias("jquery/dist/jquery.js", "jquery");
 require.alias("process/browser.js", "process");
+require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("prismjs/prism.js", "prismjs");
+require.alias("admin-lte/dist/js/adminlte.min.js", "admin-lte");
 require.alias("xterm/lib/xterm.js", "xterm");
 require.alias("buffer/index.js", "buffer");process = require('process');require.register("___globals___", function(exports, require, module) {
   

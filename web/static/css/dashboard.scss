@@ -5,6 +5,10 @@
 @import 'admin-lte/dist/css/AdminLTE';
 @import 'admin-lte/dist/css/skins/skin-yellow';
 
+@import "prismjs/themes/prism";
+@import "prismjs/plugins/line-numbers/prism-line-numbers";
+@import "prismjs/plugins/line-highlight/prism-line-highlight";
+
 .invisible-row {
   display: none;
 }
