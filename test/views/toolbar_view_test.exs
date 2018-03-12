@@ -9,14 +9,16 @@ defmodule ExDebugToolbar.ToolbarViewTest do
 
   describe "rendering" do
     test "it renders toolbar without errors" do
-      assert %Request{} |> render |> is_bitstring
+      assert %Request{uuid: 1} |> render |> is_bitstring
     end
 
     test "it renders toolbar with logs without errors" do
-      request = %Request{logs: [%LogEntry{
-        level: :info,
-        message: ["GET", 32, "/"],
-        timestamp: {{2017, 6, 1}, {21, 44, 11, 482}}
+      request = %Request{
+        uuid: 1,
+        logs: [%LogEntry{
+          level: :info,
+          message: ["GET", 32, "/"],
+          timestamp: {{2017, 6, 1}, {21, 44, 11, 482}}
       }]}
       assert request |> render |> is_bitstring
     end
@@ -38,7 +40,7 @@ defmodule ExDebugToolbar.ToolbarViewTest do
         }}
       }
       duration = 15000
-      request = %Request{ecto: [{log_entry, duration, :inline}]}
+      request = %Request{uuid: 1, ecto: [{log_entry, duration, :inline}]}
       assert request |> render |> is_bitstring
     end
 
@@ -52,7 +54,7 @@ defmodule ExDebugToolbar.ToolbarViewTest do
         result: {:ok, %Postgrex.Result{}}
       }
       duration = 15000
-      request = %Request{ecto: [{log_entry, duration, :inline}]}
+      request = %Request{uuid: 1, ecto: [{log_entry, duration, :inline}]}
       assert request |> render |> is_bitstring
     end
 
@@ -72,7 +74,7 @@ defmodule ExDebugToolbar.ToolbarViewTest do
           }]
         }]
       }
-      request = %Request{timeline: timeline}
+      request = %Request{uuid: 1, timeline: timeline}
       assert request |> render |> is_bitstring
     end
 
@@ -84,7 +86,7 @@ defmodule ExDebugToolbar.ToolbarViewTest do
           duration: 5,
           }]
       }
-      request = %Request{timeline: timeline}
+      request = %Request{uuid: 1, timeline: timeline}
       assert request |> render |> is_bitstring
     end
 
@@ -98,15 +100,15 @@ defmodule ExDebugToolbar.ToolbarViewTest do
         binding: binding(),
         inserted_at: NaiveDateTime.utc_now
       }
-      assert %Request{} |> render(breakpoints: [breakpoint]) |> is_bitstring
+      assert %Request{uuid: 1} |> render(breakpoints: [breakpoint]) |> is_bitstring
     end
 
     test "it renders toolbar when conn has no layout" do
-      assert %Request{conn: %Conn{assigns: %{layout: false}}} |> render |> is_bitstring
+      assert %Request{uuid: 1, conn: %Conn{assigns: %{layout: false}}} |> render |> is_bitstring
     end
 
     test "it renders toolbar when conn has no assigns" do
-      assert %Request{conn: %Conn{assigns: nil}} |> render |> is_bitstring
+      assert %Request{uuid: 1, conn: %Conn{assigns: nil}} |> render |> is_bitstring
     end
   end
 
