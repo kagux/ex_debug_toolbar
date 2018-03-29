@@ -1,24 +1,25 @@
 defmodule ExDebugToolbar.Plug.RequestId do
   @moduledoc false
-
-  use Plug.Builder
-
   @behaviour Plug
 
-  plug Plug.RequestId
-  plug :put_request_id_in_private
-  plug :put_request_id_in_req_headers
+  @impl Plug
+  def init(opts), do: opts
 
-  defp put_request_id_in_private(conn, opts) do
-    request_id = Plug.Conn.get_resp_header(conn, header(opts)) |> List.first
+  @impl Plug
+  def call(conn, opts) do
+    header = Plug.RequestId.init(opts)
+    conn
+    |> Plug.RequestId.call(header)
+    |> put_request_id_in_private(header)
+    |> put_request_id_in_req_headers(header)
+  end
+
+  defp put_request_id_in_private(conn, header) do
+    request_id = Plug.Conn.get_resp_header(conn, header) |> List.first
     Plug.Conn.put_private(conn, :request_id, request_id)
   end
 
-  defp put_request_id_in_req_headers(conn, opts) do
-    conn |> Plug.Conn.put_req_header(header(opts), conn.private.request_id)
-  end
-
-  defp header(opts) do
-    Plug.RequestId.init(opts)
+  defp put_request_id_in_req_headers(conn, header) do
+    conn |> Plug.Conn.put_req_header(header, conn.private.request_id)
   end
 end

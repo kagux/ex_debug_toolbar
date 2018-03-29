@@ -51,6 +51,8 @@ defmodule ExDebugToolbar.Database.RequestRepo do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
+  def init(opts), do: {:ok, opts}
+
   def handle_cast({:update, id, changes}, _state) do
 
     do_update(id, changes)
