@@ -9,8 +9,6 @@ if Config.enabled?() and Config.debug?() do
     end
   end
 
-  alias ExDebugToolbar.Poison.Encoder
-
   defimpl Poison.Encoder, for: Tuple do
     def encode(tuple, options) do
       tuple |> Tuple.to_list |> Poison.Encoder.encode(options)
@@ -27,15 +25,15 @@ if Config.enabled?() and Config.debug?() do
   end
 
   defimpl Poison.Encoder, for: Port do
-    defdelegate encode(port, options), to: Encoder, as: :encode_inspect
+    defdelegate encode(port, options), to: ExDebugToolbar.Poison.Encoder, as: :encode_inspect
   end
 
   defimpl Poison.Encoder, for: PID do
-    defdelegate encode(pid, options), to: Encoder, as: :encode_inspect
+    defdelegate encode(pid, options), to: ExDebugToolbar.Poison.Encoder, as: :encode_inspect
   end
 
   defimpl Poison.Encoder, for: Function do
-    defdelegate encode(func, options), to: Encoder, as: :encode_inspect
+    defdelegate encode(func, options), to: ExDebugToolbar.Poison.Encoder, as: :encode_inspect
   end
 end
 
