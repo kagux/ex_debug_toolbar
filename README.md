@@ -11,6 +11,9 @@ Contributions to code, feedback and suggestions will be much appreciated!
 ![Screencapture](screenshots/toolbar.gif)
 
 # Recent changes
+  ### Version 0.5.0
+   * _(new)_ phoenix 1.3
+   * _(new)_ support bootstrap 4
   ### Version 0.4.0
    * _(new)_ requests history panel
    * _(new)_ support Slim templates (`phoenix_slim` package)
