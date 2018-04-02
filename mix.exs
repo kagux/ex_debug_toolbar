@@ -49,7 +49,7 @@ defmodule ExDebugToolbar.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.2"},
+      {:phoenix, "~> 1.3"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_html, "~> 2.6"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
@@ -57,7 +57,7 @@ defmodule ExDebugToolbar.Mixfile do
       {:ecto, "~> 2.1", optional: true},
       {:postgrex, "~> 0.13", optional: true},
       {:gettext, "~> 0.11"},
-      {:cowboy, "~> 1.0"},
+      {:cowboy, ">= 1.0.0"},
       {:erlexec, "~> 1.7", runtime: false},
       {:decorator, "~> 1.2"},
       {:temp, "~> 0.4"},

@@ -29,6 +29,8 @@
 
 .container-fluid * {
   background: inherit;
+  -webkit-box-orient: unset;
+  -webkit-box-direction: unset;
 }
 
 @import "reset-and-normalize";

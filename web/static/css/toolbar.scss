@@ -17,11 +17,27 @@
   @import "xterm/dist/xterm";
   @import "xterm/dist/addons/fullscreen/fullscreen";
 
+  // force text classes
+  @import "_text_emphasis";
+  @include text-emphasis-variant-bt4('.text-primary', $brand-primary);
+  @include text-emphasis-variant-bt4('.text-success', $state-success-text);
+  @include text-emphasis-variant-bt4('.text-info', $state-info-text);
+  @include text-emphasis-variant-bt4('.text-warning', $state-warning-text);
+  @include text-emphasis-variant-bt4('.text-danger', $state-danger-text);
+
   // TOOLBAR
 
   .navbar {
     min-height: 30px;
     height: 30px;
+
+    .container-fluid {
+      display: block;
+    }
+  }
+
+  .navbar-nav {
+    display: block;
   }
 
   .navbar-nav.nav > li > span {
