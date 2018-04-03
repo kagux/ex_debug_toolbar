@@ -147,6 +147,7 @@ To change configuration, update `:ex_debug_toolbar` config key in your `config/d
 | remove_glob_params | boolean | true                                                                                         | `Plug.Router` adds `glob` params to `conn.params` and `conn.path_params` on `forward`. This option removes them     |
 | ignore_paths       | list    | [~r{^/images/}, ~r{^/css/}, ~r{^/js/}, ~r{^/phoenix/live_reload/}]                           | A list of paths that should not be recorded by toolbar. Each item can be either string for exact match or a Regex.  |
 | debug              | boolean | false                                                                                        | Toggles debug logs. Requires recompilation for some logs                                                            |
+| requests_limit     | integer | 30                                                                                           | Number of requests to keep in history                                                                               |
 
 
 # Troubleshooting

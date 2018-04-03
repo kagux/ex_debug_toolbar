@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Developer Dashboard</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="<%= static_path(@conn, "/css/dashboard.css") %>">
+  </head>
+  <body class="hold-transition skin-yellow sidebar-mini">
+    <div class="wrapper">
+
+      <!-- Main Header -->
+      <header class="main-header">
+
+        <!-- Logo -->
+        <a href="<%= request_path(@conn, :index) %>" class="logo">
+          <!-- mini logo for sidebar mini 50x50 pixels -->
+          <span class="logo-mini"><b>E</b>D<b>T</b></span>
+          <!-- logo for regular state and mobile devices -->
+          <span class="logo-lg"><b>Ex</b>Debug<b>Toolbar</b></span>
+        </a>
+
+        <!-- Header Navbar -->
+        <nav class="navbar navbar-static-top" role="navigation">
+          <!-- Sidebar toggle button-->
+          <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+            <span class="sr-only">Toggle navigation</span>
+          </a>
+        </nav>
+      </header>
+      <!-- Left side column. contains the logo and sidebar -->
+      <aside class="main-sidebar">
+
+        <!-- sidebar: style can be found in sidebar.less -->
+        <section class="sidebar">
+
+          <!-- Sidebar Menu -->
+          <ul class="sidebar-menu" data-widget="tree">
+            <li class="header"> Dashboard </li>
+            <li>
+              <a href="<%= request_path(@conn, :index) %>">
+                <i class="fa fa-bar-chart"></i> <span>History</span>
+                <span class="pull-right-container">
+                  <small id="requests-count" class="label pull-right bg-blue"><%= ExDebugToolbar.get_requests_count() %> </small>
+                </span>
+              </a>
+            </li>
+          </ul>
+          <!-- /.sidebar-menu -->
+        </section>
+        <!-- /.sidebar -->
+      </aside>
+
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            <%= @view_module.header(@conn) %>
+            <small> <%= @view_module.description(@conn) %> </small>
+          </h1>
+          <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+            <li class="active">History</li>
+          </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content container-fluid">
+          <div class="row">
+            <%= render @view_module, @view_template, assigns %>
+          </div>
+        </section>
+        <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+
+      <!-- Main Footer -->
+      <footer class="main-footer">
+        <!-- To the right -->
+        <div class="pull-right hidden-xs">
+          <strong>
+            <%= link version(), to: "https://hexdocs.pm/ex_debug_toolbar/ExDebugToolbar.html#content", target: :new %>
+          </strong>
+        </div>
+        <!-- Default to the left -->
+        Found an issue? <a href="https://github.com/kagux/ex_debug_toolbar/issues" target="_blank"> Submit it! </a>
+      </footer>
+    </div>
+    <!-- ./wrapper -->
+
+    <script>
+      window.ExDebugToolbar = {
+        debug: <%= if ExDebugToolbar.Config.debug?(), do: "true", else: "false" %>
+      };
+    </script>
+    <script src="<%= static_path(@conn, "/js/dashboard.js") %>"></script>
+  </body>
+</html>

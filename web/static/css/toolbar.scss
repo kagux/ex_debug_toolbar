@@ -1,9 +1,18 @@
+// has to be defined at root level
+@font-face {
+  font-family: 'FontAwesome';
+  src: url("../fonts/fontawesome-webfont.eot?v=4.7.0");
+  src: url("../fonts/fontawesome-webfont.eot?#iefix&v=4.7.0") format("embedded-opentype"), url("../fonts/fontawesome-webfont.woff2?v=4.7.0") format("woff2"), url("../fonts/fontawesome-webfont.woff?v=4.7.0") format("woff"), url("../fonts/fontawesome-webfont.ttf?v=4.7.0") format("truetype"), url("../fonts/fontawesome-webfont.svg?v=4.7.0#fontawesomeregular") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
 #ex-debug-toolbar {
   $panel-max-height: 200px;
 
   @import "_reset";
 
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  // font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 1.42857;
   color: #333333;
@@ -11,9 +20,16 @@
 
   // namespacing to avoid conflicts
   @import "bootstrap";
+  @import 'font-awesome';
+
+  @import 'dashboard/fonts';
+  @import 'admin-lte/dist/css/AdminLTE';
+  @import 'admin-lte/dist/css/skins/skin-yellow';
+
   @import "prismjs/themes/prism";
   @import "prismjs/plugins/line-numbers/prism-line-numbers";
   @import "prismjs/plugins/line-highlight/prism-line-highlight";
+
   @import "xterm/dist/xterm";
   @import "xterm/dist/addons/fullscreen/fullscreen";
 
@@ -193,13 +209,12 @@
       cursor: default;
     }
 
-    &.prev-request {
+    &.invisible-row {
       display: none;
     }
 
-    .history-collapse {
+    .rows-collapse {
       display: none;
     }
   }
-
 }

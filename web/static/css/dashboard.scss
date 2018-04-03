@@ -1,0 +1,34 @@
+@import 'bootstrap';
+@import 'font-awesome';
+
+@import 'dashboard/fonts';
+@import 'admin-lte/dist/css/AdminLTE';
+@import 'admin-lte/dist/css/skins/skin-yellow';
+
+@import "prismjs/themes/prism";
+@import "prismjs/plugins/line-numbers/prism-line-numbers";
+@import "prismjs/plugins/line-highlight/prism-line-highlight";
+
+.invisible-row {
+  display: none;
+}
+
+.rows-collapse {
+  display: none;
+}
+
+#requests-history tr {
+  cursor: pointer;
+}
+
+.box-body .progress {
+  margin-bottom: 0px;
+}
+
+.progress > .progress-bar {
+  border-radius: 0;
+}
+
+td.duration {
+  min-width: 200px;
+}

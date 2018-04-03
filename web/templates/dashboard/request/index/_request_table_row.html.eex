@@ -1,0 +1,27 @@
+<tr class="<%= history_row_color(@request.conn) %>" id="<%= @request.uuid %>">
+  <td class="nowrap">
+    <span class="label label-<%= conn_status_color_class(@request.conn) %>"><%= @request.conn.status %></span>
+  </td>
+  <td class="nowrap"><%= @request.conn.method %></td>
+  <td class="nowrap"><%= @request.conn.request_path %></td>
+  <td class="nowrap duration">
+    <div class="row">
+      <div class="col-lg-2">
+        <%= native_time_to_string(@request.timeline.duration) %>
+      </div>
+      <div class="col-lg-10">
+        <div class="progress progress-sm">
+          <%= for {group, duration, percentage, color} <- group_events_own_durations(@request.timeline) do %>
+            <div class="<%= color %> progress-bar"
+                 style="width: <%= percentage %>%"
+                 data-toggle="tooltip"
+                 title="<%= group %> <%= percentage %>% - <%= native_time_to_string(duration) %>">
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </td>
+  <td class="nowrap"><%= controller_action(@request.conn) %></td>
+  <td class="nowrap"><%= datetime_to_string(@request.created_at) %></td>
+</tr>

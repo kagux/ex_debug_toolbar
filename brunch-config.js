@@ -2,13 +2,16 @@ exports.config = {
   // See http://brunch.io/#documentation for docs.
   files: {
     javascripts: {
-      joinTo: {
-        "js/toolbar.js": /^(web\/static\/js\/toolbar)|^node_modules/,
+      // build output file based on required dependencies in entrypoint
+      entryPoints: {
+        "web/static/js/dashboard.js": "js/dashboard.js",
+        "web/static/js/toolbar.js": "js/toolbar.js",
       }
     },
     stylesheets: {
       joinTo: {
         "css/toolbar.css": /^(web\/static\/css\/toolbar)|^node_modules/,
+        "css/dashboard.css": /^(web\/static\/css\/dashboard)|^node_modules/,
       },
       order: {
         after: /prism/
@@ -45,7 +48,10 @@ exports.config = {
       ignore: [/web\/static\/vendor/]
     },
     copycat:{
-      "fonts" : ["node_modules/bootstrap-sass/assets/fonts"],
+      "fonts" : [
+        "node_modules/bootstrap-sass/assets/fonts",
+        "node_modules/font-awesome/fonts"
+      ],
       verbose : true, //shows each file that is copied to the destination directory
       onlyChanged: true //only copy a file if it's modified time has changed (only effective when using brunch watch)
     },
@@ -54,6 +60,7 @@ exports.config = {
         mode: 'ruby',
         includePaths: [
           'node_modules/bootstrap-sass/assets/stylesheets/',
+          'node_modules/font-awesome/scss/',
           'node_modules/css-reset-and-normalize-sass/scss/',
           'node_modules/'
         ],
@@ -66,7 +73,8 @@ exports.config = {
 
   modules: {
     autoRequire: {
-      "js/toolbar.js": ["web/static/js/toolbar"]
+      "js/toolbar.js": ["web/static/js/toolbar"],
+      "js/dashboard.js": ["web/static/js/dashboard"]
     }
   },
 

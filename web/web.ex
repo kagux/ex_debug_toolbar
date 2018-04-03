@@ -30,6 +30,12 @@ defmodule ExDebugToolbar.Web do
       import ExDebugToolbar.ErrorHelpers
       import ExDebugToolbar.Gettext
       import ExDebugToolbar.View.Helpers.TimeHelpers
+      import ExDebugToolbar.View.Helpers.TimelineHelpers
+      import ExDebugToolbar.View.Helpers.ConnHelpers
+      import ExDebugToolbar.View.Helpers.HistoryHelpers
+
+      alias ExDebugToolbar.Data.Timeline
+      alias ExDebugToolbar.Breakpoint 
     end
   end
 
@@ -46,6 +52,7 @@ defmodule ExDebugToolbar.Web do
 
       use Phoenix.Channel, log_join: @log_level, log_handle_in: @log_level
       import ExDebugToolbar.Gettext
+      alias ExDebugToolbar.Channel.Helpers.PayloadHelpers
     end
   end
 

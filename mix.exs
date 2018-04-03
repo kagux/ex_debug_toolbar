@@ -4,8 +4,8 @@ defmodule ExDebugToolbar.Mixfile do
 
   def project do
     [app: :ex_debug_toolbar,
+     elixir: "~> 1.5",
      version: "0.5.0",
-     elixir: "~> 1.4",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext, :ex_debug_toolbar] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
@@ -61,7 +61,8 @@ defmodule ExDebugToolbar.Mixfile do
       {:erlexec, "~> 1.7", runtime: false},
       {:decorator, "~> 1.2"},
       {:temp, "~> 0.4"},
-      {:ex_doc, ">= 0.0.0", only: :dev}
+      {:ex_doc, ">= 0.0.0", only: :dev},
+      {:benchee, "~> 0.9", optional: true, only: :dev}
     ]
   end
 end

@@ -20,4 +20,11 @@ defmodule ExDebugToolbar.View.Helpers.TimeHelpersTest do
       assert TimeHelpers.native_time_to_string(nil) == "N/A"
     end
   end
+
+  describe "datetime_to_string/1" do
+    test "rounds naive datetime up to seconds" do
+      {:ok, datetime} = NaiveDateTime.new(2017, 3, 15, 14, 15, 20, {1, 1})
+      assert TimeHelpers.datetime_to_string(datetime) == "2017-03-15 14:15:20"
+    end
+  end
 end

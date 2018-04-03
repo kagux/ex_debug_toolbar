@@ -1,19 +1,17 @@
 <span class="toolbar-item" data-toggle="panel">
   <i class="glyphicon glyphicon-hdd" aria-hidden="true"></i>
-  <%= length @queries %>
+  <%= length(@queries.inline) + length(@queries.parallel) %>
 </span>
 <div class="panel panel-default navbar-fixed-bottom">
   <div class="panel-heading">
     <h3 class="panel-title">Ecto Queries</h3>
   </div>
   <div class="panel-body">
-    <% inline_queries = ecto_inline_queries(@queries) %>
-    <% parallel_queries = ecto_parallel_queries(@queries) %>
-    <%= if length(inline_queries) > 0 do %>
-      <%= render "show/ecto/_queries.html", caption: "Queries executed inline", queries: inline_queries %>
+    <%= unless @queries.inline == [] do %>
+      <%= render "show/ecto/_queries.html", caption: "Queries executed inline", queries: @queries.inline %>
     <% end %>
-    <%= if length(parallel_queries) > 0 do %>
-      <%= render "show/ecto/_queries.html", caption: "Queries executed in a different process", queries: parallel_queries %>
+    <%= unless @queries.parallel == [] do %>
+      <%= render "show/ecto/_queries.html", caption: "Queries executed in a different process", queries: @queries.parallel %>
     <% end %>
   </div>
-</divecto>
+</div>

@@ -1,13 +1,13 @@
 <span class="toolbar-item" data-toggle="panel" data-title="All Requests">
   <i class="glyphicon glyphicon-list-alt" aria-hidden="true"></i>
-  <%= length @history %>
+  <%= ExDebugToolbar.get_requests_count()  %>
 </span>
 <div class="panel panel-default navbar-fixed-bottom">
   <div class="panel-heading">
     <h3 class="panel-title">History</h3>
   </div>
   <div class="panel-body">
-    <table class="table table-hover table-condensed">
+    <table id="history-table" class="table table-hover table-condensed">
       <caption>List of historical requests. <i>Click on a row to load request in the toolbar</i></caption>
       <thead>
         <th> Method </th>
@@ -16,32 +16,19 @@
         <th> Response Code </th>
         <th> Duration </th>
         <th> Timestamp </th>
-        <th>  </th>
       </thead>
       <tbody>
-        <%= for group <- collapse_history(@history)do %>
-          <%= for {request, i} <- group |> Enum.with_index do %>
-            <tr class="<%= history_row_color(request.conn) %> <%= history_row_collapse_class(i) %> history-point" data-uuid="<%= request.uuid %>">
-              <td class="nowrap"><%= request.conn.method %></td>
-              <td class="nowrap"><%= request.conn.request_path %></td>
-              <td class="nowrap"><%= controller_action(request.conn) %></td>
-              <td class="nowrap">
-                <span class="label label-<%= conn_status_color_class(request.conn) %>"><%= request.conn.status %></span>
-              </td>
-              <td class="nowrap"><%= native_time_to_string(request.timeline.duration) %></td>
-              <td class="nowrap"><%= request.created_at %></td>
-              <td class="nowrap">
-                <%= if i == 0 and length(group) > 1 do %>
-                  <a href='#' class="history-expand">
-                    <i class="glyphicon glyphicon-collapse-down"></i> expand <%= length(group) %> similar
-                  </a>
-                  <a href='#' class="history-collapse">
-                    <i class="glyphicon glyphicon-collapse-up"></i> collapse <%= length(group) %> similar
-                  </a>
-                <% end %>
-               </td>
-            </tr>
-          <% end %>
+        <%= for request <- @history do %>
+          <tr class="<%= history_row_color(request.conn) %> history-point" data-uuid="<%= request.uuid %>">
+            <td class="nowrap"><%= request.conn.method %></td>
+            <td class="nowrap"><%= request.conn.request_path %></td>
+            <td class="nowrap"><%= controller_action(request.conn) %></td>
+            <td class="nowrap">
+              <span class="label label-<%= conn_status_color_class(request.conn) %>"><%= request.conn.status %></span>
+            </td>
+            <td class="nowrap"><%= native_time_to_string(request.timeline.duration) %></td>
+            <td class="nowrap"><%= request.created_at %></td>
+          </tr>
         <% end %>
       </tbody>
     </table>

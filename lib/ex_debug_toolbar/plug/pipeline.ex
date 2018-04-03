@@ -12,6 +12,7 @@ defmodule ExDebugToolbar.Plug.Pipeline do
     ~r{^/images/},
     ~r{^/css/},
     ~r{^/js/},
-    ~r{^/phoenix/live_reload/}
+    ~r{^/phoenix/live_reload/},
+    ~r{^/favicon.ico$}
   ]
 end

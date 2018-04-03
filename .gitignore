@@ -24,3 +24,4 @@ erl_crash.dump
 /config/prod.secret.exs
 /tmp
 /doc
+.DS_Store

@@ -1,0 +1,17 @@
+<div class="box <%= if @requests == [], do: "hidden" %>" id="requests-history-container">
+  <div class="box-body table-responsive no-padding">
+    <table id="requests-history" class="table table-hover">
+      <thead>
+        <th> Status </th>
+        <th> Method </th>
+        <th> Path </th>
+        <th> Duration </th>
+        <th> Controller </th>
+        <th> Timestamp </th>
+      </thead>
+      <tbody>
+        <%= render_many @requests, ExDebugToolbar.Dashboard.RequestView, "index/_request_table_row.html", as: :request %>
+      </tbody>
+    </table>
+  </div>
+</div>

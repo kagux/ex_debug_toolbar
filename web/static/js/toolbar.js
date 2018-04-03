@@ -1,14 +1,9 @@
 import {Socket} from 'phoenix';
-import $ from './toolbar/jquery';
-import Logger from './toolbar/logger';
+import $ from './lib/jquery';
+import Logger from './lib/logger';
 import BreakpointsPanel from './toolbar/breakpoints_panel';
 import HistoryPanel from './toolbar/history_panel';
-import Prism from 'prismjs';
-import 'prismjs/components/prism-elixir';
-import 'prismjs/components/prism-sql';
-import 'prismjs/plugins/normalize-whitespace/prism-normalize-whitespace';
-import 'prismjs/plugins/line-numbers/prism-line-numbers';
-import 'prismjs/plugins/line-highlight/prism-line-highlight';
+import Highlight from './lib/highlight';
 
 class App {
   constructor(opts) {
@@ -19,6 +14,7 @@ class App {
     this.toolbar = $("<div>", {id: "ex-debug-toolbar"});
     this.breakpointsPanel = new BreakpointsPanel(this.socket, this.toolbar);
     this.historyPanel = new HistoryPanel(this.toolbar, this.originalRequestId, this.render.bind(this));
+    this.highlight = new Highlight;
     $("body").append(this.toolbar);
   }
 
@@ -43,7 +39,7 @@ class App {
       this.logger.debug('Unable to join channel', resp)
     });
 
-    channel.on("request:ready", this.onChannelResponse.bind(this));
+    channel.on("request:created", this.onChannelResponse.bind(this));
   }
 
   onChannelResponse(response){
@@ -67,7 +63,7 @@ class App {
     this.renderPopovers(this.toolbar);
     this.breakpointsPanel.render(uuid);
     this.historyPanel.render(uuid);
-    this.highlightCode(this.toolbar);
+    this.highlight.render(this.toolbar);
   }
 
   renderPanels(toolbar) {
@@ -117,19 +113,6 @@ class App {
       panel.data('panel-id', id);
     }
     return panel.data('panel-id');
-  }
-
-  highlightCode(toolbar) {
-    Prism.plugins.NormalizeWhitespace.setDefaults({
-      'remove-trailing': true,
-      'remove-indent': true,
-      'left-trim': true,
-      'right-trim': true,
-      'remove-initial-line-feed': true,
-    });
-    toolbar.find(".code").each((i, el) => {
-      Prism.highlightElement(el, false)
-    })
   }
 
   renderPopovers(toolbar) {

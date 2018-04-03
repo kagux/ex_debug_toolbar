@@ -6,6 +6,7 @@ defmodule ExDebugToolbar.UserSocket do
   ## Channels
   channel "toolbar:*", ExDebugToolbar.ToolbarChannel
   channel "breakpoint:*", ExDebugToolbar.BreakpointChannel
+  channel "dashboard:*", ExDebugToolbar.DashboardChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

@@ -9,14 +9,16 @@ defmodule ExDebugToolbar.ToolbarViewTest do
 
   describe "rendering" do
     test "it renders toolbar without errors" do
-      assert %Request{} |> render |> is_bitstring
+      assert %Request{uuid: 1} |> render |> is_bitstring
     end
 
     test "it renders toolbar with logs without errors" do
-      request = %Request{logs: [%LogEntry{
-        level: :info,
-        message: ["GET", 32, "/"],
-        timestamp: {{2017, 6, 1}, {21, 44, 11, 482}}
+      request = %Request{
+        uuid: 1,
+        logs: [%LogEntry{
+          level: :info,
+          message: ["GET", 32, "/"],
+          timestamp: {{2017, 6, 1}, {21, 44, 11, 482}}
       }]}
       assert request |> render |> is_bitstring
     end
@@ -38,7 +40,7 @@ defmodule ExDebugToolbar.ToolbarViewTest do
         }}
       }
       duration = 15000
-      request = %Request{ecto: [{log_entry, duration, :inline}]}
+      request = %Request{uuid: 1, ecto: [{log_entry, duration, :inline}]}
       assert request |> render |> is_bitstring
     end
 
@@ -52,7 +54,7 @@ defmodule ExDebugToolbar.ToolbarViewTest do
         result: {:ok, %Postgrex.Result{}}
       }
       duration = 15000
-      request = %Request{ecto: [{log_entry, duration, :inline}]}
+      request = %Request{uuid: 1, ecto: [{log_entry, duration, :inline}]}
       assert request |> render |> is_bitstring
     end
 
@@ -72,7 +74,7 @@ defmodule ExDebugToolbar.ToolbarViewTest do
           }]
         }]
       }
-      request = %Request{timeline: timeline}
+      request = %Request{uuid: 1, timeline: timeline}
       assert request |> render |> is_bitstring
     end
 
@@ -84,7 +86,7 @@ defmodule ExDebugToolbar.ToolbarViewTest do
           duration: 5,
           }]
       }
-      request = %Request{timeline: timeline}
+      request = %Request{uuid: 1, timeline: timeline}
       assert request |> render |> is_bitstring
     end
 
@@ -98,78 +100,18 @@ defmodule ExDebugToolbar.ToolbarViewTest do
         binding: binding(),
         inserted_at: NaiveDateTime.utc_now
       }
-      assert %Request{} |> render(breakpoints: [breakpoint]) |> is_bitstring
+      assert %Request{uuid: 1} |> render(breakpoints: [breakpoint]) |> is_bitstring
     end
 
     test "it renders toolbar when conn has no layout" do
-      assert %Request{conn: %Conn{assigns: %{layout: false}}} |> render |> is_bitstring
+      assert %Request{uuid: 1, conn: %Conn{assigns: %{layout: false}}} |> render |> is_bitstring
     end
 
     test "it renders toolbar when conn has no assigns" do
-      assert %Request{conn: %Conn{assigns: nil}} |> render |> is_bitstring
+      assert %Request{uuid: 1, conn: %Conn{assigns: nil}} |> render |> is_bitstring
     end
   end
 
-  describe "#conn_status_color_class/1" do
-    test "it converts conn status to color label" do
-      assert ToolbarView.conn_status_color_class(%Conn{status: 101}) == "info"
-      assert ToolbarView.conn_status_color_class(%Conn{status: 200}) == "success"
-      assert ToolbarView.conn_status_color_class(%Conn{status: 500}) == "danger"
-      assert ToolbarView.conn_status_color_class(%Conn{status: nil}) == "danger"
-    end
-  end
-
-  describe "#history_row_color/1" do
-    test "it sets color according to connection status" do
-      assert ToolbarView.history_row_color(%Conn{status: 200}) == nil
-      assert ToolbarView.history_row_color(%Conn{status: 101}) == "info"
-      assert ToolbarView.history_row_color(%Conn{status: nil}) == "danger"
-    end
-  end
-
-  describe "#collapse_history/1" do
-    @conn %Conn{status: 200, method: "get", request_path: "/path"}
-    @request %Request{uuid: 1, conn: @conn}
-
-    test "groups similar consequent requests by status" do
-      other_request = %{@request | uuid: 2, conn: %{@conn | status: 404}}
-      history = [@request, other_request, other_request, @request]
-      collapsed_history = [[@request], [other_request, other_request], [@request]] |> to_uuid
-
-      assert history |> ToolbarView.collapse_history |> to_uuid == collapsed_history
-    end
-
-    test "groups similar consequent requests by method" do
-      other_request = %{@request | uuid: 2, conn: %{@conn | method: "post"}}
-      history = [@request, other_request, other_request, @request]
-      collapsed_history = [[@request], [other_request, other_request], [@request]] |> to_uuid
-
-      assert history |> ToolbarView.collapse_history |> to_uuid == collapsed_history
-    end
-
-    test "it group similar requests by path" do
-      other_request = %{@request | uuid: 2, conn: %{@conn | request_path: "/other"}}
-      history = [@request, @request, other_request, other_request]
-      collapsed_history = [[@request, @request], [other_request, other_request]] |> to_uuid
-
-      assert history |> ToolbarView.collapse_history |> to_uuid == collapsed_history
-    end
-  end
-
-  describe "history_row_collapse_class/1" do
-    test "it is not collapsed for first row" do
-      assert ToolbarView.history_row_collapse_class(0) == "last-request"
-    end
-
-    test "it is collapsed and with a group number for other rows" do
-      assert ToolbarView.history_row_collapse_class(1) == "prev-request"
-    end
-  end
-
-  defp to_uuid(requests) when is_list(requests) do
-    requests |> Enum.map(&to_uuid/1)
-  end
-  defp to_uuid(%Request{uuid: uuid}), do: uuid
 
   defp render(request, opts \\ []) do
     assigns = [

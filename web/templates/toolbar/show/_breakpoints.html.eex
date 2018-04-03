@@ -19,7 +19,7 @@
           <tbody>
             <%= for {_id, breakpoint} <- @breakpoints.entries do %>
               <tr
-               data-breakpoint-id="<%= to_string(breakpoint_uuid(@request, breakpoint)) %>"
+               data-breakpoint-id="<%= @request |> Breakpoint.get_uuid(breakpoint) |> to_string() %>"
                class="breakpoint pointer">
                 <td><%= breakpoint.inserted_at %></td>
                 <td><%= breakpoint.file %></td>
@@ -28,8 +28,8 @@
                   <div class="hidden code-snippet">
                     <p class="text-warning"> Click on current row to open IEx session </p>
                     <pre class="language-elixir line-numbers"
-                         data-start="<%= breakpoint_code_snippet_start_line(breakpoint) %>"
-                         data-line="<%= breakpoint_relative_line(breakpoint) %>">
+                         data-start="<%= Breakpoint.get_code_snippet_start_line(breakpoint) %>"
+                         data-line="<%= Breakpoint.get_relative_line(breakpoint) %>">
                       <code class="code">
                         <%= for {line_text, _} <- breakpoint.code_snippet, do: line_text %>
                       </code>
@@ -38,7 +38,7 @@
                   <div class="hidden binding-popover">
                     List of available bound variable names:
                     <ul class="list-unstyled">
-                      <%= for key <- breakpoint_sorted_binding(breakpoint) do %>
+                      <%= for key <- Breakpoint.get_sorted_binding(breakpoint) do %>
                         <li> <%= key %> </li>
                       <% end %>
                     </ul>

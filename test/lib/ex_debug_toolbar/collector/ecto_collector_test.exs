@@ -128,9 +128,8 @@ defmodule ExDebugToolbar.Collector.EctoCollectorTest do
       assert context.request.ecto |> length > 0
     end
 
-    test "it adds this query to timeline without duration", context do
-      assert context.request.timeline.events |> length == 1
-      assert context.request.timeline.duration == 10
+    test "it does not add this query to timeline", context do
+      assert context.request.timeline.events == []
     end
 
     test "it marks query as parallel", context do

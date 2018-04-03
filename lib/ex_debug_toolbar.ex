@@ -36,7 +36,7 @@ defmodule ExDebugToolbar do
   @spec stop_request(id) :: ok
   @decorate noop_when_toolbar_disabled()
   def stop_request(id) do
-    :ok = RequestRepo.update(id, &(%{&1 | stopped?: true}), async: false)
+    :ok = RequestRepo.stop(id)
   end
 
   @doc """
@@ -44,18 +44,23 @@ defmodule ExDebugToolbar do
   """
   @spec delete_request(uuid) :: ok
   @decorate noop_when_toolbar_disabled()
-  def delete_request(uuid) do
-    RequestRepo.delete(uuid)
-  end
+  defdelegate delete_request(uuid), to: RequestRepo, as: :delete
+
+  @doc """
+  Returns total number of tracked requests
+
+  *Note*: this count excludes requests in progress
+  """
+  @spec get_requests_count :: integer
+  @decorate noop_when_toolbar_disabled(0)
+  defdelegate get_requests_count, to: RequestRepo, as: :stopped_count
 
   @doc """
   Returns request matching provided `id`, which defaults to `self()`
   """
   @spec get_request(id) :: Request.t()
   @decorate noop_when_toolbar_disabled()
-  def get_request(id \\ self()) do
-    RequestRepo.get(id)
-  end
+  defdelegate get_request(id \\ self()), to: RequestRepo, as: :get
 
   @doc """
   Returns the breakpoint
@@ -74,9 +79,7 @@ defmodule ExDebugToolbar do
   """
   @spec get_all_requests() :: [Request.t()]
   @decorate noop_when_toolbar_disabled([])
-  def get_all_requests do
-    RequestRepo.all
-  end
+  defdelegate get_all_requests, to: RequestRepo, as: :all
 
   @doc """
   Starts a timeline event `name` in request identified by `id`, which defaults to `self()`

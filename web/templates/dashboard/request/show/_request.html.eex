@@ -1,0 +1,96 @@
+<div class="row">
+  <div class="col-xs-12">
+    <div class="box box-solid">
+      <div class="box-body">
+        <div class="row">
+          <div class="col-xs-6">
+            <dl class="dl-horizontal">
+              <dt>Status</dt>
+              <dd>
+              <span class="label label-<%= conn_status_color_class(@request.conn) %>"><%= @request.conn.status %></span>
+              </dd>
+              <dt>Duration</dt>
+              <dd><%= native_time_to_string(@request.timeline.duration) %></dd>
+              <dt>Path</dt>
+              <dd><%= @request.conn.request_path %></dd>
+            </dl>
+          </div>
+          <div class="col-xs-6">
+            <dl class="dl-horizontal">
+              <dt>Method</dt>
+              <dd><%= @request.conn.method %></dd>
+              <dt>Controller</dt>
+              <dd><%= controller_action(@request.conn) %></dd>
+              <dt>Timestamp</dt>
+              <dd><%= datetime_to_string(@request.created_at) %></dd>
+            </dl>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12">
+            <%= render "show/_duration_breakdown.html", timeline: @request.timeline %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12">
+    <div class="nav-tabs-custom">
+      <ul class="nav nav-tabs">
+        <li class="active">
+          <a href="#overview-tab" data-toggle="tab" aria-expanded="true">
+            <i class="fa fa-heartbeat" aria-hidden="true"></i>&nbsp;Overview
+          </a>
+        </li>
+        <li>
+          <a href="#tab_3" data-toggle="tab" aria-expanded="false">
+            <i class="fa fa-database" aria-hidden="true"></i>&nbsp;Ecto
+          </a>
+        </li>
+        <li>
+          <a href="#tab_3" data-toggle="tab" aria-expanded="false">
+            <i class="fa fa-file-text-o" aria-hidden="true"></i>&nbsp;Templates
+          </a>
+        </li>
+        <li>
+          <a href="#tab_3" data-toggle="tab" aria-expanded="false">
+            <i class="fa fa-stop-circle" aria-hidden="true"></i>&nbsp;Breakpoints
+          </a>
+        </li>
+        <li>
+          <a href="#tab_3" data-toggle="tab" aria-expanded="false">
+            <i class="fa fa-book" aria-hidden="true"></i>&nbsp;Logs
+          </a>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane active" id="overview-tab">
+            <%= render "show/_overview.html", conn: @request.conn %>
+        </div>
+        <div class="tab-pane" id="tab_2">
+          The European languages are members of the same family. Their separate existence is a myth.
+          For science, music, sport, etc, Europe uses the same vocabulary. The languages only differ
+          in their grammar, their pronunciation and their most common words. Everyone realizes why a
+          new common language would be desirable: one could refuse to pay expensive translators. To
+          achieve this, it would be necessary to have uniform grammar, pronunciation and more common
+          words. If several languages coalesce, the grammar of the resulting language is more simple
+          and regular than that of the individual languages.
+        </div>
+        <!-- /.tab-pane -->
+        <div class="tab-pane" id="tab_3">
+          Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+          Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+          when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+          It has survived not only five centuries, but also the leap into electronic typesetting,
+          remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset
+          sheets containing Lorem Ipsum passages, and more recently with desktop publishing software
+          like Aldus PageMaker including versions of Lorem Ipsum.
+        </div>
+        <!-- /.tab-pane -->
+      </div>
+      <!-- /.tab-content -->
+    </div>
+  </div>
+</div>

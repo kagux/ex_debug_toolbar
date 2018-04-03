@@ -7,20 +7,17 @@
     </div>
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <%= unless ExDebugToolbar.Data.Timeline.empty? @request.timeline do %>
-          <li> <%= render "show/_timeline.html", timeline: @request.timeline %> </li>
-        <% end %>
-        <li> <%= render "show/_conn.html", request_conn: @request.conn, timeline: @request.timeline %> </li>
-        <%= unless Enum.empty? @request.logs do %>
+        <li> <%= render "show/_overview.html", request: @request %> </li>
+        <%= unless @request.logs == [] do %>
           <li> <%= render "show/_logs.html", logs: @request.logs %> </li>
         <% end %>
-        <%= unless Enum.empty? @request.ecto do %>
-          <li> <%= render "show/_ecto.html", queries: @request.ecto %> </li>
+        <%= unless @request.ecto == [] do %>
+          <li> <%= render "show/_ecto.html", queries: ExDebugToolbar.Request.Ecto.split_inline_and_parallel_queries(@request.ecto) %> </li>
         <% end %>
-        <%= unless Enum.empty? @request.breakpoints.entries do %>
+        <%= unless @request.breakpoints.entries == [] do %>
           <li> <%= render "show/_breakpoints.html", request: @request, breakpoints: @request.breakpoints %> </li>
         <% end %>
-        <%= unless Enum.empty? @history do %>
+        <%= unless @history == [] do %>
           <li> <%= render "show/_history.html", request: @request, history: @history %> </li>
         <% end %>
       </ul>

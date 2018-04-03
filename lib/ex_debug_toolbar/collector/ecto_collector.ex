@@ -7,7 +7,9 @@ if Code.ensure_compiled?(Ecto) do
     def log(%LogEntry{} = original_entry) do
       entry = original_entry |> remove_result_rows |> cast_params
       {id, duration, type} = parse_entry(entry)
-      ExDebugToolbar.add_finished_event(id, "ecto.query", duration)
+      if type == :inline do
+        ExDebugToolbar.add_finished_event(id, "ecto.query", duration)
+      end
       ExDebugToolbar.add_data(id, :ecto, {entry, duration, type})
       original_entry
     end
