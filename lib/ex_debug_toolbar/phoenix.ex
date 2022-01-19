@@ -31,7 +31,7 @@ defmodule ExDebugToolbar.Phoenix do
       @doc """
       Wrapper around app endpoint. After passing connection through
       toolbar's router we make a decision how to further process it.
-      Ignoring request in a toolbar works by not emiting `:ex_debug_toolbar` event
+      Ignoring request in a toolbar works by not emitting `:ex_debug_toolbar` event
       which creates new request in toolbar. The rest of data collection functions
       become effectively no-op for ignored requests.
       """

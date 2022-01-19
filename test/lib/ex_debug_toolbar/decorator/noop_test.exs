@@ -25,7 +25,7 @@ defmodule ExDebugToolbar.Decorator.NoopTest do
   end
 
   describe "noop_when_toolbar_disabled/1" do
-    test "does not modify function when toolbar is enalbed" do
+    test "does not modify function when toolbar is enabled" do
       Application.put_env(:ex_debug_toolbar, :enable, true)
       assert :ok = Dummy.toolbar_disabled()
     end
