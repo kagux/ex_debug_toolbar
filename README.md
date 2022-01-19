@@ -66,7 +66,7 @@ request (10 by default).
 ![Breakpoints](screenshots/breakpoints.png)
 
 A click on any breakpoint will take you to familiar `iex` session with context as it was at execution time.
-![Breakpoint Sesssion](screenshots/breakpoint_session.png)
+![Breakpoint Session](screenshots/breakpoint_session.png)
 
 
 # Installation
